@@ -1,0 +1,48 @@
+{
+  "ban": {
+    "add": {
+      "title": "封禁 UID",
+      "tipPre": "被封禁的 UID 将无法上传深渊/剧演记录，对应 ",
+      "tipSuf": "。",
+      "uidPlaceholder": "9-10 位数字 UID",
+      "reasonLabel": "封禁原因（可选）",
+      "reasonPlaceholder": "封禁原因",
+      "submit": "封禁"
+    },
+    "batch": {
+      "title": "批量封禁",
+      "tip": "每行或用空格/逗号分隔多个 9-10 位数字 UID，已存在的会自动跳过。",
+      "uidListLabel": "UID 列表",
+      "uidListPlaceholder": "多个 UID，换行或逗号分隔",
+      "reasonLabel": "封禁原因（可选）",
+      "reasonPlaceholder": "批量封禁原因",
+      "submit": "批量封禁"
+    },
+    "list": {
+      "title": "封禁列表",
+      "searchPlaceholder": "按 UID 搜索",
+      "search": "搜索",
+      "colReason": "原因",
+      "colBanTime": "封禁时间",
+      "colOp": "操作",
+      "unban": "解封"
+    },
+    "dialog": {
+      "unbanHeader": "解封确认",
+      "unbanBody": "确定解除对 UID {uid} 的封禁？",
+      "unbanConfirm": "解封"
+    },
+    "messages": {
+      "listFail": "获取封禁列表失败",
+      "uidFormat": "请输入 9-10 位数字 UID",
+      "banSuccess": "封禁成功",
+      "banFail": "封禁失败",
+      "emptyUids": "请输入至少一个 UID",
+      "invalidUids": "有 {count} 个 UID 格式不正确（应为 9-10 位数字），请检查",
+      "batchSuccess": "批量封禁成功",
+      "batchFail": "批量封禁失败",
+      "unbanSuccess": "解封成功",
+      "unbanFail": "解封失败"
+    }
+  }
+}

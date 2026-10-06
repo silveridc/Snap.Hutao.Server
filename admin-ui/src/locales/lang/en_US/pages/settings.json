@@ -1,0 +1,83 @@
+{
+  "settings": {
+    "header": {
+      "title": "System Settings",
+      "tip": "Dynamic configuration is stored in the database and takes precedence over appsettings.json. Leave a field empty to use the default value from the configuration file.",
+      "reload": "Reload",
+      "saveBtn": "Save Changes ({n})"
+    },
+    "sections": {
+      "global": {
+        "title": "Global Switches",
+        "description": "Controls overall system behavior. Changes take effect immediately."
+      },
+      "pizzaHelper": {
+        "title": "Genshin Pizza Helper",
+        "description": "Upstream configuration for Spiral Abyss data sync. Update here when the Cookie/Salt expires."
+      },
+      "afdian": {
+        "title": "Afdian SKU Mapping",
+        "description": "Product IDs used for order matching. Update here when products change."
+      },
+      "mail": {
+        "title": "Email Notifications",
+        "description": "Recipients of system diagnostic emails"
+      }
+    },
+    "fields": {
+      "maintenanceMode": {
+        "label": "Maintenance Mode",
+        "hint": "When enabled, all non-admin endpoints return a maintenance response"
+      },
+      "registrationEnabled": {
+        "label": "Allow Registration",
+        "hint": "When disabled, new users cannot register passport accounts"
+      },
+      "captchaEnabled": {
+        "label": "Enable Captcha",
+        "hint": "When disabled, login/registration no longer verifies reCaptcha"
+      },
+      "uidSalt": {
+        "label": "Uid Salt",
+        "hint": "Salt used for UID obfuscation"
+      },
+      "apiSalt": {
+        "label": "Api Salt",
+        "hint": "Salt used for request signing"
+      },
+      "avatarHolding": {
+        "label": "Avatar Holding Endpoint",
+        "hint": "AvatarHolding API address"
+      },
+      "spiralAbyss": {
+        "label": "Spiral Abyss Endpoint",
+        "hint": "SpiralAbyss API address"
+      },
+      "skuGachaLog": {
+        "label": "Wish Log SKU",
+        "hint": "SKU ID of the wish log service in Afdian orders"
+      },
+      "skuCdn": {
+        "label": "CDN Service SKU",
+        "hint": "SKU ID of the CDN service in Afdian 2 orders"
+      },
+      "diagnosticEmail": {
+        "label": "Diagnostic Email",
+        "hint": "Email address that receives system exception and order diagnostic notifications"
+      }
+    },
+    "form": {
+      "emptyPlaceholder": "Leave empty to use the default",
+      "resetTooltip": "Reset to default",
+      "reset": "Reset"
+    },
+    "messages": {
+      "loadFail": "Failed to load configuration",
+      "noChanges": "No changes",
+      "saveSuccess": "Saved successfully",
+      "saveFail": "Failed to save",
+      "resetSuccess": "Reset successfully",
+      "resetFail": "Failed to reset"
+    }
+  }
+}

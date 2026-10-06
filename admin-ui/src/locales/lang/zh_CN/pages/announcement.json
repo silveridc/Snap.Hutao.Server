@@ -1,0 +1,65 @@
+{
+  "announcement": {
+    "severity": {
+      "informational": "普通 (Informational)",
+      "success": "成功 (Success)",
+      "warning": "警告 (Warning)",
+      "error": "错误 (Error)",
+      "informationalShort": "普通",
+      "successShort": "成功",
+      "warningShort": "警告",
+      "errorShort": "错误"
+    },
+    "form": {
+      "title": "发布公告",
+      "tipPre": "对应 ",
+      "tipSuf": "。公告仅对携带版本号的胡桃客户端可见。",
+      "titleLabel": "标题",
+      "titlePlaceholder": "公告标题",
+      "severity": "严重级别",
+      "link": "跳转链接",
+      "linkPlaceholder": "可选，点击公告时跳转的 URL",
+      "maxVersion": "最高展示版本",
+      "maxVersionPlaceholder": "可选，如 1.17.1.0；仅低于该版本的客户端展示",
+      "content": "内容",
+      "contentPlaceholder": "公告正文",
+      "submit": "发布公告"
+    },
+    "list": {
+      "title": "公告列表",
+      "refresh": "刷新",
+      "colTitle": "标题",
+      "colSeverity": "级别",
+      "colMaxVersion": "最高展示版本",
+      "colEnabled": "状态",
+      "colUpdateTime": "更新时间",
+      "colOp": "操作"
+    },
+    "edit": {
+      "title": "编辑公告",
+      "linkPlaceholder": "可选",
+      "maxVersionPlaceholder": "可选，如 1.17.1.0"
+    },
+    "actions": {
+      "edit": "编辑",
+      "delete": "删除",
+      "save": "保存"
+    },
+    "dialog": {
+      "removeHeader": "删除公告",
+      "removeConfirmBody": "确定删除公告「{title}」（ID {id}）？"
+    },
+    "messages": {
+      "titleContentRequired": "请填写标题与内容",
+      "uploadSuccess": "公告上传成功",
+      "uploadFail": "上传失败",
+      "listFail": "获取公告列表失败",
+      "deleteSuccess": "删除成功",
+      "deleteFail": "删除失败",
+      "opSuccess": "操作成功",
+      "opFail": "操作失败",
+      "editSuccess": "编辑成功",
+      "editFail": "编辑失败"
+    }
+  }
+}

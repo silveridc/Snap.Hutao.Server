@@ -1,0 +1,61 @@
+{
+  "release": {
+    "current": {
+      "title": "Currently Active Version",
+      "version": "Version",
+      "publisher": "Publisher",
+      "publishedAt": "Published At",
+      "mirrors": "Mirrors",
+      "releaseNotes": "Release Notes"
+    },
+    "form": {
+      "title": "Publish New Version",
+      "tipPre": "Corresponds to ",
+      "tipSuf": ". The version is activated automatically after publishing, and the previous one becomes a historical version.",
+      "version": "Version",
+      "versionPlaceholder": "Four segments of numbers, e.g. 1.17.2.0",
+      "validation": "SHA-256 Checksum",
+      "validationPlaceholder": "64-character hexadecimal string",
+      "mirrors": "Download Mirrors",
+      "mirrorNamePlaceholder": "Mirror name",
+      "mirrorUrlPlaceholder": "HTTPS download URL",
+      "removeMirror": "Remove",
+      "addMirror": "Add Mirror",
+      "releaseNotes": "Release Notes",
+      "releaseNotesPlaceholder": "Optional, what is new in this version",
+      "submit": "Publish"
+    },
+    "list": {
+      "title": "Release History",
+      "refresh": "Refresh",
+      "colVersion": "Version",
+      "colMirrors": "Mirrors",
+      "colStatus": "Status",
+      "colPublisher": "Publisher",
+      "colPublishedAt": "Published At",
+      "colOp": "Actions",
+      "active": "Active",
+      "history": "History",
+      "current": "Current"
+    },
+    "actions": {
+      "activate": "Activate"
+    },
+    "dialog": {
+      "activateHeader": "Activate Historical Version",
+      "activateConfirmBody": "Set version {version} as the currently active version? The current active version will be replaced."
+    },
+    "messages": {
+      "versionRequired": "Please enter the version number",
+      "validationRequired": "Please enter the SHA-256 checksum",
+      "mirrorRequired": "Please add at least one download mirror",
+      "mirrorEmpty": "The name and URL of mirror {n} cannot be empty",
+      "publishSuccess": "Published successfully",
+      "publishFail": "Failed to publish",
+      "listFail": "Failed to load the release history",
+      "alreadyActive": "This version is already the currently active one",
+      "activateSuccess": "Activated successfully",
+      "activateFail": "Failed to activate"
+    }
+  }
+}

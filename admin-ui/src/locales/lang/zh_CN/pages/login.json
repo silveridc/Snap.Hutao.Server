@@ -1,0 +1,20 @@
+{
+  "login": {
+    "brand": "胡桃云",
+    "subtitle": "管理后台",
+    "tip": "请使用维护者账号登录",
+    "form": {
+      "emailPlaceholder": "账号邮箱",
+      "passwordPlaceholder": "登录密码",
+      "loginBtn": "登录"
+    },
+    "rules": {
+      "email": "请输入邮箱",
+      "password": "请输入密码"
+    },
+    "messages": {
+      "loginSuccess": "登录成功",
+      "loginFail": "登录失败"
+    }
+  }
+}

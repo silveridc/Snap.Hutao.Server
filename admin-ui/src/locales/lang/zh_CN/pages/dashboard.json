@@ -1,0 +1,43 @@
+{
+  "dashboard": {
+    "overview": {
+      "title": "系统数据概览",
+      "refresh": "刷新",
+      "noData": "暂无数据"
+    },
+    "stats": {
+      "totalUsers": "总用户数",
+      "maintainers": "维护者",
+      "licensedDevelopers": "开发者授权",
+      "activeGachaLogUsers": "祈愿服务在期",
+      "activeCdnUsers": "CDN 服务在期",
+      "bannedUids": "封禁 UID",
+      "gachaItemCount": "祈愿记录条数",
+      "abyssRecords": "深渊记录数",
+      "theaterRecords": "剧演记录数"
+    },
+    "account": {
+      "title": "账号信息",
+      "refresh": "刷新",
+      "email": "邮箱账号",
+      "maintainer": "维护者",
+      "licensedDeveloper": "开发者授权",
+      "gachaLogExpireAt": "祈愿记录服务到期",
+      "cdnExpireAt": "CDN 服务到期",
+      "yes": "是",
+      "no": "否"
+    },
+    "shortcuts": {
+      "title": "快捷操作",
+      "abyssStats": "触发深渊统计刷新",
+      "compensation": "补偿服务时长",
+      "announcement": "发布公告",
+      "redeem": "生成兑换码"
+    },
+    "messages": {
+      "statsFail": "获取统计失败",
+      "refreshed": "已刷新",
+      "refreshFail": "刷新失败"
+    }
+  }
+}

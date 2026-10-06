@@ -1,0 +1,49 @@
+{
+  "cache": {
+    "presets": {
+      "abyssStats": "Abyss Statistics",
+      "gachaDistribution": "Gacha Distribution",
+      "gachaEventStats": "Gacha Event Statistics",
+      "theaterStats": "Theater Mode Statistics",
+      "enka": "Enka Showcase",
+      "wallpaper": "Wallpapers",
+      "announcements": "Announcements",
+      "maintainer": "Maintainer Check",
+      "userStats": "User Statistics"
+    },
+    "quick": {
+      "title": "Quick Invalidation",
+      "tipPre": "Mark caches as expired in batch by preset patterns. Endpoint: ",
+      "tipSuf": ".",
+      "invalidateAll": "Clear All"
+    },
+    "custom": {
+      "title": "Custom Invalidation",
+      "keysLabel": "Exact keys (press Enter to add multiple)",
+      "keysPlaceholder": "e.g. GachaEventStatistics",
+      "patternsLabel": "Glob patterns (press Enter to add multiple)",
+      "patternsPlaceholder": "e.g. RoleCombatStatistics:*",
+      "submit": "Submit Invalidation"
+    },
+    "browse": {
+      "title": "Browse Cache Keys",
+      "patternPlaceholder": "glob pattern, default *",
+      "query": "Query",
+      "expireSelected": "Expire Selected ({count})",
+      "colKey": "Cache Key"
+    },
+    "dialog": {
+      "clearAllHeader": "Clear All Caches",
+      "clearAllBody": "All cache keys under this application's namespace (pattern *) are about to be deleted. Caches will be rebuilt from the database on next access. Continue?",
+      "clearAllConfirm": "Confirm Clear"
+    },
+    "messages": {
+      "result": "Removed {keys} by exact keys, deleted {patterns} by patterns",
+      "invalidateSuccess": "Cache invalidated successfully",
+      "opFail": "Operation failed",
+      "emptyInput": "Please provide at least one exact key or pattern",
+      "queryFail": "Query failed",
+      "selectFirst": "Please select the cache keys to expire first"
+    }
+  }
+}

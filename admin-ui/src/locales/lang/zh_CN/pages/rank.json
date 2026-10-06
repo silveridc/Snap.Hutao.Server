@@ -1,0 +1,18 @@
+{
+  "rank": {
+    "view": {
+      "title": "排行榜查看",
+      "tipPre": "只读查看 Redis 中的伤害 / 承伤排行榜（对应 ",
+      "tipSuf": " 有序集合）。",
+      "selectPlaceholder": "选择排行榜",
+      "query": "查询",
+      "refreshKeys": "刷新键",
+      "colValue": "数值"
+    },
+    "messages": {
+      "loadKeysFail": "获取排行榜键失败",
+      "selectFirst": "请先选择排行榜",
+      "loadBoardFail": "获取排行榜失败"
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "redeem": {
+    "service": {
+      "gachalog": "祈愿记录 (GachaLog)",
+      "cdn": "CDN / 胡桃云",
+      "gachalogShort": "祈愿记录",
+      "cdnShort": "CDN"
+    },
+    "limit": {
+      "time": "时间限制",
+      "times": "次数限制",
+      "none": "无限制"
+    },
+    "gen": {
+      "title": "生成兑换码",
+      "tipPre": "对应 ",
+      "tipSuf": "。可叠加时间限制与次数限制。",
+      "serviceType": "服务类型",
+      "count": "生成数量",
+      "valueDays": "时长天数 (Value)",
+      "limitMode": "限制方式",
+      "expireTime": "过期时间",
+      "times": "可使用次数",
+      "description": "备注",
+      "descriptionPlaceholder": "可选，兑换码用途备注",
+      "submit": "生成",
+      "totalCount": "共 {n} 个",
+      "copyAll": "复制全部"
+    },
+    "use": {
+      "title": "使用兑换码",
+      "tipPre": "对应 ",
+      "tipSuf": "。留空用户邮箱表示为当前登录账号兑换。",
+      "code": "兑换码",
+      "codePlaceholder": "18 位兑换码",
+      "username": "目标用户邮箱",
+      "usernamePlaceholder": "可选，默认当前账号",
+      "submit": "兑换"
+    },
+    "list": {
+      "title": "兑换码列表",
+      "searchPlaceholder": "按兑换码 / 备注 / 创建者搜索",
+      "search": "搜索",
+      "batchDelete": "批量删除（{n}）",
+      "exportCsv": "导出 CSV",
+      "colCode": "兑换码",
+      "colService": "服务",
+      "colValue": "时长(天)",
+      "colType": "限制",
+      "colUsed": "已用",
+      "colCreator": "创建者",
+      "colCreateTime": "创建时间",
+      "colOp": "操作"
+    },
+    "edit": {
+      "title": "编辑兑换码",
+      "code": "兑换码",
+      "descriptionPlaceholder": "兑换码用途备注"
+    },
+    "actions": {
+      "edit": "编辑",
+      "delete": "删除",
+      "save": "保存"
+    },
+    "dialog": {
+      "removeHeader": "删除兑换码",
+      "removeConfirmBody": "确定删除兑换码「{code}」？其使用记录也会一并删除。",
+      "batchRemoveHeader": "批量删除兑换码",
+      "batchRemoveConfirmBody": "确定删除选中的 {n} 个兑换码？其使用记录也会一并删除。"
+    },
+    "messages": {
+      "countRequired": "请填写生成数量",
+      "expireTimeRequired": "已选择时间限制，请填写过期时间",
+      "generateSuccess": "成功生成 {n} 个兑换码",
+      "generateFail": "生成失败",
+      "copied": "已复制到剪贴板",
+      "copyFail": "复制失败，请手动选择文本复制",
+      "codeRequired": "请填写兑换码",
+      "redeemSuccess": "兑换成功",
+      "redeemFail": "兑换失败",
+      "listFail": "获取兑换码列表失败",
+      "editSuccess": "编辑成功",
+      "editFail": "编辑失败",
+      "selectFirst": "请先勾选要删除的兑换码",
+      "deleteSuccess": "删除成功",
+      "deleteFail": "删除失败",
+      "noExportData": "没有可导出的数据",
+      "exportFail": "导出失败"
+    }
+  }
+}

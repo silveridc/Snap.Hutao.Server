@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.6887863">
+  <PropertyGroup>
+    <!-- F5 / 调试时启动的命令（Vite 开发服务器，端口 5173） -->
+    <StartupCommand>pnpm run dev</StartupCommand>
+    <!-- 发布（Publish）时执行的构建命令，产物输出到 admin-ui/wwwroot/admin -->
+    <BuildCommand>pnpm run build</BuildCommand>
+    <JsxRuntime>vue</JsxRuntime>
+  </PropertyGroup>
+</Project>

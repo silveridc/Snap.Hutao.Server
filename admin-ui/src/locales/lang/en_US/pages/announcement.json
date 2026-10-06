@@ -1,0 +1,65 @@
+{
+  "announcement": {
+    "severity": {
+      "informational": "Informational",
+      "success": "Success",
+      "warning": "Warning",
+      "error": "Error",
+      "informationalShort": "Info",
+      "successShort": "Success",
+      "warningShort": "Warning",
+      "errorShort": "Error"
+    },
+    "form": {
+      "title": "Publish Announcement",
+      "tipPre": "Corresponds to ",
+      "tipSuf": ". Announcements are only visible to Hutao clients that carry a version number.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Announcement title",
+      "severity": "Severity",
+      "link": "Link",
+      "linkPlaceholder": "Optional, URL opened when the announcement is clicked",
+      "maxVersion": "Max Present Version",
+      "maxVersionPlaceholder": "Optional, e.g. 1.17.1.0; only shown to clients below this version",
+      "content": "Content",
+      "contentPlaceholder": "Announcement body",
+      "submit": "Publish Announcement"
+    },
+    "list": {
+      "title": "Announcement List",
+      "refresh": "Refresh",
+      "colTitle": "Title",
+      "colSeverity": "Severity",
+      "colMaxVersion": "Max Present Version",
+      "colEnabled": "Status",
+      "colUpdateTime": "Updated At",
+      "colOp": "Actions"
+    },
+    "edit": {
+      "title": "Edit Announcement",
+      "linkPlaceholder": "Optional",
+      "maxVersionPlaceholder": "Optional, e.g. 1.17.1.0"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save"
+    },
+    "dialog": {
+      "removeHeader": "Delete Announcement",
+      "removeConfirmBody": "Delete announcement 「{title}」 (ID {id})?"
+    },
+    "messages": {
+      "titleContentRequired": "Please enter the title and content",
+      "uploadSuccess": "Announcement published successfully",
+      "uploadFail": "Failed to publish",
+      "listFail": "Failed to load the announcement list",
+      "deleteSuccess": "Deleted successfully",
+      "deleteFail": "Failed to delete",
+      "opSuccess": "Operation succeeded",
+      "opFail": "Operation failed",
+      "editSuccess": "Updated successfully",
+      "editFail": "Failed to update"
+    }
+  }
+}

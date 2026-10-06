@@ -1,0 +1,61 @@
+{
+  "release": {
+    "current": {
+      "title": "当前激活版本",
+      "version": "版本",
+      "publisher": "发布者",
+      "publishedAt": "发布时间",
+      "mirrors": "镜像数",
+      "releaseNotes": "更新说明"
+    },
+    "form": {
+      "title": "发布新版本",
+      "tipPre": "对应 ",
+      "tipSuf": "。发布后自动激活，旧版本变为历史版本。",
+      "version": "版本号",
+      "versionPlaceholder": "四段数字，如 1.17.2.0",
+      "validation": "SHA-256 校验值",
+      "validationPlaceholder": "64 位十六进制字符串",
+      "mirrors": "下载镜像",
+      "mirrorNamePlaceholder": "镜像名称",
+      "mirrorUrlPlaceholder": "HTTPS 下载地址",
+      "removeMirror": "移除",
+      "addMirror": "添加镜像",
+      "releaseNotes": "更新说明",
+      "releaseNotesPlaceholder": "可选，本版本更新内容",
+      "submit": "发布"
+    },
+    "list": {
+      "title": "发布历史",
+      "refresh": "刷新",
+      "colVersion": "版本",
+      "colMirrors": "镜像数",
+      "colStatus": "状态",
+      "colPublisher": "发布者",
+      "colPublishedAt": "发布时间",
+      "colOp": "操作",
+      "active": "激活",
+      "history": "历史",
+      "current": "当前"
+    },
+    "actions": {
+      "activate": "激活"
+    },
+    "dialog": {
+      "activateHeader": "激活历史版本",
+      "activateConfirmBody": "确定将版本 {version} 设为当前激活版本？当前激活版本将被替换。"
+    },
+    "messages": {
+      "versionRequired": "请填写版本号",
+      "validationRequired": "请填写 SHA-256 校验值",
+      "mirrorRequired": "请至少添加一个下载镜像",
+      "mirrorEmpty": "镜像 {n} 的名称和地址不能为空",
+      "publishSuccess": "发布成功",
+      "publishFail": "发布失败",
+      "listFail": "获取发布历史失败",
+      "alreadyActive": "该版本已是当前激活版本",
+      "activateSuccess": "激活成功",
+      "activateFail": "激活失败"
+    }
+  }
+}

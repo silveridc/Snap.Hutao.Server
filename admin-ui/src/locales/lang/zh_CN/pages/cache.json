@@ -1,0 +1,49 @@
+{
+  "cache": {
+    "presets": {
+      "abyssStats": "深渊统计",
+      "gachaDistribution": "祈愿分布",
+      "gachaEventStats": "祈愿活动统计",
+      "theaterStats": "剧演统计",
+      "enka": "Enka 展柜",
+      "wallpaper": "壁纸",
+      "announcements": "公告",
+      "maintainer": "维护者判定",
+      "userStats": "用户统计"
+    },
+    "quick": {
+      "title": "快速失效",
+      "tipPre": "按预设模式批量将缓存标记为过期，对应 ",
+      "tipSuf": "。",
+      "invalidateAll": "清空全部"
+    },
+    "custom": {
+      "title": "自定义失效",
+      "keysLabel": "精确键（回车添加多个）",
+      "keysPlaceholder": "例如 GachaEventStatistics",
+      "patternsLabel": "Glob 模式（回车添加多个）",
+      "patternsPlaceholder": "例如 RoleCombatStatistics:*",
+      "submit": "提交失效"
+    },
+    "browse": {
+      "title": "浏览缓存键",
+      "patternPlaceholder": "glob 模式，默认 *",
+      "query": "查询",
+      "expireSelected": "使选中项过期（{count}）",
+      "colKey": "缓存键"
+    },
+    "dialog": {
+      "clearAllHeader": "清空全部缓存",
+      "clearAllBody": "即将删除该应用命名空间下的所有缓存键（模式 *）。缓存会在下次访问时从数据库重建，确定继续？",
+      "clearAllConfirm": "确认清空"
+    },
+    "messages": {
+      "result": "已按精确键移除 {keys} 个，按模式删除 {patterns} 个",
+      "invalidateSuccess": "缓存失效成功",
+      "opFail": "操作失败",
+      "emptyInput": "请至少填写一个精确键或模式",
+      "queryFail": "查询失败",
+      "selectFirst": "请先勾选要过期的缓存键"
+    }
+  }
+}

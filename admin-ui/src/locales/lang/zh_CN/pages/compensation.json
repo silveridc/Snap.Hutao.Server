@@ -1,0 +1,30 @@
+{
+  "compensation": {
+    "form": {
+      "title": "服务时长补偿",
+      "tip": "为用户增加祈愿记录或 CDN (胡桃云) 的服务时长。天数可为负数用于扣减。",
+      "serviceType": "服务类型",
+      "serviceGachalog": "祈愿记录",
+      "serviceCdn": "CDN / 胡桃云",
+      "target": "补偿范围",
+      "targetAll": "全体用户",
+      "targetUser": "指定用户",
+      "days": "补偿天数",
+      "userEmail": "目标用户邮箱",
+      "userEmailPlaceholder": "用户注册邮箱",
+      "submit": "提交补偿"
+    },
+    "dialog": {
+      "allHeader": "全员补偿确认",
+      "allBody": "即将为「所有用户」的{service}服务增加 {days} 天时长，此操作影响范围很大，确定继续？",
+      "allConfirm": "确认补偿"
+    },
+    "messages": {
+      "daysRequired": "请填写补偿天数（可为负数用于扣减）",
+      "emailRequired": "请填写目标用户邮箱",
+      "opSuccess": "操作成功",
+      "compensateSuccess": "补偿成功",
+      "opFail": "操作失败"
+    }
+  }
+}

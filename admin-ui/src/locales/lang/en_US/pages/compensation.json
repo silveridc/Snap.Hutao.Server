@@ -1,0 +1,30 @@
+{
+  "compensation": {
+    "form": {
+      "title": "Service Duration Compensation",
+      "tip": "Add service duration for Gacha Log or CDN (Hutao Cloud). Negative days can be used to deduct.",
+      "serviceType": "Service Type",
+      "serviceGachalog": "Gacha Log",
+      "serviceCdn": "CDN / Hutao Cloud",
+      "target": "Compensation Scope",
+      "targetAll": "All Users",
+      "targetUser": "Specific User",
+      "days": "Days to Compensate",
+      "userEmail": "Target User Email",
+      "userEmailPlaceholder": "User registration email",
+      "submit": "Submit Compensation"
+    },
+    "dialog": {
+      "allHeader": "Confirm All-User Compensation",
+      "allBody": "About to add {days} days of duration to the {service} service for 「all users」. This operation affects a wide range. Continue?",
+      "allConfirm": "Confirm Compensation"
+    },
+    "messages": {
+      "daysRequired": "Please enter the number of days (negative values deduct duration)",
+      "emailRequired": "Please enter the target user's email",
+      "opSuccess": "Operation succeeded",
+      "compensateSuccess": "Compensation applied successfully",
+      "opFail": "Operation failed"
+    }
+  }
+}

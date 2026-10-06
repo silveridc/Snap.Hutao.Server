@@ -1,0 +1,91 @@
+{
+  "redeem": {
+    "service": {
+      "gachalog": "Gacha Log",
+      "cdn": "CDN / Hutao Cloud",
+      "gachalogShort": "Gacha Log",
+      "cdnShort": "CDN"
+    },
+    "limit": {
+      "time": "Time limit",
+      "times": "Use limit",
+      "none": "No limit"
+    },
+    "gen": {
+      "title": "Generate Redeem Codes",
+      "tipPre": "Corresponds to ",
+      "tipSuf": ". Time and use limits can be combined.",
+      "serviceType": "Service Type",
+      "count": "Count",
+      "valueDays": "Duration in Days (Value)",
+      "limitMode": "Limits",
+      "expireTime": "Expiration Time",
+      "times": "Allowed Uses",
+      "description": "Notes",
+      "descriptionPlaceholder": "Optional, describe the purpose of the codes",
+      "submit": "Generate",
+      "totalCount": "{n} in total",
+      "copyAll": "Copy All"
+    },
+    "use": {
+      "title": "Redeem a Code",
+      "tipPre": "Corresponds to ",
+      "tipSuf": ". Leave the user email empty to redeem for the currently signed-in account.",
+      "code": "Redeem Code",
+      "codePlaceholder": "18-character redeem code",
+      "username": "Target User Email",
+      "usernamePlaceholder": "Optional, defaults to the current account",
+      "submit": "Redeem"
+    },
+    "list": {
+      "title": "Redeem Code List",
+      "searchPlaceholder": "Search by code / notes / creator",
+      "search": "Search",
+      "batchDelete": "Batch Delete ({n})",
+      "exportCsv": "Export CSV",
+      "colCode": "Code",
+      "colService": "Service",
+      "colValue": "Days",
+      "colType": "Limits",
+      "colUsed": "Used",
+      "colCreator": "Creator",
+      "colCreateTime": "Created At",
+      "colOp": "Actions"
+    },
+    "edit": {
+      "title": "Edit Redeem Code",
+      "code": "Redeem Code",
+      "descriptionPlaceholder": "Purpose of the redeem code"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save"
+    },
+    "dialog": {
+      "removeHeader": "Delete Redeem Code",
+      "removeConfirmBody": "Delete redeem code 「{code}」? Its usage records will also be deleted.",
+      "batchRemoveHeader": "Batch Delete Redeem Codes",
+      "batchRemoveConfirmBody": "Delete the {n} selected redeem codes? Their usage records will also be deleted."
+    },
+    "messages": {
+      "countRequired": "Please enter the number of codes to generate",
+      "expireTimeRequired": "Time limit is selected, please set the expiration time",
+      "generateSuccess": "Successfully generated {n} redeem codes",
+      "generateFail": "Failed to generate",
+      "copied": "Copied to clipboard",
+      "copyFail": "Failed to copy, please select and copy the text manually",
+      "codeRequired": "Please enter a redeem code",
+      "redeemSuccess": "Redeemed successfully",
+      "redeemFail": "Failed to redeem",
+      "listFail": "Failed to load the redeem code list",
+      "editSuccess": "Updated successfully",
+      "editFail": "Failed to update",
+      "selectFirst": "Please select the codes to delete first",
+      "deleteSuccess": "Deleted successfully",
+      "deleteFail": "Failed to delete",
+      "noExportData": "No data to export",
+      "exportFail": "Failed to export"
+    }
+  }
+}

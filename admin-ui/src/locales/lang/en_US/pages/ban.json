@@ -1,0 +1,48 @@
+{
+  "ban": {
+    "add": {
+      "title": "Ban UID",
+      "tipPre": "Banned UIDs will no longer be able to upload Spiral Abyss / Theater Mode records. Endpoint: ",
+      "tipSuf": ".",
+      "uidPlaceholder": "9-10 digit UID",
+      "reasonLabel": "Ban Reason (Optional)",
+      "reasonPlaceholder": "Ban reason",
+      "submit": "Ban"
+    },
+    "batch": {
+      "title": "Batch Ban",
+      "tip": "Enter multiple 9-10 digit UIDs, one per line or separated by spaces/commas. Existing entries are skipped automatically.",
+      "uidListLabel": "UID List",
+      "uidListPlaceholder": "Multiple UIDs, separated by line breaks or commas",
+      "reasonLabel": "Ban Reason (Optional)",
+      "reasonPlaceholder": "Batch ban reason",
+      "submit": "Batch Ban"
+    },
+    "list": {
+      "title": "Ban List",
+      "searchPlaceholder": "Search by UID",
+      "search": "Search",
+      "colReason": "Reason",
+      "colBanTime": "Banned At",
+      "colOp": "Actions",
+      "unban": "Unban"
+    },
+    "dialog": {
+      "unbanHeader": "Confirm Unban",
+      "unbanBody": "Are you sure you want to lift the ban on UID {uid}?",
+      "unbanConfirm": "Unban"
+    },
+    "messages": {
+      "listFail": "Failed to load the ban list",
+      "uidFormat": "Please enter a 9-10 digit UID",
+      "banSuccess": "Banned successfully",
+      "banFail": "Failed to ban",
+      "emptyUids": "Please enter at least one UID",
+      "invalidUids": "{count} UIDs have an invalid format (expected 9-10 digits), please check",
+      "batchSuccess": "Batch ban succeeded",
+      "batchFail": "Failed to batch ban",
+      "unbanSuccess": "Unbanned successfully",
+      "unbanFail": "Failed to unban"
+    }
+  }
+}

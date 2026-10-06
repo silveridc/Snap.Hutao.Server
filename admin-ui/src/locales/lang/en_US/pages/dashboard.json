@@ -1,0 +1,43 @@
+{
+  "dashboard": {
+    "overview": {
+      "title": "System Overview",
+      "refresh": "Refresh",
+      "noData": "No data"
+    },
+    "stats": {
+      "totalUsers": "Total Users",
+      "maintainers": "Maintainers",
+      "licensedDevelopers": "Licensed Developers",
+      "activeGachaLogUsers": "Active Gacha Log Users",
+      "activeCdnUsers": "Active CDN Users",
+      "bannedUids": "Banned UIDs",
+      "gachaItemCount": "Gacha Log Records",
+      "abyssRecords": "Spiral Abyss Records",
+      "theaterRecords": "Theater Mode Records"
+    },
+    "account": {
+      "title": "Account Info",
+      "refresh": "Refresh",
+      "email": "Email Account",
+      "maintainer": "Maintainer",
+      "licensedDeveloper": "Licensed Developer",
+      "gachaLogExpireAt": "Gacha Log Service Expiry",
+      "cdnExpireAt": "CDN Service Expiry",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "shortcuts": {
+      "title": "Quick Actions",
+      "abyssStats": "Refresh Spiral Abyss Statistics",
+      "compensation": "Compensate Service Duration",
+      "announcement": "Publish Announcement",
+      "redeem": "Generate Redeem Code"
+    },
+    "messages": {
+      "statsFail": "Failed to load statistics",
+      "refreshed": "Refreshed",
+      "refreshFail": "Failed to refresh"
+    }
+  }
+}

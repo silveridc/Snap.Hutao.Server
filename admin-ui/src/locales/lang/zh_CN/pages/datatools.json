@@ -1,0 +1,39 @@
+{
+  "datatools": {
+    "versions": {
+      "title": "放行客户端版本",
+      "tipPre": "管理允许访问的客户端版本 Header（对应 ",
+      "tipSuf": " 表）。",
+      "inputPlaceholder": "版本 Header，如 Snap Hutao/1.17.1",
+      "add": "新增",
+      "refresh": "刷新",
+      "empty": "暂无放行版本"
+    },
+    "uids": {
+      "title": "无效祈愿 UID",
+      "tipPre": "被统计任务判定为异常的 UID（对应 ",
+      "tipSuf": " 表）。移除后可重新纳入统计。",
+      "searchPlaceholder": "按 UID 搜索",
+      "search": "搜索",
+      "colOp": "操作",
+      "remove": "移除"
+    },
+    "dialog": {
+      "removeVersionHeader": "移除放行版本",
+      "removeVersionBody": "确定移除放行版本「{header}」？",
+      "removeVersionConfirm": "移除",
+      "removeUidHeader": "移除无效 UID",
+      "removeUidBody": "确定移除无效 UID {uid}？移除后该 UID 将可重新纳入祈愿统计。",
+      "removeUidConfirm": "移除"
+    },
+    "messages": {
+      "loadVersionsFail": "获取放行版本失败",
+      "headerRequired": "请输入版本 Header",
+      "addSuccess": "新增成功",
+      "addFail": "新增失败",
+      "loadUidsFail": "获取无效 UID 失败",
+      "removeSuccess": "移除成功",
+      "removeFail": "移除失败"
+    }
+  }
+}

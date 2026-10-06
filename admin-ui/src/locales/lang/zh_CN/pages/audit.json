@@ -1,0 +1,19 @@
+{
+  "audit": {
+    "list": {
+      "title": "后台操作审计",
+      "refresh": "刷新",
+      "tip": "记录维护者的写操作（封禁、改密码、审批、编辑兑换码/公告等），密码等敏感字段已脱敏。",
+      "colTime": "时间",
+      "colOperator": "操作者",
+      "colAction": "操作",
+      "colResult": "结果",
+      "colDetail": "详情",
+      "success": "成功",
+      "failure": "异常"
+    },
+    "messages": {
+      "loadFail": "获取审计日志失败"
+    }
+  }
+}

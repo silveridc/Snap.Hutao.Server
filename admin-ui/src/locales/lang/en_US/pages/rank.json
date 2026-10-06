@@ -1,0 +1,18 @@
+{
+  "rank": {
+    "view": {
+      "title": "Leaderboard Viewer",
+      "tipPre": "Read-only view of the damage / damage-taken leaderboards in Redis (sorted set ",
+      "tipSuf": ").",
+      "selectPlaceholder": "Select a leaderboard",
+      "query": "Query",
+      "refreshKeys": "Refresh Keys",
+      "colValue": "Value"
+    },
+    "messages": {
+      "loadKeysFail": "Failed to load leaderboard keys",
+      "selectFirst": "Please select a leaderboard first",
+      "loadBoardFail": "Failed to load the leaderboard"
+    }
+  }
+}

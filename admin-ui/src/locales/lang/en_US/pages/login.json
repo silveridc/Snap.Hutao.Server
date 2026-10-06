@@ -1,0 +1,20 @@
+{
+  "login": {
+    "brand": "Hutao Cloud",
+    "subtitle": "Admin Console",
+    "tip": "Please sign in with a maintainer account",
+    "form": {
+      "emailPlaceholder": "Account email",
+      "passwordPlaceholder": "Password",
+      "loginBtn": "Sign in"
+    },
+    "rules": {
+      "email": "Please enter your email",
+      "password": "Please enter your password"
+    },
+    "messages": {
+      "loginSuccess": "Signed in successfully",
+      "loginFail": "Sign in failed"
+    }
+  }
+}

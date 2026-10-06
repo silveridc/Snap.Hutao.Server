@@ -1,0 +1,93 @@
+{
+  "user": {
+    "overview": {
+      "title": "User Overview",
+      "refresh": "Refresh",
+      "noData": "No data"
+    },
+    "stats": {
+      "totalUsers": "Total Users",
+      "maintainers": "Maintainers",
+      "licensedDevelopers": "Licensed Developers",
+      "activeGachaLogUsers": "Active Gacha Log Users",
+      "activeCdnUsers": "Active CDN Users",
+      "bannedUids": "Banned UIDs",
+      "gachaItemCount": "Gacha Log Records",
+      "abyssRecords": "Spiral Abyss Records",
+      "theaterRecords": "Theater Mode Records"
+    },
+    "list": {
+      "title": "User List",
+      "searchPlaceholder": "Search by username or email",
+      "allRoles": "All Roles",
+      "maintainersOnly": "Maintainers Only",
+      "developersOnly": "Developers Only",
+      "expiryAny": "Any Expiry",
+      "expiry7Days": "Expiring in 7 Days",
+      "expiry30Days": "Expiring in 30 Days",
+      "search": "Search",
+      "colUserName": "Username / Email",
+      "colMaintainer": "Maintainer",
+      "colDeveloper": "Developer",
+      "colGachaExpireAt": "Gacha Log Expiry",
+      "colCdnExpireAt": "CDN Expiry",
+      "colOperation": "Actions",
+      "yes": "Yes",
+      "detail": "Details",
+      "adjustDuration": "Adjust Duration",
+      "privilege": "Privileges",
+      "resetPassword": "Reset Password"
+    },
+    "messages": {
+      "noUserName": "This user has no username/email and cannot be modified",
+      "opSuccess": "Operation succeeded",
+      "opFail": "Operation failed",
+      "updateSuccess": "Updated successfully",
+      "updateFail": "Update failed",
+      "passwordTooShort": "New password must be at least 8 characters",
+      "resetPasswordSuccess": "Password reset successfully",
+      "resetPasswordFail": "Failed to reset password",
+      "detailFail": "Failed to load details",
+      "statsFail": "Failed to load statistics",
+      "userListFail": "Failed to load user list"
+    },
+    "durationDialog": {
+      "header": "Adjust Service Duration",
+      "submit": "Submit",
+      "targetUser": "Target User",
+      "serviceType": "Service Type",
+      "gachalog": "Gacha Log",
+      "cdn": "CDN / Hutao Cloud",
+      "daysLabel": "Days (negative values deduct time)"
+    },
+    "privilegeDialog": {
+      "header": "User Privileges",
+      "save": "Save",
+      "targetUser": "Target User",
+      "maintainer": "Maintainer",
+      "licensedDeveloper": "Licensed Developer"
+    },
+    "passwordDialog": {
+      "header": "Reset User Password",
+      "reset": "Reset",
+      "targetUser": "Target User",
+      "newPasswordLabel": "New Password (at least 8 characters)",
+      "newPasswordPlaceholder": "Enter new password"
+    },
+    "detailDialog": {
+      "header": "User Details",
+      "colUserName": "Username / Email",
+      "redeemUsedCount": "Redeem Code Redemptions",
+      "maintainer": "Maintainer",
+      "licensedDeveloper": "Licensed Developer",
+      "gachaExpireAt": "Gacha Log Expiry",
+      "cdnExpireAt": "CDN Expiry",
+      "yes": "Yes",
+      "no": "No",
+      "idSuffix": "(#{id})",
+      "gachaUidTitle": "Gacha UIDs ({n})",
+      "colGachaItemCount": "Gacha Log Items",
+      "noData": "No data"
+    }
+  }
+}

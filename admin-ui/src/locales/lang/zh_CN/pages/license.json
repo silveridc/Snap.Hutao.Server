@@ -1,0 +1,33 @@
+{
+  "license": {
+    "approve": {
+      "title": "批准开源许可证申请",
+      "tipPre": "对应 ",
+      "tipSuf": "（维护者鉴权）。批准码来自申请审批邮件，也可在下方申请列表直接一键批准。",
+      "emailLabel": "申请人邮箱",
+      "emailPlaceholder": "申请人注册邮箱",
+      "codeLabel": "批准码",
+      "submit": "批准"
+    },
+    "list": {
+      "title": "申请列表",
+      "onlyPending": "仅看待批准",
+      "refresh": "刷新",
+      "approved": "已批准",
+      "pending": "待批准",
+      "approve": "批准"
+    },
+    "columns": {
+      "applicant": "申请人",
+      "projectUrl": "项目地址",
+      "status": "状态",
+      "op": "操作"
+    },
+    "messages": {
+      "fillRequired": "请填写申请人邮箱与批准码",
+      "approveSuccess": "批准成功",
+      "approveFail": "批准失败",
+      "loadListFail": "获取申请列表失败"
+    }
+  }
+}

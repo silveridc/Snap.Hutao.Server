@@ -1,0 +1,18 @@
+{
+  "statistics": {
+    "run": {
+      "title": "Spiral Abyss Statistics Refresh",
+      "tipPre": "See",
+      "tipSuf": " to manually trigger a Spiral Abyss (Legacy) statistics refresh task.\nThe task runs synchronously and the request may take a while to return.",
+      "triggerBtn": "Trigger Refresh Now",
+      "dialogHeader": "Trigger Spiral Abyss Statistics Refresh",
+      "dialogBody": "This operation recalculates Spiral Abyss statistics immediately and may take a long time. Continue?",
+      "dialogConfirm": "Start Refresh",
+      "successMsg": "Statistics refresh completed"
+    },
+    "messages": {
+      "opSuccess": "Operation succeeded",
+      "opFail": "Operation failed"
+    }
+  }
+}
