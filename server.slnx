@@ -7,4 +7,5 @@
     <Deploy />
   </Project>
   <Project Path="server/server.csproj" />
+  <Project Path="tests/server.Tests/server.Tests.csproj" />
 </Solution>

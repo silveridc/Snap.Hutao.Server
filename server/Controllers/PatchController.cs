@@ -4,7 +4,7 @@ using server.Services.Admin;
 namespace server.Controllers;
 
 [ApiController]
-[Route("patch")]
+[Route("[controller]")]
 [ApiExplorerSettings(GroupName = "Patch")]
 public sealed class PatchController(ReleaseService releaseService) : ControllerBase
 {

@@ -1,7 +1,20 @@
 import axios from 'axios'
+import { i18n } from '@/locales'
 import { getAccessToken, getRefreshToken, setTokens, clearTokens, emitAuthExpired } from '@/utils/token'
 import { getDeviceHeaders } from '@/utils/device'
 import { rsaEncrypt } from '@/utils/crypto'
+
+// 服务端返回消息本地化：l10nKey → pages/server.json（与 launcher 的 SH.resx 同源，scripts/extract-server-l10n.mjs 生成）
+const SERVER_KEY_PREFIX = 'pages.server.'
+
+// 优先按 l10nKey 查本地化文案，查不到回退服务端 message（英文）
+function localizedMessage(envelope) {
+  const key = envelope?.l10nKey
+  if (key && i18n.global.te(SERVER_KEY_PREFIX + key)) {
+    return i18n.global.t(SERVER_KEY_PREFIX + key)
+  }
+  return envelope?.message
+}
 
 // 后端返回码 (Models/Response/ReturnCode.cs)
 export const RET_SUCCESS = 0
@@ -57,7 +70,7 @@ async function refreshTokens() {
 }
 
 function toError(envelope) {
-  const err = new Error(envelope?.message || '请求失败')
+  const err = new Error(localizedMessage(envelope) || i18n.global.t(`${SERVER_KEY_PREFIX}requestFailed`))
   err.retcode = envelope?.retcode
   err.l10nKey = envelope?.l10nKey
   return err
@@ -71,6 +84,7 @@ http.interceptors.response.use(
       return envelope
     }
     if (envelope.retcode === RET_SUCCESS) {
+      envelope.message = localizedMessage(envelope)
       return envelope
     }
     if (envelope.retcode === RET_LOGIN_FAIL && !response.config._retried) {
@@ -91,8 +105,8 @@ http.interceptors.response.use(
   },
   (error) => {
     const message = error.response
-      ? `服务异常 (HTTP ${error.response.status})`
-      : error.message || '网络错误，请检查网络连接'
+      ? i18n.global.t(`${SERVER_KEY_PREFIX}httpError`, { code: error.response.status })
+      : error.message || i18n.global.t(`${SERVER_KEY_PREFIX}networkError`)
     return Promise.reject(new Error(message))
   },
 )

@@ -95,7 +95,13 @@ namespace server.Controllers
             [FromQuery(Name = "code")][Required] string code,
             [FromQuery(Name = "state")][Required] string state)
         {
-            OAuthBindState? decryptedState = JsonSerializer.Deserialize<OAuthBindState>(DecryptState(state));
+            string? plainState = DecryptState(state);
+            if (plainState is null)
+            {
+                return BadRequest("Invalid state.");
+            }
+
+            OAuthBindState? decryptedState = JsonSerializer.Deserialize<OAuthBindState>(plainState);
             if (decryptedState is null)
             {
                 return BadRequest("Invalid state.");
@@ -150,20 +156,33 @@ namespace server.Controllers
         /// 解密 OAuth 状态信息。
         /// </summary>
         /// <param name="state">Base64 编码的密文。</param>
-        /// <returns>解密后的状态字符串。</returns>
-        private string DecryptState(string state)
+        /// <returns>解密后的状态字符串；参数是伪造/损坏的密文时为 <see langword="null"/>。</returns>
+        private string? DecryptState(string state)
         {
-            using Aes aes = Aes.Create();
-            aes.Key = appOptions.OAuthStateEncryptKey;
-            aes.IV = new byte[16];
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.PKCS7;
+            try
+            {
+                using Aes aes = Aes.Create();
+                aes.Key = appOptions.OAuthStateEncryptKey;
+                aes.IV = new byte[16];
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
 
-            using MemoryStream sourceStream = new(Convert.FromBase64String(state));
-            using ICryptoTransform transform = aes.CreateDecryptor();
-            using CryptoStream cryptoStream = new(sourceStream, transform, CryptoStreamMode.Read);
-            using StreamReader streamReader = new(cryptoStream, leaveOpen: true);
-            return streamReader.ReadToEnd();
+                using MemoryStream sourceStream = new(Convert.FromBase64String(state));
+                using ICryptoTransform transform = aes.CreateDecryptor();
+                using CryptoStream cryptoStream = new(sourceStream, transform, CryptoStreamMode.Read);
+                using StreamReader streamReader = new(cryptoStream, leaveOpen: true);
+                return streamReader.ReadToEnd();
+            }
+            catch (FormatException)
+            {
+                // 不是合法 Base64
+                return null;
+            }
+            catch (CryptographicException)
+            {
+                // 长度不是分组的整数倍，或填充不合法（非本密钥的密文）
+                return null;
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ using server.Services.Admin;
 
 namespace server.Services.Afdian
 {
-    // Singleton
+    // Scoped（依赖 Scoped 的 RedeemService，注册成 Singleton 会无法解析）
     public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
     {
         private readonly IDistributedCache cache = serviceProvider.GetRequiredService<IDistributedCache>();

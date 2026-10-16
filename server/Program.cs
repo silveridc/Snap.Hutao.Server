@@ -9,6 +9,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Quartz;
 using Sentry;
+using Sentry.Protocol;
 using server.Extension;
 using server.Services.Admin;
 using server.Services.Cache;
@@ -20,6 +21,7 @@ namespace server
 {
     public static class Program
     {
+        private static ILogger? logger;
         public const string applicationVersion = "server@v1.0.4";
         private const string sentryProjectId = "7";
         private const string sentryDsn = "https://26b2259ad03e4fd26fedf7b08226eaa2@sentry.silveridc.cn/7";
@@ -29,7 +31,6 @@ namespace server
             WebApplicationBuilder appBuilder = WebApplication.CreateBuilder(args);
             AppOptions appOptions = appBuilder.Configuration.GetSection("App").Get<AppOptions>()!;
             IServiceCollection services = appBuilder.Services;
-
             IConnectionMultiplexer redisMultiplexer = ConnectionMultiplexer.Connect(appOptions.RedisAddress);
             services.AddSingleton(redisMultiplexer);
 
@@ -112,6 +113,7 @@ namespace server
             }
             services.AddSentryTunneling();
             string assetsPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Assets");
+
             // Services
             services
                 .AddAuthorization()
@@ -191,8 +193,8 @@ namespace server
                 .AddScoped<BanService>()
                 .AddScoped<AdminQueryService>()
                 .AddScoped<ReleaseService>()
-                .AddScoped<Bing>()
-                .AddScoped<HoyoPlay>()
+                .AddScoped<BingWallpaper>()
+                .AddScoped<HoyoPlayWallpaper>()
                 .AddScoped<GithubApiService>()
                 .AddScoped<StatisticsService>()
                 .AddScoped<ReCaptchaService>()
@@ -203,7 +205,7 @@ namespace server
                 .AddScoped<ValidateMaintainPermission>()
                 .AddScoped<GachaLogStatisticsService>()
 
-                .AddSingleton<AfdianWebhookService>()
+                .AddScoped<AfdianWebhookService>()
                 .AddSingleton<CacheService>()
                 .AddSingleton<CdnExpireService>()
                 .AddSingleton<GachaLogExpireService>()
@@ -216,6 +218,7 @@ namespace server
                 .AddKeyedSingleton<ISearcher>("IPv6DB", (sp, key) => new Searcher(CachePolicy.Content, Path.Combine(assetsPath, "ipv6.xdb")))
                 .AddSingleton<Services.PublicAPI.IpRegionService>()
                 .AddSingleton(appOptions)
+                // Quartz.
                 .AddTransient<GachaLogStatisticsRefreshJob>()
                 .AddTransient<LegacyStatisticsRefreshJob>()
                 .AddTransient<RoleCombatRecordCleanJob>()
@@ -253,13 +256,14 @@ namespace server
                     passwordOptions.RequireNonAlphanumeric = false;
                     passwordOptions.RequireDigit = false;
                 })
-                .AddEntityFrameworkStores<AppDbContext>();
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
             // Swagger
             services
                 .AddEndpointsApiExplorer()
                 .AddSwaggerGen(options =>
                 {
-                    options.SwaggerDoc("v1", new() { Version = "v1", Title = "Api v1", Description = "未分组接口（公告、公共 API）" });
+                    options.SwaggerDoc("v1", new() { Version = "v1", Title = "Api v1", Description = "公共api" });
                     options.SwaggerDoc("SpiralAbyss", new() { Version = "1.0", Title = "深渊统计", Description = "深渊统计数据" });
                     options.SwaggerDoc("RoleCombat", new() { Version = "1.0", Title = "剧诗统计", Description = "幻想真境剧诗" });
                     options.SwaggerDoc("Passport", new() { Version = "1.0", Title = "账户", Description = "账户" });
@@ -279,8 +283,6 @@ namespace server
                         Type = SecuritySchemeType.ApiKey,
                         Scheme = "Bearer",
                     });
-
-                    // OpenAPI.NET 2.x 移除了 OpenApiReference/ReferenceType，改用 OpenApiSecuritySchemeReference，并按生成中的文档延迟注册
                     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                     {
                         [new OpenApiSecuritySchemeReference("Bearer", document)] = [],
@@ -308,6 +310,7 @@ namespace server
                 });
 
             WebApplication app = appBuilder.Build();
+            logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Program");
             MigrateDatabase(app);
             app.UseForwardedHeaders();
             // 中间件的顺序敏感
@@ -357,8 +360,7 @@ namespace server
 
             // Initialize dynamic config from DB
             await app.Services.GetRequiredService<SystemConfigService>().InitializeAsync();
-
-            Console.WriteLine("Starting...");
+            logger.LogInformation($"Api Version:{applicationVersion}");
             await app.RunAsync();
         }
 

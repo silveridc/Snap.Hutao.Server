@@ -6,7 +6,7 @@ namespace server.Controllers;
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
 
-public class WallpaperController(Bing bing,HoyoPlay hyp) : Controller
+public class WallpaperController(BingWallpaper bing,HoyoPlayWallpaper hyp) : Controller
 {
     [HttpGet("bing")]
     [HttpGet("today")]

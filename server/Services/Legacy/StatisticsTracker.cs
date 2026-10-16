@@ -246,6 +246,9 @@ namespace server.Services.Legacy
             {
                 double totalTime = stopwatch.GetElapsedTime().TotalMilliseconds;
 
+                // 无记录时按 0 计，Infinity/NaN 无法被 MVC 的 JSON 输出序列化，会让 /Statistics/Overview 直接 500
+                double timeAverage = totalRecordCounter == 0 ? 0 : totalTime / totalRecordCounter;
+
                 Overview overview = new()
                 {
                     ScheduleId = scheduleId,
@@ -257,7 +260,7 @@ namespace server.Services.Legacy
                     SpiralAbyssFullStar = level12TotalRecordCounter,
                     Timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                     TimeTotal = totalTime,
-                    TimeAverage = totalTime / totalRecordCounter,
+                    TimeAverage = timeAverage,
                 };
 
                 spiralAbyssStatisticsService.SaveStatistics(scheduleId, LegacyStatistics.Overview, overview);
