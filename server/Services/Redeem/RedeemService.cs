@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using server.Core;
 using server.Extension;
-using server.Models.Context;
-using server.Models.Entity.Passport;
 using server.Models.Entity.Redeem;
 using server.Models.Redeem;
-using server.Services.Expire;
 
 namespace server.Services.Redeem
 {

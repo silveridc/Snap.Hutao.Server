@@ -1,6 +1,5 @@
 using MailKit.Net.Smtp;
 using MimeKit;
-using server.Options;
 
 namespace server.Services
 {

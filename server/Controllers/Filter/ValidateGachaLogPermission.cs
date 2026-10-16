@@ -1,8 +1,4 @@
-﻿using server.Models.Context;
-using server.Models.Entity.Passport;
-using server.Models.Response;
-
-namespace server.Controllers.Filter
+﻿namespace server.Controllers.Filter
 {
     public sealed class ValidateGachaLogPermission(AppDbContext appDbContext) : IAsyncActionFilter
     {

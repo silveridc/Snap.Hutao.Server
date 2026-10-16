@@ -1,6 +1,4 @@
-﻿using server.Models.Entity.Passport;
-
-namespace server.Models.Entity.Achievement
+﻿namespace server.Models.Entity.Achievement
 {
     [Table("achievement_archives")]
     public sealed class EntityAchievementArchive

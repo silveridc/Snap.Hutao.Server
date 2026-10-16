@@ -1,5 +1,4 @@
 ﻿using server.Models.Afdian;
-using server.Services.Afdian;
 
 namespace server.Controllers
 {

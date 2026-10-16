@@ -1,8 +1,6 @@
-﻿using server.Models.Context;
-using server.Models.Entity.SpiralAbyss;
+﻿using server.Models.Entity.SpiralAbyss;
 using server.Models.Legacy;
 using server.Models.Upload;
-using server.Options;
 using StackExchange.Redis;
 
 namespace server.Services.Ranking

@@ -1,7 +1,5 @@
 ﻿using server.Models.Entity.Telemetry;
-using server.Models.Response;
 using server.Models.Upload;
-using server.Services.Telemetry;
 
 namespace server.Controllers
 {

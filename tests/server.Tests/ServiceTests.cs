@@ -1,6 +1,6 @@
-using System.Net;
 using server.Models.Admin;
 using server.Tests.Infrastructure;
+using System.Net;
 
 namespace server.Tests;
 

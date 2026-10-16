@@ -2,8 +2,8 @@ using server.Models.Admin;
 using server.Models.Entity.Announcement;
 using server.Models.Entity.Redeem;
 using server.Models.GachaLog;
-using server.Models.Redeem;
 using server.Models.Metadata;
+using server.Models.Redeem;
 using server.Models.Upload;
 using server.Services.Legacy;
 

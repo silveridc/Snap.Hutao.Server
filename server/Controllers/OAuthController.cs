@@ -1,10 +1,4 @@
-﻿using server.Models.Context;
-using server.Models.Entity.Passport;
-using server.Models.Response;
-using server.Options;
-using server.Services.Github;
-using server.Services.OAuth;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace server.Controllers
 {

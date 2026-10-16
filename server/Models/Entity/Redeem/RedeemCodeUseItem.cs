@@ -1,6 +1,4 @@
-﻿using server.Models.Entity.Passport;
-
-namespace server.Models.Entity.Redeem
+﻿namespace server.Models.Entity.Redeem
 {
     [Table("redeem_code_use_items")]
     public sealed class RedeemCodeUseItem

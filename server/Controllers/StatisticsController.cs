@@ -1,7 +1,5 @@
 ﻿using server.Models.Entity.SpiralAbyss;
 using server.Models.Legacy;
-using server.Models.Response;
-using server.Services.Legacy;
 
 namespace server.Controllers
 {

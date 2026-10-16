@@ -1,1 +1,0 @@
-import{R as e,h as t,t as n,x as r}from"./_plugin-vue_export-helper-C62dHoT8.js";var i=r({name:`FrameBlank`});function a(n,r,i,a,o,s){return e(),t(`div`)}var o=n(i,[[`render`,a]]);export{o as default};

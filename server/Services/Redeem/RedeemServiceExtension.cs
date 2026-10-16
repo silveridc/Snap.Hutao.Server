@@ -1,6 +1,5 @@
 ﻿using server.Models.Entity.Redeem;
 using server.Models.Redeem;
-using server.Services.Afdian;
 
 namespace server.Services.Redeem
 {

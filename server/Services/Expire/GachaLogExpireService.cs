@@ -1,6 +1,4 @@
 ﻿using server.Extension;
-using server.Models.Context;
-using server.Models.Entity.Passport;
 
 namespace server.Services.Expire
 {

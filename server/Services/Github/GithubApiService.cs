@@ -1,5 +1,4 @@
 using server.Models.Github;
-using server.Options;
 
 namespace server.Services.Github
 {

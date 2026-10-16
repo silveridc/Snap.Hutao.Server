@@ -1,6 +1,5 @@
 ﻿using Quartz;
 using Sentry;
-using server.Services.Legacy;
 
 namespace server.Job
 {

@@ -1,8 +1,5 @@
 ﻿using server.Models.Legacy;
-using server.Models.Response;
 using server.Models.Upload;
-using server.Services.Legacy;
-using server.Services.Ranking;
 
 namespace server.Controllers
 {

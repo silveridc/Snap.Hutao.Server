@@ -1,11 +1,6 @@
 using MailKit.Net.Smtp;
 using MimeKit;
-using server.Models.Context;
-using server.Models.Entity.Passport;
 using server.Models.Passport;
-using server.Models.Response;
-using server.Services;
-using server.Services.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace server.Controllers

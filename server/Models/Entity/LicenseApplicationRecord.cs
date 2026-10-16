@@ -1,6 +1,4 @@
-﻿using server.Models.Entity.Passport;
-
-namespace server.Models.Entity
+﻿namespace server.Models.Entity
 {
     [Table("license_application_records")]
     public sealed class LicenseApplicationRecord

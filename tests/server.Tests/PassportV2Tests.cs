@@ -1,6 +1,6 @@
-using System.Net;
 using server.Models.Passport;
 using server.Tests.Infrastructure;
+using System.Net;
 
 namespace server.Tests;
 

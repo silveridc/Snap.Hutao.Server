@@ -1,6 +1,7 @@
 ﻿using server.Extension;
 
 namespace server.Controllers.Filter;
+
 public sealed class ValidateMaintainPermission(AppDbContext appDbContext, IDistributedCache cache) : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

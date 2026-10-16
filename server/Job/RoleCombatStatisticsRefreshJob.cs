@@ -1,6 +1,5 @@
 ﻿using Quartz;
 using Sentry;
-using server.Services.RoleCombat;
 
 namespace server.Job
 {

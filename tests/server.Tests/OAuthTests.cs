@@ -1,10 +1,8 @@
-using System.Net;
 using Microsoft.EntityFrameworkCore;
-using server.Models.Context;
 using server.Models.Entity.Passport;
-using server.Models.Passport;
 using server.Services.OAuth;
 using server.Tests.Infrastructure;
+using System.Net;
 
 namespace server.Tests;
 

@@ -1,7 +1,4 @@
-﻿using server.Models.Entity.Passport;
-using server.Services.Authorization;
-
-namespace server.Controllers
+﻿namespace server.Controllers
 {
     internal static class UserAuthorizationExtension
     {

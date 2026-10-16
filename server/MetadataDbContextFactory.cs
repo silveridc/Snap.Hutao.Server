@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using server.Models.Context;
+﻿using Microsoft.EntityFrameworkCore.Design;
 
 namespace server
 {

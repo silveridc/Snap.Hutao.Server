@@ -1,10 +1,5 @@
 ﻿using server.Extension;
-using server.Models.Context;
-using server.Models.Entity.Passport;
 using server.Models.Github;
-using server.Options;
-using server.Services.Authorization;
-using server.Services.OAuth;
 using System.Web;
 
 namespace server.Services.Github

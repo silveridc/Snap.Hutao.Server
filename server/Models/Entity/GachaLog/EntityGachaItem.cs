@@ -1,5 +1,4 @@
-﻿using server.Models.Entity.Passport;
-using server.Models.Metadata;
+﻿using server.Models.Metadata;
 using System.ComponentModel;
 
 namespace server.Models.Entity.GachaLog

@@ -1,6 +1,5 @@
 using server.Extension;
 using StackExchange.Redis;
-using System.Net;
 
 namespace server.Services.Cache
 {

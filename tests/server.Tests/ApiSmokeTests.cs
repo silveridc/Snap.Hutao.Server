@@ -1,6 +1,5 @@
-using System.Net;
-using System.Text;
 using server.Tests.Infrastructure;
+using System.Net;
 
 namespace server.Tests;
 

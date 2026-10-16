@@ -1,8 +1,6 @@
 ﻿using Quartz;
 using Sentry;
 using server.Extension;
-using server.Models.Context;
-using server.Services.GachaLog.Statistics;
 
 namespace server.Job
 {

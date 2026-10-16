@@ -1,9 +1,5 @@
-﻿using server.Controllers;
-using server.Extension;
-using server.Models.Context;
-using server.Models.Entity.Passport;
+﻿using server.Extension;
 using server.Models.Passport;
-using server.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;

@@ -1,5 +1,4 @@
 ﻿using server.Models.ReCaptcha;
-using server.Options;
 
 namespace server.Services.ReCaptcha
 {

@@ -36,10 +36,10 @@ public static class RegisteredRoutes
                 }
 
                 foreach (HttpMethodMetadata metadata in methods)
-                foreach (string method in metadata.HttpMethods)
-                {
-                    routes.Add(new RouteKey(method.ToUpperInvariant(), template));
-                }
+                    foreach (string method in metadata.HttpMethods)
+                    {
+                        routes.Add(new RouteKey(method.ToUpperInvariant(), template));
+                    }
             }
         }
 

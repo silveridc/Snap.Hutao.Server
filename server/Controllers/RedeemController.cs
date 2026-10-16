@@ -1,8 +1,5 @@
-﻿using server.Models.Context;
-using server.Models.Entity.Redeem;
+﻿using server.Models.Entity.Redeem;
 using server.Models.Redeem;
-using server.Models.Response;
-using server.Services.Redeem;
 
 namespace server.Controllers
 {

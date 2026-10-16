@@ -1,6 +1,4 @@
-﻿using server.Services.OAuth;
-
-namespace server.Models.Entity.Passport
+﻿namespace server.Models.Entity.Passport
 {
     public class OAuthBindIdentity
     {

@@ -1,6 +1,4 @@
-﻿using server.Models.Entity.Passport;
-
-namespace server.Services.Expire
+﻿namespace server.Services.Expire
 {
     internal interface IExpireService
     {

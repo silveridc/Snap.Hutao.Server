@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization.Policy;
-using server.Controllers;
-using server.Models.Response;
 
 namespace server.Services.Authorization
 {

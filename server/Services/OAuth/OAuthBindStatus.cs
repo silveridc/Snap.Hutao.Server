@@ -1,6 +1,4 @@
-﻿using server.Models.Entity.Passport;
-
-namespace server.Services.OAuth
+﻿namespace server.Services.OAuth
 {
     public sealed class OAuthBindStatus
     {

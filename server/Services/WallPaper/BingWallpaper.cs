@@ -2,6 +2,7 @@
 using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
+
 public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCache cache, ILogger<BingWallpaper> logger)
 {
     const string wallpaperType = "bing";
@@ -25,7 +26,7 @@ public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCac
                 return null!;
             }
             string resUrl = $"https://www.bing.com{imgItem.UrlBase}_UHD.jpg";
-            WallPaperResponse result = new (resUrl,imgItem.CopyrightLink, "Bing", imgItem.Copyright);
+            WallPaperResponse result = new(resUrl, imgItem.CopyrightLink, "Bing", imgItem.Copyright);
             cache.Set(todayKey, result, new DateTimeOffset(DateTime.Today.AddDays(1)));
 
             return result;

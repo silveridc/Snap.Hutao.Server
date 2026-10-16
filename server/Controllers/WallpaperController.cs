@@ -6,14 +6,14 @@ namespace server.Controllers;
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
 
-public class WallpaperController(BingWallpaper bing,HoyoPlayWallpaper hyp) : Controller
+public class WallpaperController(BingWallpaper bing, HoyoPlayWallpaper hyp) : Controller
 {
     [HttpGet("bing")]
     [HttpGet("today")]
     public async Task<IActionResult> GetBingWallpaper()
     {
         WallPaperResponse data = await bing.GetTodayWallpaperAsync();
-        return Response<WallPaperResponse>.Success("Success",data);
+        return Response<WallPaperResponse>.Success("Success", data);
     }
     [HttpGet("hoyoplay")]
     public async Task<IActionResult> GetHypWallpaper()

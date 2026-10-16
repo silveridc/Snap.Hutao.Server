@@ -1,6 +1,4 @@
-﻿using server.Services.Afdian;
-
-namespace server.Services.Expire
+﻿namespace server.Services.Expire
 {
     public static class CdnExpireServiceExtension
     {

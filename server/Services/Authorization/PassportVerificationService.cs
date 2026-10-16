@@ -1,5 +1,4 @@
 ﻿using server.Core;
-using server.Options;
 using StackExchange.Redis;
 
 namespace server.Services.Authorization

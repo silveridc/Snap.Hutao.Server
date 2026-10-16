@@ -1,12 +1,11 @@
-using System.Net;
 using Microsoft.EntityFrameworkCore;
 using server.Models.GachaLog;
 using server.Models.Legacy;
 using server.Models.Metadata;
 using server.Models.Passport;
-using server.Models.Upload;
 using server.Services.GachaLog;
 using server.Tests.Infrastructure;
+using System.Net;
 
 namespace server.Tests;
 

@@ -1,1 +1,0 @@
-import{H as e,R as t,b as n,h as r,t as i}from"./_plugin-vue_export-helper-C62dHoT8.js";var a={},o={class:`tdesign-wrapper`};function s(i,a){let s=e(`router-view`);return t(),r(`div`,o,[n(s)])}var c=i(a,[[`render`,s],[`__scopeId`,`data-v-d2d85c5e`]]);export{c as default};

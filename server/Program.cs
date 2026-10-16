@@ -9,7 +9,6 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Quartz;
 using Sentry;
-using Sentry.Protocol;
 using server.Extension;
 using server.Services.Admin;
 using server.Services.Cache;
@@ -172,7 +171,7 @@ namespace server
                     config.ScheduleJob<SpiralAbyssRecordCleanJob>(t => t.StartNow().WithCronSchedule("0 0 4 16 * ?"));
                     config.ScheduleJob<RoleCombatStatisticsRefreshJob>(t => t.StartNow().WithCronSchedule("0 10 */1 * * ?"));
                     config.ScheduleJob<RoleCombatRecordCleanJob>(t => t.StartNow().WithCronSchedule("0 0 4 1 * ?"));
-               })
+                })
                 .AddQuartzHostedService(options => options.WaitForJobsToComplete = true)
                 .AddResponseCompression()
 

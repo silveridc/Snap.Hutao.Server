@@ -4,7 +4,6 @@ using server.Models.Entity;
 using server.Models.Entity.Achievement;
 using server.Models.Entity.Announcement;
 using server.Models.Entity.GachaLog;
-using server.Models.Entity.Passport;
 using server.Models.Entity.Redeem;
 using server.Models.Entity.RoleCombat;
 using server.Models.Entity.SpiralAbyss;
