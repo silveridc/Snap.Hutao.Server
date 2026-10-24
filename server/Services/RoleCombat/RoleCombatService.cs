@@ -1,84 +1,73 @@
-﻿using server.Extension;
+using System.Runtime.InteropServices;
+using server.Extension;
 using server.Models.Entity.RoleCombat;
 using server.Models.RoleCombat;
 using server.Services.Legacy.Primitive;
-using System.Runtime.InteropServices;
 
-namespace server.Services.RoleCombat
+namespace server.Services.RoleCombat;
+
+public sealed class RoleCombatService(IServiceProvider serviceProvider, TimeProvider timeProvider)
 {
-    public sealed class RoleCombatService(IServiceProvider serviceProvider)
+    public const string Working = "RoleCombatService.Working";
+
+    private static readonly Func<AppDbContext, IEnumerable<RoleCombatRecord>> RecordsQuery = EF.CompileQuery((AppDbContext context) =>
+        context.RoleCombatRecords.AsNoTracking());
+
+    private static readonly Func<AppDbContext, long, IEnumerable<RoleCombatAvatar>> AvatarsQuery = EF.CompileQuery((AppDbContext context, long recordId) =>
+        context.RoleCombatAvatars.AsNoTracking().Where(g => g.RecordId == recordId).AsQueryable());
+
+    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
+    private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
+
+    public async Task RunAsync()
     {
-        public const string Working = "RoleCombatService.Working";
-
-        private static readonly Func<AppDbContext, IEnumerable<RoleCombatRecord>> RecordsQuery = EF.CompileQuery((AppDbContext context) =>
-            context.RoleCombatRecords.AsNoTracking());
-
-        private static readonly Func<AppDbContext, long, IEnumerable<RoleCombatAvatar>> AvatarsQuery = EF.CompileQuery((AppDbContext context, long recordId) =>
-            context.RoleCombatAvatars.AsNoTracking().Where(g => g.RecordId == recordId).AsQueryable());
-
-        private readonly AppDbContext appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-        private readonly IDistributedCache cache = serviceProvider.GetRequiredService<IDistributedCache>();
-
-        public async Task RunAsync()
+        await _cache.RunExclusiveAsync(Working, async () =>
         {
-            if (cache.HasFlag(Working))
-            {
-                return;
-            }
+            Map<uint, int> resultMap = [];
 
-            try
+            int total = await Task.Run(() => RunCore(resultMap)).ConfigureAwait(false);
+            RoleCombatStatisticsItem item = new()
             {
-                cache.SetFlag(Working, DistributedCacheExtension.WorkingExpiration);
-                Map<uint, int> resultMap = [];
+                ScheduleId = RoleCombatScheduleId.GetForNow(),
+                RecordTotal = total,
+                Timestamp = timeProvider.GetUnixTimeMilliseconds(),
+                BackupAvatarRates = [.. resultMap.Select(kvp => new Models.Legacy.ItemRate<uint, double>(kvp.Key, kvp.Value / (double)total))],
+            };
 
-                int total = await Task.Run(() => RunCore(resultMap)).ConfigureAwait(false);
-                RoleCombatStatisticsItem item = new()
+            int scheduleId = RoleCombatScheduleId.GetForNow();
+            RoleCombatStatistics? statistics = _appDbContext.RoleCombatStatistics.SingleOrDefault(s => s.ScheduleId == scheduleId);
+
+            if (statistics == null)
+            {
+                statistics = new()
                 {
-                    ScheduleId = RoleCombatScheduleId.GetForNow(),
-                    RecordTotal = total,
-                    Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    BackupAvatarRates = [.. resultMap.Select(kvp => new Models.Legacy.ItemRate<uint, double>(kvp.Key, kvp.Value / (double)total))],
+                    ScheduleId = scheduleId,
                 };
-
-                int scheduleId = RoleCombatScheduleId.GetForNow();
-                RoleCombatStatistics? statistics = appDbContext.RoleCombatStatistics.SingleOrDefault(s => s.ScheduleId == scheduleId);
-
-                if (statistics == null)
-                {
-                    statistics = new()
-                    {
-                        ScheduleId = scheduleId,
-                    };
-                    appDbContext.RoleCombatStatistics.Add(statistics);
-                }
-
-                cache.Set($"RoleCombatStatistics:{scheduleId}", item);
-                statistics.Data = JsonSerializer.Serialize(item);
-
-                await appDbContext.SaveChangesAsync().ConfigureAwait(false);
+                _appDbContext.RoleCombatStatistics.Add(statistics);
             }
-            finally
-            {
-                cache.Remove(Working);
-            }
-        }
 
-        private int RunCore(Map<uint, int> resultMap)
+            _cache.Set($"RoleCombatStatistics:{scheduleId}", item);
+            statistics.Data = JsonSerializer.Serialize(item);
+
+            await _appDbContext.SaveChangesAsync().ConfigureAwait(false);
+        }).ConfigureAwait(false);
+    }
+
+    private int RunCore(Map<uint, int> resultMap)
+    {
+        int count = 0;
+        List<RoleCombatRecord> reocrds = [.. RecordsQuery(_appDbContext)];
+        foreach (ref readonly RoleCombatRecord record in CollectionsMarshal.AsSpan(reocrds))
         {
-            int count = 0;
-            List<RoleCombatRecord> reocrds = [.. RecordsQuery(appDbContext)];
-            foreach (ref readonly RoleCombatRecord record in CollectionsMarshal.AsSpan(reocrds))
+            count++;
+            List<RoleCombatAvatar> avatars = [.. AvatarsQuery(_appDbContext, record.PrimaryId)];
+
+            foreach (ref readonly RoleCombatAvatar avatar in CollectionsMarshal.AsSpan(avatars))
             {
-                count++;
-                List<RoleCombatAvatar> avatars = [.. AvatarsQuery(appDbContext, record.PrimaryId)];
-
-                foreach (ref readonly RoleCombatAvatar avatar in CollectionsMarshal.AsSpan(avatars))
-                {
-                    resultMap.IncreaseOne(avatar.AvatarId);
-                }
+                resultMap.IncreaseOne(avatar.AvatarId);
             }
-
-            return count;
         }
+
+        return count;
     }
 }

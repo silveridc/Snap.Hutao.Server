@@ -1,8 +1,7 @@
-﻿namespace server.Models.Entity.Announcement
+﻿namespace server.Models.Entity.Announcement;
+
+public enum AnnouncementKind
 {
-    public enum AnnouncementKind
-    {
-        None,
-        VersionUpdate,
-    }
+    None,
+    VersionUpdate,
 }

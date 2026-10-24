@@ -55,7 +55,9 @@ const items = computed(() => {
   if (!u?.name) return [];
   return [
     { label: t('pages.dashboard.account.email'), value: u.name },
+    { label: t('pages.dashboard.account.authKind'), value: u.authKind === 'admin' ? t('pages.dashboard.account.kindAdmin') : t('pages.dashboard.account.kindUser') },
     { label: t('pages.dashboard.account.maintainer'), value: u.isMaintainer ? t('pages.dashboard.account.yes') : t('pages.dashboard.account.no') },
+    { label: t('pages.dashboard.account.canWrite'), value: u.canWrite ? t('pages.dashboard.account.yes') : t('pages.dashboard.account.no') },
     { label: t('pages.dashboard.account.licensedDeveloper'), value: u.isLicensedDeveloper ? t('pages.dashboard.account.yes') : t('pages.dashboard.account.no') },
     { label: t('pages.dashboard.account.gachaLogExpireAt'), value: fmt(u.gachaLogExpireAt) },
     { label: t('pages.dashboard.account.cdnExpireAt'), value: fmt(u.cdnExpireAt) },

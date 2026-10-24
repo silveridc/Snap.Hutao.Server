@@ -1,0 +1,20 @@
+{
+  "sso": {
+    "title": "Single Sign-On",
+    "working": "Finishing the SSO login…",
+    "success": "Signed in, redirecting…",
+    "subject": "Subject",
+    "copy": "Copy",
+    "copied": "Subject copied",
+    "backToLogin": "Back to sign in",
+    "errors": {
+      "expired": "The login request has expired or was already used. Start SSO again.",
+      "upstream": "The identity provider rejected this login. Try again or sign in with a password.",
+      "invalid_token": "The identity token failed validation. Start SSO again.",
+      "not_provisioned": "Your identity is verified but no admin account exists yet. Send the subject to an administrator.",
+      "disabled": "This admin account has been disabled. Contact an administrator.",
+      "ticket": "The login ticket is invalid or has expired. Start SSO again.",
+      "unknown": "The SSO login failed. Start again or sign in with a password."
+    }
+  }
+}

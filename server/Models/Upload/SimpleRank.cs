@@ -1,9 +1,8 @@
-﻿namespace server.Models.Upload
-{
-    public sealed class SimpleRank
-    {
-        public int AvatarId { get; set; }
+﻿namespace server.Models.Upload;
 
-        public int Value { get; set; }
-    }
+public sealed class SimpleRank
+{
+    public int AvatarId { get; set; }
+
+    public int Value { get; set; }
 }

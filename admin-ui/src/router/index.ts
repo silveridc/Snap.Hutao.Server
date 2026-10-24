@@ -18,6 +18,12 @@ const defaultRouterList: Array<RouteRecordRaw> = [
     name: 'login',
     component: () => import('@/pages/login/index.vue'),
   },
+  // 单点登录回跳页：无布局，白名单放行，票据只出现在地址的 hash 片段里
+  {
+    path: '/sso',
+    name: 'sso',
+    component: () => import('@/pages/sso/index.vue'),
+  },
   {
     path: '/',
     redirect: '/dashboard',

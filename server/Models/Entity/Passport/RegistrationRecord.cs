@@ -1,9 +1,8 @@
-﻿namespace server.Models.Entity.Passport
+﻿namespace server.Models.Entity.Passport;
+
+[Table("registration_records")]
+public sealed class RegistrationRecord
 {
-    [Table("registration_records")]
-    public sealed class RegistrationRecord
-    {
-        [Key]
-        public string UserName { get; set; } = default!;
-    }
+    [Key]
+    public string UserName { get; set; } = default!;
 }

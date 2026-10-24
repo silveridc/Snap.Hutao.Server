@@ -1,12 +1,11 @@
-namespace server.Models.Patch
+namespace server.Models.Patch;
+
+/// <summary>
+/// 镜像类型，序列化为字符串以匹配客户端（Direct/Archive/Browser）。
+/// </summary>
+public enum HutaoPackageMirrorType
 {
-    /// <summary>
-    /// 镜像类型，序列化为字符串以匹配客户端（Direct/Archive/Browser）。
-    /// </summary>
-    public enum HutaoPackageMirrorType
-    {
-        Direct,
-        Archive,
-        Browser,
-    }
+    Direct,
+    Archive,
+    Browser,
 }

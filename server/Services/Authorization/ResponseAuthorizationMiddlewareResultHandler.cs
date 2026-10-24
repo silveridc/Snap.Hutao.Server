@@ -1,32 +1,31 @@
 ﻿using Microsoft.AspNetCore.Authorization.Policy;
 
-namespace server.Services.Authorization
+namespace server.Services.Authorization;
+
+// Singleton
+public class ResponseAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
 {
-    // Singleton
-    public class ResponseAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
+    private readonly AuthorizationMiddlewareResultHandler _defaultHandler = new();
+
+    /// <inheritdoc/>
+    public Task HandleAsync(RequestDelegate next, HttpContext context, AuthorizationPolicy policy, PolicyAuthorizationResult authorizeResult)
     {
-        private readonly AuthorizationMiddlewareResultHandler defaultHandler = new();
-
-        /// <inheritdoc/>
-        public Task HandleAsync(RequestDelegate next, HttpContext context, AuthorizationPolicy policy, PolicyAuthorizationResult authorizeResult)
+        if (authorizeResult.Succeeded)
         {
-            if (authorizeResult.Succeeded)
-            {
-                return defaultHandler.HandleAsync(next, context, policy, authorizeResult);
-            }
-
-            return ForbidAsync(context);
+            return _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
         }
 
-        private static async Task ForbidAsync(HttpContext context)
-        {
-            if (!context.Response.HasStarted)
-            {
-                context.Response.StatusCode = StatusCodes.Status200OK;
-            }
+        return ForbidAsync(context);
+    }
 
-            Response response = Response.FailResponse(ReturnCode.LoginFail, "Please log in or register a Snap Hutao account first", ServerKeys.ServerPassportLoginRequired);
-            await context.Response.WriteAsJsonAsync(response).ConfigureAwait(false);
+    private static async Task ForbidAsync(HttpContext context)
+    {
+        if (!context.Response.HasStarted)
+        {
+            context.Response.StatusCode = StatusCodes.Status200OK;
         }
+
+        Response<object?> response = Response.CreateFail<object?>("Please log in or register a Snap Hutao account first", ReturnCode.LoginFail, key: ServerKeys.ServerPassportLoginRequired);
+        await context.Response.WriteAsJsonAsync(response).ConfigureAwait(false);
     }
 }

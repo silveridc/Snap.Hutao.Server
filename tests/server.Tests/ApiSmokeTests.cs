@@ -27,6 +27,10 @@ public sealed class ApiSmokeTests
         "/OAuth/Auth",
         "/OAuth/Callback",
         "/Webhook",
+        "/client",
+        "/metadata",
+        "/Admin/Sso/Callback",
+        "/Passport/Sso/Callback",
     ];
 
     /// <summary>每次运行都使用不同账号，避免与其它用例的验证码缓存互相干扰。</summary>
@@ -76,6 +80,14 @@ public sealed class ApiSmokeTests
     {
         // 客户端更新
         { "GET", "/patch/hutao", null },
+
+        // 启动器功能配置（裸 JSON，未同步过的版本返回 404）
+        { "GET", "/client/AchievementFieldId_0.0.0.json", null },
+        { "GET", "/client/UnknownFeature_1.0.0.json", null },
+
+        // metadata 原文档（裸 JSON，没导入过返回 404）。散文件路径 /metadata/Genshin/{locale}/Avatar/{id}.json
+        // 与下面的模板段数不同，路由匹配器只认这一段深度的地址，语义断言见 MetadataTests
+        { "GET", "/metadata/Genshin/AAA/Achievement.json", null },
 
         // 公告
         { "POST", "/Announcement/List", "[]" },
@@ -162,6 +174,18 @@ public sealed class ApiSmokeTests
         // 爱发电订单回调：未知 sku 不做外部校验，直接判定为不支持（成功分支见 WebhookTests）
         { "POST", "/Webhook", TestData.AfdianOrderJson("smoke-unknown-sku", "SKU-NOT-CONFIGURED", 1, "smoke@example.com") },
 
+        // 后台单点登录：SSO 未启用的宿主里 Status 报未启用、Challenge/Exchange/Callback 走拒绝分支，
+        // 全链路的成功分支见 SsoTests
+        { "GET", "/Admin/Sso/Status", null },
+        { "GET", "/Admin/Sso/Challenge", null },
+        { "GET", "/Admin/Sso/Callback?code=smoke&state=smoke", null },
+        { "POST", "/Admin/Sso/Exchange", """{"Ticket":"smoke"}""" },
+
+        // 启动器单点登录：同样只跑拒绝分支，成功链路见 SsoTests 与 upd-test/sso-e2e
+        { "GET", "/Passport/Sso/Status", null },
+        { "GET", "/Passport/Sso/Challenge", null },
+        { "GET", "/Passport/Sso/Callback?code=smoke&state=smoke", null },
+        { "POST", "/Passport/Sso/Exchange", """{"Ticket":"smoke"}""" },
 
         // 公共 API 与第三方透传
         { "GET", "/publicapi/ip", null },

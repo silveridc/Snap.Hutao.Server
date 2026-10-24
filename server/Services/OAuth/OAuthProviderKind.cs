@@ -1,7 +1,6 @@
-﻿namespace server.Services.OAuth
+﻿namespace server.Services.OAuth;
+
+public enum OAuthProviderKind
 {
-    public enum OAuthProviderKind
-    {
-        Github,
-    }
+    Github,
 }

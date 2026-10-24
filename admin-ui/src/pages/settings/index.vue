@@ -19,6 +19,14 @@ const CONFIG_SECTIONS = computed(() => [
     ],
   },
   {
+    title: t('pages.settings.sections.killSwitch.title'),
+    description: t('pages.settings.sections.killSwitch.description'),
+    fields: [
+      { key: 'Patch.DisableFpsUnlock', label: t('pages.settings.fields.disableFpsUnlock.label'), type: 'switch', hint: t('pages.settings.fields.disableFpsUnlock.hint') },
+      { key: 'Patch.DisableIslandInjection', label: t('pages.settings.fields.disableIslandInjection.label'), type: 'switch', hint: t('pages.settings.fields.disableIslandInjection.hint') },
+    ],
+  },
+  {
     title: t('pages.settings.sections.pizzaHelper.title'),
     description: t('pages.settings.sections.pizzaHelper.description'),
     fields: [
@@ -41,6 +49,23 @@ const CONFIG_SECTIONS = computed(() => [
     description: t('pages.settings.sections.mail.description'),
     fields: [
       { key: 'Smtp.DiagnosticEmailAddress', label: t('pages.settings.fields.diagnosticEmail.label'), type: 'text', hint: t('pages.settings.fields.diagnosticEmail.hint') },
+    ],
+  },
+  {
+    title: t('pages.settings.sections.sso.title'),
+    description: t('pages.settings.sections.sso.description'),
+    fields: [
+      { key: 'Oidc.Enabled', label: t('pages.settings.fields.ssoEnabled.label'), type: 'switch', hint: t('pages.settings.fields.ssoEnabled.hint') },
+      { key: 'Oidc.Authority', label: t('pages.settings.fields.ssoAuthority.label'), type: 'text', hint: t('pages.settings.fields.ssoAuthority.hint') },
+      { key: 'Oidc.ClientId', label: t('pages.settings.fields.ssoClientId.label'), type: 'text', hint: t('pages.settings.fields.ssoClientId.hint') },
+      { key: 'Oidc.ClientSecret', label: t('pages.settings.fields.ssoClientSecret.label'), type: 'password', hint: t('pages.settings.fields.ssoClientSecret.hint') },
+      { key: 'Oidc.RedirectUri', label: t('pages.settings.fields.ssoRedirectUri.label'), type: 'text', hint: t('pages.settings.fields.ssoRedirectUri.hint') },
+      { key: 'Oidc.ClientRedirectUri', label: t('pages.settings.fields.ssoClientRedirectUri.label'), type: 'text', hint: t('pages.settings.fields.ssoClientRedirectUri.hint') },
+      { key: 'Oidc.Scope', label: t('pages.settings.fields.ssoScope.label'), type: 'text', hint: t('pages.settings.fields.ssoScope.hint') },
+      { key: 'Oidc.DisplayName', label: t('pages.settings.fields.ssoDisplayName.label'), type: 'text', hint: t('pages.settings.fields.ssoDisplayName.hint') },
+      { key: 'Oidc.BootstrapClaim', label: t('pages.settings.fields.ssoBootstrapClaim.label'), type: 'text', hint: t('pages.settings.fields.ssoBootstrapClaim.hint') },
+      { key: 'Oidc.BootstrapValue', label: t('pages.settings.fields.ssoBootstrapValue.label'), type: 'text', hint: t('pages.settings.fields.ssoBootstrapValue.hint') },
+      { key: 'Oidc.RequireHttpsMetadata', label: t('pages.settings.fields.ssoRequireHttps.label'), type: 'switch', hint: t('pages.settings.fields.ssoRequireHttps.hint') },
     ],
   },
 ]);
@@ -171,6 +196,7 @@ onMounted(load);
                   <t-space align="center" style="width: 100%">
                     <t-input
                       v-model="form[field.key]"
+                      :type="field.type === 'password' ? 'password' : 'text'"
                       :placeholder="$t('pages.settings.form.emptyPlaceholder')"
                       clearable
                       style="max-width: 360px"

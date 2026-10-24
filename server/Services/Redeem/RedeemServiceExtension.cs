@@ -1,44 +1,43 @@
-﻿using server.Models.Entity.Redeem;
+using server.Models.Entity.Redeem;
 using server.Models.Redeem;
 
-namespace server.Services.Redeem
+namespace server.Services.Redeem;
+
+public static class RedeemServiceExtension
 {
-    public static class RedeemServiceExtension
+    public static async ValueTask<string> GenerateRedeemCodeForPurchaseGachaLogServiceAsync(this RedeemService redeemService, AfdianOrderInformation info)
     {
-        public static async ValueTask<string> GenerateRedeemCodeForPurchaseGachaLogServiceAsync(this RedeemService redeemService, AfdianOrderInformation info)
+        RedeemGenerateRequest req = new()
         {
-            RedeemGenerateRequest req = new()
-            {
-                Count = 1U,
-                Type = RedeemCodeType.TimeLimited | RedeemCodeType.TimesLimited,
-                ServiceType = RedeemCodeTargetServiceType.GachaLog,
-                Value = 30 * info.OrderCount,
-                Description = "For unregistered user",
-                ExpireTime = DateTimeOffset.UtcNow + TimeSpan.FromDays(3),
-                Times = 1,
-                Creator = "AfdianWebhookService",
-            };
+            Count = 1U,
+            Type = RedeemCodeType.TimeLimited | RedeemCodeType.TimesLimited,
+            ServiceType = RedeemCodeTargetServiceType.GachaLog,
+            Value = 30 * info.OrderCount,
+            Description = "For unregistered user",
+            ExpireTime = TimeProvider.System.GetUtcNow() + TimeSpan.FromDays(3),
+            Times = 1,
+            Creator = "AfdianWebhookService",
+        };
 
-            RedeemGenerateResponse codes = await redeemService.GenerateRedeemCodesAsync(req).ConfigureAwait(false);
-            return codes.Codes.Single();
-        }
+        RedeemGenerateResponse codes = await redeemService.GenerateRedeemCodesAsync(req).ConfigureAwait(false);
+        return codes.Codes.Single();
+    }
 
-        public static async ValueTask<string> GenerateRedeemCodeForPurchaseCdnServiceAsync(this RedeemService redeemService, AfdianOrderInformation info)
+    public static async ValueTask<string> GenerateRedeemCodeForPurchaseCdnServiceAsync(this RedeemService redeemService, AfdianOrderInformation info)
+    {
+        RedeemGenerateRequest req = new()
         {
-            RedeemGenerateRequest req = new()
-            {
-                Count = 1U,
-                Type = RedeemCodeType.TimeLimited | RedeemCodeType.TimesLimited,
-                ServiceType = RedeemCodeTargetServiceType.Cdn,
-                Value = 30 * info.OrderCount,
-                Description = "For unregistered user",
-                ExpireTime = DateTimeOffset.UtcNow + TimeSpan.FromDays(3),
-                Times = 1,
-                Creator = "AfdianWebhookService",
-            };
+            Count = 1U,
+            Type = RedeemCodeType.TimeLimited | RedeemCodeType.TimesLimited,
+            ServiceType = RedeemCodeTargetServiceType.Cdn,
+            Value = 30 * info.OrderCount,
+            Description = "For unregistered user",
+            ExpireTime = TimeProvider.System.GetUtcNow() + TimeSpan.FromDays(3),
+            Times = 1,
+            Creator = "AfdianWebhookService",
+        };
 
-            RedeemGenerateResponse codes = await redeemService.GenerateRedeemCodesAsync(req).ConfigureAwait(false);
-            return codes.Codes.Single();
-        }
+        RedeemGenerateResponse codes = await redeemService.GenerateRedeemCodesAsync(req).ConfigureAwait(false);
+        return codes.Codes.Single();
     }
 }

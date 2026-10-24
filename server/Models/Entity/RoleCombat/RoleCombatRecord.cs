@@ -1,20 +1,19 @@
-﻿namespace server.Models.Entity.RoleCombat
+﻿namespace server.Models.Entity.RoleCombat;
+
+[Table("role_combat_records")]
+public sealed class RoleCombatRecord
 {
-    [Table("role_combat_records")]
-    public sealed class RoleCombatRecord
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long PrimaryId { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public long PrimaryId { get; set; }
 
-        [StringLength(10, MinimumLength = 9)]
-        public string Uid { get; set; } = null!;
+    [StringLength(10, MinimumLength = 9)]
+    public string Uid { get; set; } = null!;
 
-        [StringLength(64)]
-        public string Uploader { get; set; } = null!;
+    [StringLength(64)]
+    public string Uploader { get; set; } = null!;
 
-        public long UploadTime { get; set; }
+    public long UploadTime { get; set; }
 
-        public List<RoleCombatAvatar> Avatars { get; set; } = null!;
-    }
+    public List<RoleCombatAvatar> Avatars { get; set; } = null!;
 }

@@ -27,7 +27,7 @@ namespace server.Tests.Infrastructure;
 /// <item>关闭 Unix Socket、RealIp 与 Sentry/OpenTelemetry 上报。</item>
 /// </list>
 /// </summary>
-public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Response.Response>, IAsyncLifetime
+public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Context.AppDbContext>, IAsyncLifetime
 {
     private readonly string stateDirectory = Path.Combine(Path.GetTempPath(), $"hutao-tests-{Guid.NewGuid():N}");
     private readonly StubHttpMessageHandler stubHttp = new();
@@ -358,6 +358,22 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Res
         using IServiceScope scope = Services.CreateScope();
         AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         return await selector(appDbContext);
+    }
+
+    /// <summary>在独立作用域中执行一段 metadata 库操作（MetadataDbContext 没有迁移，表由 CreateTablesAsync 建）。</summary>
+    public async Task WithMetadataDbContextAsync(Func<MetadataDbContext, Task> action)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        MetadataDbContext metadataDbContext = scope.ServiceProvider.GetRequiredService<MetadataDbContext>();
+        await action(metadataDbContext);
+    }
+
+    /// <summary>在独立作用域中读取 metadata 库。</summary>
+    public async Task<T> WithMetadataDbContextAsync<T>(Func<MetadataDbContext, Task<T>> selector)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        MetadataDbContext metadataDbContext = scope.ServiceProvider.GetRequiredService<MetadataDbContext>();
+        return await selector(metadataDbContext);
     }
 
     private sealed class LoopbackRemoteIpStartupFilter : IStartupFilter

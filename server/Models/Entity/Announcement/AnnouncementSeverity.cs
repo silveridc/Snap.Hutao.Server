@@ -1,10 +1,9 @@
-﻿namespace server.Models.Entity.Announcement
+﻿namespace server.Models.Entity.Announcement;
+
+public enum AnnouncementSeverity
 {
-    public enum AnnouncementSeverity
-    {
-        Informational,
-        Success,
-        Warning,
-        Error,
-    }
+    Informational,
+    Success,
+    Warning,
+    Error,
 }

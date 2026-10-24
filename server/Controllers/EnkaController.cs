@@ -5,7 +5,7 @@ namespace server.Controllers;
 [ApiExplorerSettings(IgnoreApi = true)]
 public sealed class EnkaController(IHttpClientFactory httpClientFactory, IDistributedCache cache) : ControllerBase
 {
-    private const string EnkaApiPrefix = "https://enka.network/api/uid/";
+    private const string _enkaApiPrefix = "https://enka.network/api/uid/";
     private static readonly DistributedCacheEntryOptions CacheOptions = new()
     {
         AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60),
@@ -20,7 +20,7 @@ public sealed class EnkaController(IHttpClientFactory httpClientFactory, IDistri
     [HttpGet("{uid}")]
     public Task<IActionResult> GetDataAsync([FromRoute] string uid, CancellationToken token)
     {
-        return ForwardAsync($"{EnkaApiPrefix}{uid}", token);
+        return ForwardAsync($"{_enkaApiPrefix}{uid}", token);
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public sealed class EnkaController(IHttpClientFactory httpClientFactory, IDistri
     [HttpGet("{uid}/info")]
     public Task<IActionResult> GetPlayerInfoAsync([FromRoute] string uid, CancellationToken token)
     {
-        return ForwardAsync($"{EnkaApiPrefix}{uid}?info", token);
+        return ForwardAsync($"{_enkaApiPrefix}{uid}?info", token);
     }
 
     private async Task<IActionResult> ForwardAsync(string url, CancellationToken token)

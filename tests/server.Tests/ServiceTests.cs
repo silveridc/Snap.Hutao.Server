@@ -1,3 +1,4 @@
+using server.Services.Admin;
 using server.Models.Admin;
 using server.Tests.Infrastructure;
 using System.Net;
@@ -508,6 +509,75 @@ public sealed class ServiceTests
         // 回滚到历史版本
         TestResponse activated = await SendAsync("POST", "/Service/Release/Activate", JsonSerializer.Serialize(new HutaoReleaseActivateRequest { Id = release.Id }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, activated.Retcode);
+    }
+
+    /// <summary>
+    /// 最低强制版本链路：发布时携带 minimumVersion → /patch/hutao 原样下发（客户端据此强制更新）；
+    /// 不携带时字段省略（null 走 WhenWritingNull），大于 Version 的值被拒绝。
+    /// </summary>
+    [Fact]
+    public async Task ReleasePublish_WithMinimumVersion_ServesItOnPatch()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+        string version = $"1.98.{Random.Shared.Next(1000, 9999)}.0";
+        string minimum = $"1.90.{Random.Shared.Next(1000, 9999)}.0";
+
+        TestResponse published = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(version, minimum), maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, published.Retcode);
+        Assert.Equal(minimum, published.DeserializeData<HutaoReleaseItem>()!.MinimumVersion);
+
+        using HttpResponseMessage patch = await client.GetWithTokenAsync("/patch/hutao", token: null);
+        TestResponse patchParsed = await patch.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, patchParsed.Retcode);
+        Assert.Equal(minimum, patchParsed.Data.GetProperty("minimumVersion").GetString());
+
+        // 最低版本不得超过发布版本本身
+        string later = $"1.97.{Random.Shared.Next(1000, 9999)}.0";
+        TestResponse rejected = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(later, "1.99.0.0"), maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.InvalidUploadData, rejected.Retcode);
+
+        // 不带 minimumVersion 的发布（换版本号避开唯一索引），下发里字段应缺席
+        TestResponse plain = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(later), maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, plain.Retcode);
+        using HttpResponseMessage patchAgain = await client.GetWithTokenAsync("/patch/hutao", token: null);
+        TestResponse parsed = await patchAgain.ReadTestResponseAsync();
+        Assert.Equal(later, parsed.Data.GetProperty("version").GetString());
+        Assert.False(parsed.Data.TryGetProperty("minimumVersion", out _), "未配置强制版本时字段应省略");
+    }
+
+    /// <summary>
+    /// 功能熔断链路：后台开启 Patch.DisableFpsUnlock / Patch.DisableIslandInjection 后，
+    /// /patch/hutao 下发 true；关闭时字段省略（客户端视为 false，恢复用户本地设置）。
+    /// </summary>
+    [Fact]
+    public async Task PatchKillSwitches_AreServedOnPatchEndpoint()
+    {
+        SystemConfigService config = factory.GetService<SystemConfigService>();
+        try
+        {
+            await config.UpdateAsync(new Dictionary<string, string?>
+            {
+                [SystemConfigService.Keys.PatchDisableFpsUnlock] = "true",
+                [SystemConfigService.Keys.PatchDisableIslandInjection] = "true",
+            }, 0).ConfigureAwait(false);
+
+            using HttpResponseMessage on = await client.GetAsync("/patch/hutao");
+            TestResponse parsedOn = await on.ReadTestResponseAsync();
+            Assert.Equal(ReturnCodes.Success, parsedOn.Retcode);
+            Assert.True(parsedOn.Data.GetProperty("fpsUnlockDisabled").GetBoolean());
+            Assert.True(parsedOn.Data.GetProperty("islandInjectionDisabled").GetBoolean());
+        }
+        finally
+        {
+            await config.DeleteAsync(SystemConfigService.Keys.PatchDisableFpsUnlock).ConfigureAwait(false);
+            await config.DeleteAsync(SystemConfigService.Keys.PatchDisableIslandInjection).ConfigureAwait(false);
+        }
+
+        using HttpResponseMessage off = await client.GetAsync("/patch/hutao");
+        TestResponse parsedOff = await off.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, parsedOff.Retcode);
+        Assert.False(parsedOff.Data.TryGetProperty("fpsUnlockDisabled", out _), "未熔断时字段应省略");
+        Assert.False(parsedOff.Data.TryGetProperty("islandInjectionDisabled", out _), "未熔断时字段应省略");
     }
 
     [Theory]

@@ -159,6 +159,20 @@
     "ServerStatisticsAbyssSucceed": "Spiral Abyss statistics acquired successfully",
     "requestFailed": "Request failed",
     "httpError": "Service error (HTTP {code})",
-    "networkError": "Network error, please check your connection"
+    "networkError": "Network error, please check your connection",
+    "ServerAdminSsoNotEnabled": "Admin SSO is not enabled",
+    "ServerAdminSsoUpstreamFailed": "The identity provider is unavailable, please retry later",
+    "ServerAdminSsoTicketInvalid": "The login ticket is invalid or has expired",
+    "ServerAdminSsoLoginSucceed": "Admin SSO login succeeded",
+    "ServerAdminWriteRequiresSso": "Only SSO admin accounts can modify data",
+    "ServerAdminAccountListSucceed": "Admin account list acquired successfully",
+    "ServerAdminAccountAddSucceed": "Admin account added successfully",
+    "ServerAdminAccountSubjectRequired": "The identity subject is invalid",
+    "ServerAdminAccountAlreadyExists": "An admin account for this identity already exists",
+    "ServerAdminAccountNotFound": "Admin account does not exist",
+    "ServerAdminAccountSelfOperation": "You cannot disable or remove the admin account you are using",
+    "ServerAdminAccountLastEnabled": "At least one enabled admin account must remain",
+    "ServerAdminAccountSetEnabledSucceed": "Admin account state updated successfully",
+    "ServerAdminAccountRemoveSucceed": "Admin account removed successfully"
   }
 }

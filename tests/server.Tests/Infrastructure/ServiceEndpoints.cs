@@ -147,7 +147,35 @@ public static class ServiceEndpoints
         new("GET", "/Service/Config/Get", null, ReturnCodes.Success),
         new("POST", "/Service/Config/Update", JsonSerializer.Serialize(new Dictionary<string, string?> { [ConfigUpdateKey] = "1" }), ReturnCodes.Success),
         new("POST", $"/Service/Config/Reset?key={ConfigResetKey}", null, ReturnCodes.NotFound),
+
+        new("GET", "/Service/Yae/Metadata", null, ReturnCodes.Success),
+
+        // Yae 同步有状态：成功分支会写库，且依赖外部 bucket 的桩数据，
+        // 两个分支由 YaeTests 断言，这里只要求它穿过维护者权限过滤器
+        new("POST", "/Service/Yae/SyncMetadata", null, null),
+
+        // metadata：只用没导入过的 locale 与文档名，保证与 MetadataTests 的写入互不影响
+        new("GET", "/Service/Metadata/Documents?locale=ZZZ", null, ReturnCodes.Success),
+        new("GET", "/Service/Metadata/Kinds", null, ReturnCodes.Success),
+        new("GET", "/Service/Metadata/Translations?locale=ZZZ", null, ReturnCodes.Success),
+        new("GET", "/Service/Metadata/Leaves?name=NoSuchDocument&locale=ZZA&baseline=ZZB", null, ReturnCodes.NotFound),
+        new("POST", "/Service/Metadata/Translation?locale=ZZA&name=NoSuchDocument&pointer=%2FName&value=smoke", null, ReturnCodes.InvalidQueryString),
+        new("POST", "/Service/Metadata/Translation/Remove?locale=ZZA&name=NoSuchDocument&pointer=%2FName", null, ReturnCodes.InvalidQueryString),
+
+        // 后台专属账号（SSO）：SSO 未启用的宿主里写门禁整体放行，维护者可到达业务逻辑。
+        // Add 有状态（唯一 subject，重复调用会走到「已存在」分支），只要求穿过权限过滤器；
+        // SetEnabled/Remove 用越界 accountId，稳定落在「账号不存在」分支。
+        new("GET", "/Service/AdminAccount/List", null, ReturnCodes.Success),
+        new("POST", "/Service/AdminAccount/Add", JsonSerializer.Serialize(new AdminAccountAddRequest { Subject = AdminAccountSubject }), null),
+        new("POST", $"/Service/AdminAccount/SetEnabled?accountId={int.MaxValue}&enabled=false", null, ReturnCodes.NotFound),
+        new("POST", $"/Service/AdminAccount/Remove?accountId={int.MaxValue}", null, ReturnCodes.NotFound),
+        // Bind/Unbind 同样用越界 accountId 落在「账号不存在」分支，绑定的成功分支见 SsoTests
+        new("POST", $"/Service/AdminAccount/Bind?accountId={int.MaxValue}", JsonSerializer.Serialize(new AdminAccountBindRequest { UserName = "no-such-user@example.com" }), ReturnCodes.NotFound),
+        new("POST", $"/Service/AdminAccount/Unbind?accountId={int.MaxValue}", null, ReturnCodes.NotFound),
     ];
+
+    /// <summary>后台账号用例使用的 subject，与真实身份源签发的好区分。</summary>
+    public const string AdminAccountSubject = "smoke-admin-subject";
 
     /// <summary>xUnit <see cref="TheoryData{T1,T2,T3}"/> 形式，供 <c>[MemberData]</c> 直接引用。</summary>
     public static TheoryData<string, string, string?> TheoryData

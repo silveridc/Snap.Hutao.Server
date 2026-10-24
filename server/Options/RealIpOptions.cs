@@ -1,8 +1,7 @@
-﻿namespace server.Options
+﻿namespace server.Options;
+
+public sealed class RealIpOptions
 {
-    public sealed class RealIpOptions
-    {
-        public bool Status { get; set; } = false;
-        public string Header { get; set; } = "X-Real-IP";
-    }
+    public bool Status { get; set; } = false;
+    public string Header { get; set; } = "X-Real-IP";
 }

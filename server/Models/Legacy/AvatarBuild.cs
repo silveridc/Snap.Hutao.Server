@@ -1,7 +1,6 @@
-﻿namespace server.Models.Legacy
+﻿namespace server.Models.Legacy;
+
+public abstract class AvatarBuild(int avatarId)
 {
-    public abstract class AvatarBuild(int avatarId)
-    {
-        public int AvatarId { get; set; } = avatarId;
-    }
+    public int AvatarId { get; set; } = avatarId;
 }

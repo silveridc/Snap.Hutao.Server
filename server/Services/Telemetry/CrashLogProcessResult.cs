@@ -1,8 +1,7 @@
-﻿namespace server.Services.Telemetry
+﻿namespace server.Services.Telemetry;
+
+public enum CrashLogProcessResult
 {
-    public enum CrashLogProcessResult
-    {
-        Ok,
-        InvalidData,
-    }
+    Ok,
+    InvalidData,
 }

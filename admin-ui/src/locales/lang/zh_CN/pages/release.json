@@ -23,7 +23,10 @@
       "addMirror": "添加镜像",
       "releaseNotes": "更新说明",
       "releaseNotesPlaceholder": "可选，本版本更新内容",
-      "submit": "发布"
+      "submit": "发布",
+      "minimumVersion": "最低强制版本",
+      "minimumVersionPlaceholder": "留空不强制，如 1.17.0.0",
+      "minimumVersionHint": "客户端版本低于此值时强制更新且不可跳过；不得大于发布版本"
     },
     "list": {
       "title": "发布历史",

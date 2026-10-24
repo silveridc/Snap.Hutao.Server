@@ -1,14 +1,13 @@
-﻿namespace server.Models.Redeem
+﻿namespace server.Models.Redeem;
+
+public enum RedeemStatus
 {
-    public enum RedeemStatus
-    {
-        Ok,
-        Invalid,
-        NotExists,
-        AlreadyUsed,
-        Expired,
-        NotEnough,
-        NoSuchUser,
-        DbError,
-    }
+    Ok,
+    Invalid,
+    NotExists,
+    AlreadyUsed,
+    Expired,
+    NotEnough,
+    NoSuchUser,
+    DbError,
 }

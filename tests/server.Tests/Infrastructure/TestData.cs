@@ -184,13 +184,14 @@ public static class TestData
         });
     }
 
-    /// <summary>客户端版本发布请求体。</summary>
-    public static string ReleasePublishJson(string version = "1.17.2.0")
+    /// <summary>客户端版本发布请求体；<paramref name="minimumVersion"/> 非空时携带最低强制版本。</summary>
+    public static string ReleasePublishJson(string version = "1.17.2.0", string? minimumVersion = null)
     {
         return JsonSerializer.Serialize(new HutaoReleasePublishRequest
         {
             Version = version,
             Validation = new string('a', 64),
+            MinimumVersion = minimumVersion,
             Mirrors = [new server.Models.Patch.HutaoPackageMirror { MirrorName = "test", Url = "https://example.com/hutao.zip" }],
         });
     }

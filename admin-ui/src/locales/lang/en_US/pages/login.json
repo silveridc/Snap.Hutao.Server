@@ -12,6 +12,12 @@
       "email": "Please enter your email",
       "password": "Please enter your password"
     },
+    "sso": {
+      "divider": "or",
+      "btn": "Sign in with {name}",
+      "defaultName": "Single Sign-On",
+      "fail": "Unable to start the SSO login"
+    },
     "messages": {
       "loginSuccess": "Signed in successfully",
       "loginFail": "Sign in failed"

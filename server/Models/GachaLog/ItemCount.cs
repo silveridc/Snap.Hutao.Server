@@ -1,9 +1,8 @@
-﻿namespace server.Models.GachaLog
-{
-    public sealed class ItemCount
-    {
-        public int Item { get; set; }
+﻿namespace server.Models.GachaLog;
 
-        public long Count { get; set; }
-    }
+public sealed class ItemCount
+{
+    public int Item { get; set; }
+
+    public long Count { get; set; }
 }

@@ -1,27 +1,26 @@
 ﻿using server.Models.Entity.GachaLog;
 
-namespace server.Models.Metadata
+namespace server.Models.Metadata;
+
+public static class GachaEventInfoExtension
 {
-    public static class GachaEventInfoExtension
+    public static IEnumerable<int> GetUpOrangeItems(this GachaEventInfo info)
     {
-        public static IEnumerable<int> GetUpOrangeItems(this GachaEventInfo info)
+        return typeof(GachaEventInfo)
+            .GetProperties()
+            .Where(p => p.Name.StartsWith("UpOrangeItem"))
+            .Select(p => (uint)p.GetValue(info)!)
+            .Where(v => v is not 0U)
+            .Select(v => (int)v);
+    }
+
+    public static bool ItemInThisEvent(this GachaEventInfo info, EntityGachaItem item)
+    {
+        if (item.GachaType == info.Type && item.Time >= info.From && item.Time <= info.To)
         {
-            return typeof(GachaEventInfo)
-                .GetProperties()
-                .Where(p => p.Name.StartsWith("UpOrangeItem"))
-                .Select(p => (uint)p.GetValue(info)!)
-                .Where(v => v is not 0U)
-                .Select(v => (int)v);
+            return true;
         }
 
-        public static bool ItemInThisEvent(this GachaEventInfo info, EntityGachaItem item)
-        {
-            if (item.GachaType == info.Type && item.Time >= info.From && item.Time <= info.To)
-            {
-                return true;
-            }
-
-            return false;
-        }
+        return false;
     }
 }

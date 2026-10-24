@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { fetchUserInfo, login as apiLogin } from '@/api/passport';
+import { exchangeSsoTicket } from '@/api/sso';
 import { usePermissionStore } from '@/store';
 import { clearTokens, getAccessToken, setTokens } from '@/utils/token';
 
@@ -9,6 +10,10 @@ interface AdminUserInfo {
   roles: string[];
   isMaintainer: boolean;
   isLicensedDeveloper: boolean;
+  /** 身份类型：主站用户 user，后台专属账号 admin */
+  authKind: string;
+  /** 当前身份能否执行写操作 (启用单点登录后主站维护者会被降级为只读) */
+  canWrite: boolean;
   gachaLogExpireAt?: string;
   cdnExpireAt?: string;
 }
@@ -18,6 +23,8 @@ const InitUserInfo: AdminUserInfo = {
   roles: [],
   isMaintainer: false,
   isLicensedDeveloper: false,
+  authKind: 'user',
+  canWrite: false,
 };
 
 export const useUserStore = defineStore('user', {
@@ -46,9 +53,24 @@ export const useUserStore = defineStore('user', {
         roles: ['all'],
         isMaintainer: Boolean(info.IsMaintainer),
         isLicensedDeveloper: Boolean(info.IsLicensedDeveloper),
+        authKind: info.AuthKind || 'user',
+        canWrite: Boolean(info.CanWrite),
         gachaLogExpireAt: info.GachaLogExpireAt,
         cdnExpireAt: info.CdnExpireAt,
       };
+    },
+    // 单点登录回跳页用一次性票据换后台令牌。后台令牌不带刷新令牌，先清空旧令牌，
+    // 否则过期后会静默刷新回主站用户身份。
+    async loginWithTicket(ticket: string) {
+      const res: any = await exchangeSsoTicket(ticket);
+      clearTokens();
+      setTokens({
+        accessToken: res.data.AccessToken,
+        expiresIn: res.data.ExpiresIn,
+      });
+      this.token = getAccessToken() || '';
+      await this.getUserInfo();
+      return res.data;
     },
     async logout() {
       clearTokens();

@@ -1,10 +1,9 @@
-﻿namespace server.Services.GachaLog
+﻿namespace server.Services.GachaLog;
+
+public enum GachaLogSaveResultKind
 {
-    public enum GachaLogSaveResultKind
-    {
-        Ok,
-        UidPerUserLimitExceeded,
-        InvalidGachaItemDetected,
-        DatebaseOperationFailed,
-    }
+    Ok,
+    UidPerUserLimitExceeded,
+    InvalidGachaItemDetected,
+    DatebaseOperationFailed,
 }

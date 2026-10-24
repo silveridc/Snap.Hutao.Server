@@ -1,23 +1,21 @@
 ﻿using Quartz;
-using Sentry;
 
-namespace server.Job
+namespace server.Job;
+
+public class LegacyStatisticsRefreshJob(StatisticsService statisticsService) : IJob
 {
-    public class LegacyStatisticsRefreshJob(StatisticsService statisticsService) : IJob
+    public async ValueTask Execute(IJobExecutionContext _, CancellationToken _cancellationToken = default)
     {
-        public async ValueTask Execute(IJobExecutionContext _, CancellationToken _cancellationToken = default)
+        SentryId id = SentrySdk.CaptureCheckIn("LegacyStatisticsRefreshJob", CheckInStatus.InProgress);
+        try
         {
-            SentryId id = SentrySdk.CaptureCheckIn("LegacyStatisticsRefreshJob", CheckInStatus.InProgress);
-            try
-            {
-                await statisticsService.RunAsync().ConfigureAwait(false);
-                SentrySdk.CaptureCheckIn("LegacyStatisticsRefreshJob", CheckInStatus.Ok, id);
-            }
-            catch
-            {
-                SentrySdk.CaptureCheckIn("LegacyStatisticsRefreshJob", CheckInStatus.Error, id);
-                throw;
-            }
+            await statisticsService.RunAsync().ConfigureAwait(false);
+            SentrySdk.CaptureCheckIn("LegacyStatisticsRefreshJob", CheckInStatus.Ok, id);
+        }
+        catch
+        {
+            SentrySdk.CaptureCheckIn("LegacyStatisticsRefreshJob", CheckInStatus.Error, id);
+            throw;
         }
     }
 }

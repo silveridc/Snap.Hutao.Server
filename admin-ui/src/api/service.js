@@ -210,6 +210,70 @@ export function resetSystemConfig(key) {
   return http.post('/Service/Config/Reset', null, { params: { key } })
 }
 
+// ===== metadata 元数据管理 =====
+
+// 已导入的原文档清单 (locale 省略时为全部语言)
+export function getMetadataDocuments(locale) {
+  return http.get('/Service/Metadata/Documents', { params: { locale } })
+}
+
+// 已写入的 i18n 覆盖
+export function getMetadataTranslations(locale, name) {
+  return http.get('/Service/Metadata/Translations', { params: { locale, name } })
+}
+
+// 分表读模型 (metadata_object 那一套) 的投影状态
+export function getMetadataKinds() {
+  return http.get('/Service/Metadata/Kinds')
+}
+
+// 把一个文档的字符串叶子摊平出来，与对照语言逐条比较
+export function getMetadataLeaves(name, locale, baseline) {
+  return http.get('/Service/Metadata/Leaves', { params: { name, locale, baseline } })
+}
+
+// 写一条覆盖，服务端会立刻贴进文档本体并重算哈希与 Meta.json
+export function setMetadataTranslation(locale, name, pointer, value) {
+  return http.post('/Service/Metadata/Translation', null, { params: { locale, name, pointer, value } })
+}
+
+// 删一条覆盖并把文档还原成原文
+export function removeMetadataTranslation(locale, name, pointer) {
+  return http.post('/Service/Metadata/Translation/Remove', null, { params: { locale, name, pointer } })
+}
+
+// ===== 后台专属账号 (SSO) =====
+
+// 后台账号清单，当前调用者的那一行会带 IsCurrent
+export function getAdminAccounts() {
+  return http.get('/Service/AdminAccount/List')
+}
+
+// 允许身份源里的某个主体使用后台
+export function addAdminAccount(subject, userName, email) {
+  return http.post('/Service/AdminAccount/Add', { Subject: subject, UserName: userName, Email: email })
+}
+
+// 启用或停用后台账号，停用会让已签发的后台令牌立即失效
+export function setAdminAccountEnabled(accountId, enabled) {
+  return http.post('/Service/AdminAccount/SetEnabled', null, { params: { accountId, enabled } })
+}
+
+// 删除后台账号
+export function removeAdminAccount(accountId) {
+  return http.post('/Service/AdminAccount/Remove', null, { params: { accountId } })
+}
+
+// 把后台账号绑到一个主站账号（邮箱）上，绑定后这个身份才能用单点登录进启动器
+export function bindAdminAccount(accountId, userName) {
+  return http.post('/Service/AdminAccount/Bind', { UserName: userName }, { params: { accountId } })
+}
+
+// 解除绑定，该身份随即不能再用于启动器登录
+export function unbindAdminAccount(accountId) {
+  return http.post('/Service/AdminAccount/Unbind', null, { params: { accountId } })
+}
+
 // ===== 其它管理操作 =====
 
 // 使用兑换码 (username 为空则表示当前登录账号)

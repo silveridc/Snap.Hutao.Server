@@ -23,7 +23,10 @@
       "addMirror": "Add Mirror",
       "releaseNotes": "Release Notes",
       "releaseNotesPlaceholder": "Optional, what is new in this version",
-      "submit": "Publish"
+      "submit": "Publish",
+      "minimumVersion": "Minimum required version",
+      "minimumVersionPlaceholder": "Empty for optional, e.g. 1.17.0.0",
+      "minimumVersionHint": "Clients below this version are forced to update; must not exceed the release version"
     },
     "list": {
       "title": "Release History",

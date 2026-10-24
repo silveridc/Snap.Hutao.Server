@@ -1,14 +1,14 @@
-﻿using server.Extension;
+using server.Extension;
 using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
 
-public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCache cache, ILogger<BingWallpaper> logger)
+public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCache cache, ILogger<BingWallpaper> logger, TimeProvider timeProvider)
 {
-    const string wallpaperType = "bing";
+    private const string _wallpaperType = "bing";
     public async Task<WallPaperResponse> GetTodayWallpaperAsync()
     {
-        string todayKey = $"{wallpaperType}Wallpaper_{DateTime.UtcNow:yyyyMMdd}";
+        string todayKey = $"{_wallpaperType}Wallpaper_{timeProvider.GetUtcNow().UtcDateTime:yyyyMMdd}";
         string apiPath = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN";
         if (cache.TryGetValue(todayKey, out WallPaperResponse? cresult))
         {

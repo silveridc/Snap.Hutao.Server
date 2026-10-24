@@ -1,9 +1,8 @@
-﻿namespace server.Options
-{
-    public sealed class GenshinPizzaHelperEndPointsOptions
-    {
-        public string AvatarHolding { get; set; } = default!;
+﻿namespace server.Options;
 
-        public string SpiralAbyss { get; set; } = default!;
-    }
+public sealed class GenshinPizzaHelperEndPointsOptions
+{
+    public string AvatarHolding { get; set; } = default!;
+
+    public string SpiralAbyss { get; set; } = default!;
 }

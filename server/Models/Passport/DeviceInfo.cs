@@ -1,11 +1,10 @@
-﻿namespace server.Models.Passport
+﻿namespace server.Models.Passport;
+
+public class DeviceInfo(string deviceId, string? deviceName, string? operatingSystem)
 {
-    public class DeviceInfo(string deviceId, string? deviceName, string? operatingSystem)
-    {
-        public string DeviceId { get; set; } = deviceId;
+    public string DeviceId { get; set; } = deviceId;
 
-        public string? DeviceName { get; set; } = deviceName;
+    public string? DeviceName { get; set; } = deviceName;
 
-        public string? OperatingSystem { get; set; } = operatingSystem;
-    }
+    public string? OperatingSystem { get; set; } = operatingSystem;
 }

@@ -1,21 +1,20 @@
-﻿namespace server.Models.Entity.Redeem
+﻿namespace server.Models.Entity.Redeem;
+
+[Table("redeem_code_use_items")]
+public sealed class RedeemCodeUseItem
 {
-    [Table("redeem_code_use_items")]
-    public sealed class RedeemCodeUseItem
-    {
-        public uint RedeemCodeId { get; set; }
+    public uint RedeemCodeId { get; set; }
 
-        [ForeignKey(nameof(RedeemCodeId))]
-        public RedeemCode RedeemCode { get; set; } = default!;
+    [ForeignKey(nameof(RedeemCodeId))]
+    public RedeemCode RedeemCode { get; set; } = default!;
 
-        [Key]
-        public uint Id { get; set; }
+    [Key]
+    public uint Id { get; set; }
 
-        public int UsedBy { get; set; } = default!;
+    public int UsedBy { get; set; } = default!;
 
-        [ForeignKey(nameof(UsedBy))]
-        public HutaoUser User { get; set; } = default!;
+    [ForeignKey(nameof(UsedBy))]
+    public HutaoUser User { get; set; } = default!;
 
-        public DateTimeOffset UseTime { get; set; }
-    }
+    public DateTimeOffset UseTime { get; set; }
 }

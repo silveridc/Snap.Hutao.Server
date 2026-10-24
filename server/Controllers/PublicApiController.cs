@@ -4,6 +4,7 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[ApiExplorerSettings(GroupName = "Public")]
 public class PublicApiController(IpRegionService ipRegionService) : ControllerBase
 {
     /// <summary>
@@ -23,6 +24,6 @@ public class PublicApiController(IpRegionService ipRegionService) : ControllerBa
         IPAddress clientIp = HttpContext.Connection.RemoteIpAddress!;
         string?[] region = ipRegionService.GetRegion(clientIp);
         IpResponse? data = new(clientIp.ToString(), region[0]!, region[1]!, region[2]!, region[3]!);
-        return Response<IpResponse>.Success("Success", data);
+        return Success<IpResponse>("Success", data);
     }
 }

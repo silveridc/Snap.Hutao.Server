@@ -1,15 +1,14 @@
-﻿namespace server.Services.Afdian
+﻿namespace server.Services.Afdian;
+
+public class AfdianOrderInformation
 {
-    public class AfdianOrderInformation
-    {
-        public AfdianOrderStatus Status { get; set; }
+    public AfdianOrderStatus Status { get; set; }
 
-        public string SkuId { get; set; } = default!;
+    public string SkuId { get; set; } = default!;
 
-        public string OrderNumber { get; set; } = default!;
+    public string OrderNumber { get; set; } = default!;
 
-        public int OrderCount { get; set; }
+    public int OrderCount { get; set; }
 
-        public string UserName { get; set; } = default!;
-    }
+    public string UserName { get; set; } = default!;
 }

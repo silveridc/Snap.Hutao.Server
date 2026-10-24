@@ -1,5 +1,5 @@
-﻿using IP2Region.Net.Abstractions;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
+using IP2Region.Net.Abstractions;
 namespace server.Services.PublicAPI;
 
 public class IpRegionService([FromKeyedServices("IPv4DB")] ISearcher searcher, [FromKeyedServices("IPv6DB")] ISearcher ipv6Searcher)

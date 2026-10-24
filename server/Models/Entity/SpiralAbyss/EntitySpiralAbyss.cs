@@ -1,25 +1,24 @@
-﻿namespace server.Models.Entity.SpiralAbyss
+﻿namespace server.Models.Entity.SpiralAbyss;
+
+[Table("spiral_abysses")]
+public class EntitySpiralAbyss
 {
-    [Table("spiral_abysses")]
-    public class EntitySpiralAbyss
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long PrimaryId { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public long PrimaryId { get; set; }
 
-        public long RecordId { get; set; }
+    public long RecordId { get; set; }
 
-        public int TotalBattleTimes { get; set; }
+    public int TotalBattleTimes { get; set; }
 
-        public int TotalWinTimes { get; set; }
+    public int TotalWinTimes { get; set; }
 
-        [ForeignKey(nameof(RecordId))]
-        public EntityRecord Record { get; set; } = null!;
+    [ForeignKey(nameof(RecordId))]
+    public EntityRecord Record { get; set; } = null!;
 
-        public EntityDamageRank Damage { get; set; } = default!;
+    public EntityDamageRank Damage { get; set; } = default!;
 
-        public EntityTakeDamageRank TakeDamage { get; set; } = default!;
+    public EntityTakeDamageRank TakeDamage { get; set; } = default!;
 
-        public List<EntityFloor> Floors { get; set; } = default!;
-    }
+    public List<EntityFloor> Floors { get; set; } = default!;
 }

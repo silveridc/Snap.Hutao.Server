@@ -159,6 +159,20 @@
     "ServerStatisticsAbyssSucceed": "获取深渊统计数据成功",
     "requestFailed": "请求失败",
     "httpError": "服务异常 (HTTP {code})",
-    "networkError": "网络错误，请检查网络连接"
+    "networkError": "网络错误，请检查网络连接",
+    "ServerAdminSsoNotEnabled": "后台未启用单点登录",
+    "ServerAdminSsoUpstreamFailed": "身份源不可用，请稍后重试或改用账号密码登录",
+    "ServerAdminSsoTicketInvalid": "登录票据无效或已过期，请重新发起单点登录",
+    "ServerAdminSsoLoginSucceed": "后台单点登录成功",
+    "ServerAdminWriteRequiresSso": "启用单点登录后，只有后台专属账号可以修改数据",
+    "ServerAdminAccountListSucceed": "后台账号清单获取成功",
+    "ServerAdminAccountAddSucceed": "后台账号已添加",
+    "ServerAdminAccountSubjectRequired": "身份主体标识无效（为空或过长）",
+    "ServerAdminAccountAlreadyExists": "该身份已有后台账号",
+    "ServerAdminAccountNotFound": "后台账号不存在",
+    "ServerAdminAccountSelfOperation": "不能停用或删除正在使用的后台账号",
+    "ServerAdminAccountLastEnabled": "至少要保留一个可用的后台账号",
+    "ServerAdminAccountSetEnabledSucceed": "后台账号状态已更新",
+    "ServerAdminAccountRemoveSucceed": "后台账号已删除"
   }
 }

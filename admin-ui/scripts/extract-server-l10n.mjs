@@ -51,6 +51,28 @@ enOut.server.requestFailed = 'Request failed';
 enOut.server.httpError = 'Service error (HTTP {code})';
 enOut.server.networkError = 'Network error, please check your connection';
 
+// 后台单点登录与后台账号相关的键在 launcher 的 SH.resx 里不存在（客户端用不到），文案由本脚本维护
+const adminSsoOnly = {
+  ServerAdminSsoNotEnabled: ['后台未启用单点登录', 'Admin SSO is not enabled'],
+  ServerAdminSsoUpstreamFailed: ['身份源不可用，请稍后重试或改用账号密码登录', 'The identity provider is unavailable, please retry later'],
+  ServerAdminSsoTicketInvalid: ['登录票据无效或已过期，请重新发起单点登录', 'The login ticket is invalid or has expired'],
+  ServerAdminSsoLoginSucceed: ['后台单点登录成功', 'Admin SSO login succeeded'],
+  ServerAdminWriteRequiresSso: ['启用单点登录后，只有后台专属账号可以修改数据', 'Only SSO admin accounts can modify data'],
+  ServerAdminAccountListSucceed: ['后台账号清单获取成功', 'Admin account list acquired successfully'],
+  ServerAdminAccountAddSucceed: ['后台账号已添加', 'Admin account added successfully'],
+  ServerAdminAccountSubjectRequired: ['身份主体标识无效（为空或过长）', 'The identity subject is invalid'],
+  ServerAdminAccountAlreadyExists: ['该身份已有后台账号', 'An admin account for this identity already exists'],
+  ServerAdminAccountNotFound: ['后台账号不存在', 'Admin account does not exist'],
+  ServerAdminAccountSelfOperation: ['不能停用或删除正在使用的后台账号', 'You cannot disable or remove the admin account you are using'],
+  ServerAdminAccountLastEnabled: ['至少要保留一个可用的后台账号', 'At least one enabled admin account must remain'],
+  ServerAdminAccountSetEnabledSucceed: ['后台账号状态已更新', 'Admin account state updated successfully'],
+  ServerAdminAccountRemoveSucceed: ['后台账号已删除', 'Admin account removed successfully'],
+};
+for (const [key, [zhText, enText]] of Object.entries(adminSsoOnly)) {
+  zhOut.server[key] = zhText;
+  enOut.server[key] = enText;
+}
+
 fs.writeFileSync(OUT_ZH, `${JSON.stringify(zhOut, null, 2)}\n`);
 fs.writeFileSync(OUT_EN, `${JSON.stringify(enOut, null, 2)}\n`);
 JSON.parse(fs.readFileSync(OUT_ZH, 'utf8'));

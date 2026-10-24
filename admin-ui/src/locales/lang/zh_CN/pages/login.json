@@ -12,6 +12,12 @@
       "email": "请输入邮箱",
       "password": "请输入密码"
     },
+    "sso": {
+      "divider": "或",
+      "btn": "使用 {name} 登录",
+      "defaultName": "单点登录",
+      "fail": "无法发起单点登录"
+    },
     "messages": {
       "loginSuccess": "登录成功",
       "loginFail": "登录失败"

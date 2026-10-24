@@ -1,7 +1,6 @@
-﻿namespace server.Models.Redeem
+﻿namespace server.Models.Redeem;
+
+public sealed class RedeemGenerateResponse(List<string> codes)
 {
-    public sealed class RedeemGenerateResponse(List<string> codes)
-    {
-        public List<string> Codes { get; set; } = codes;
-    }
+    public List<string> Codes { get; set; } = codes;
 }

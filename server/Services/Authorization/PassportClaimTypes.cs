@@ -1,7 +1,6 @@
-﻿namespace server.Services.Authorization
+﻿namespace server.Services.Authorization;
+
+public static class PassportClaimTypes
 {
-    public static class PassportClaimTypes
-    {
-        public const string UserId = nameof(UserId);
-    }
+    public const string UserId = nameof(UserId);
 }

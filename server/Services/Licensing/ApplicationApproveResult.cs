@@ -1,9 +1,8 @@
-﻿namespace server.Services.Licensing
+﻿namespace server.Services.Licensing;
+
+public enum ApplicationApproveResult
 {
-    public enum ApplicationApproveResult
-    {
-        Ok,
-        UsetNotExists,
-        NoSuchApplication,
-    }
+    Ok,
+    UsetNotExists,
+    NoSuchApplication,
 }

@@ -1,10 +1,9 @@
-﻿namespace server.Services.Licensing
+﻿namespace server.Services.Licensing;
+
+public enum ApplicationProcessResult
 {
-    public enum ApplicationProcessResult
-    {
-        Ok,
-        ReCaptchaVerificationFailed,
-        UsetNotExists,
-        AlreadyApplied,
-    }
+    Ok,
+    ReCaptchaVerificationFailed,
+    UsetNotExists,
+    AlreadyApplied,
 }

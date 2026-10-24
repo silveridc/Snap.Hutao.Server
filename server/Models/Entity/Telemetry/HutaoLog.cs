@@ -1,21 +1,20 @@
-﻿namespace server.Models.Entity.Telemetry
+﻿namespace server.Models.Entity.Telemetry;
+
+[Table("hutao_logs")]
+public class HutaoLog
 {
-    [Table("hutao_logs")]
-    public class HutaoLog
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long PrimaryId { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public long PrimaryId { get; set; }
 
-        public string Info { get; set; } = default!;
+    public string Info { get; set; } = default!;
 
-        public int Count { get; set; } = default!;
+    public int Count { get; set; } = default!;
 
-        public bool Resolved { get; set; }
+    public bool Resolved { get; set; }
 
-        public string Version { get; set; } = default!;
+    public string Version { get; set; } = default!;
 
-        [NotMapped]
-        public long Time { get; set; }
-    }
+    [NotMapped]
+    public long Time { get; set; }
 }

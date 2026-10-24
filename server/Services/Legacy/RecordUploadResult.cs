@@ -1,16 +1,15 @@
-﻿namespace server.Services.Legacy
+﻿namespace server.Services.Legacy;
+
+public enum RecordUploadResult
 {
-    public enum RecordUploadResult
-    {
-        OkWithNotFirstAttempt,
-        OkWithNoUserNamePresented,
-        OkWithGachaLogExtended,
-        OkWithGachaLogNoSuchUser,
-        None,
-        ComputingStatistics,
-        UidBanned,
-        NotCurrentSchedule,
-        InvalidData,
-        ConcurrencyNotSupported,
-    }
+    OkWithNotFirstAttempt,
+    OkWithNoUserNamePresented,
+    OkWithGachaLogExtended,
+    OkWithGachaLogNoSuchUser,
+    None,
+    ComputingStatistics,
+    UidBanned,
+    NotCurrentSchedule,
+    InvalidData,
+    ConcurrencyNotSupported,
 }

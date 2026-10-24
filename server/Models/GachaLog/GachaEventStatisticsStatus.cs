@@ -1,8 +1,7 @@
-﻿namespace server.Models.GachaLog
+﻿namespace server.Models.GachaLog;
+
+public enum GachaEventStatisticsStatus
 {
-    public enum GachaEventStatisticsStatus
-    {
-        Ok,
-        InvalidItemDetected,
-    }
+    Ok,
+    InvalidItemDetected,
 }

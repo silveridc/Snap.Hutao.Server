@@ -1,9 +1,8 @@
-﻿namespace server.Models.GachaLog
-{
-    internal sealed class GachaDistribution
-    {
-        public long TotalValidPulls { get; set; }
+﻿namespace server.Models.GachaLog;
 
-        public List<PullCount> Distribution { get; set; } = default!;
-    }
+internal sealed class GachaDistribution
+{
+    public long TotalValidPulls { get; set; }
+
+    public List<PullCount> Distribution { get; set; } = default!;
 }

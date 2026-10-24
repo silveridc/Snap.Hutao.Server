@@ -1,7 +1,6 @@
-﻿namespace server.Options
+﻿namespace server.Options;
+
+public sealed class AfdianOptions : AfdianAuthorizationOptions
 {
-    public sealed class AfdianOptions : AfdianAuthorizationOptions
-    {
-        public string SkuGachaLogUploadService { get; set; } = default!;
-    }
+    public string SkuGachaLogUploadService { get; set; } = default!;
 }

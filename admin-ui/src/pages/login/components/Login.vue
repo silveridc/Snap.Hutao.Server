@@ -35,14 +35,23 @@
     <t-form-item class="btn-container">
       <t-button block size="large" type="submit" :loading="loading">{{ $t('pages.login.form.loginBtn') }}</t-button>
     </t-form-item>
+
+    <t-divider v-if="sso.enabled">{{ $t('pages.login.sso.divider') }}</t-divider>
+
+    <t-form-item v-if="sso.enabled" class="btn-container">
+      <t-button block size="large" variant="outline" :loading="ssoLoading" @click="onSsoLogin">
+        {{ $t('pages.login.sso.btn', { name: sso.displayName || $t('pages.login.sso.defaultName') }) }}
+      </t-button>
+    </t-form-item>
   </t-form>
 </template>
 <script setup lang="ts">
 import type { FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
 import { MessagePlugin } from 'tdesign-vue-next';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { getSsoChallenge, getSsoStatus } from '@/api/sso';
 import { t } from '@/locales';
 import { useUserStore } from '@/store';
 
@@ -62,9 +71,33 @@ const form = ref<FormInstanceFunctions>();
 const formData = ref({ ...INITIAL_DATA });
 const showPsw = ref(false);
 const loading = ref(false);
+const sso = ref<{ enabled: boolean; displayName: string }>({ enabled: false, displayName: '' });
+const ssoLoading = ref(false);
 
 const router = useRouter();
 const route = useRoute();
+
+// 身份源没配置时后端会返回未启用，这里静默隐藏入口即可
+onMounted(async () => {
+  try {
+    const res: any = await getSsoStatus();
+    sso.value = { enabled: Boolean(res.data?.Enabled), displayName: res.data?.DisplayName || '' };
+  } catch {
+    sso.value = { enabled: false, displayName: '' };
+  }
+});
+
+const onSsoLogin = async () => {
+  ssoLoading.value = true;
+  try {
+    const res: any = await getSsoChallenge((route.query.redirect as string) || '');
+    // 授权地址必须在浏览器里整页跳转，跨站的 XHR 拿不到重定向后的结果
+    window.location.assign(res.data);
+  } catch (e: unknown) {
+    MessagePlugin.error((e as Error).message || t('pages.login.sso.fail'));
+    ssoLoading.value = false;
+  }
+};
 
 const onSubmit = async (ctx: SubmitContext) => {
   if (ctx.validateResult !== true) {

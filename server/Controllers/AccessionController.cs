@@ -17,10 +17,10 @@ public sealed class AccessionController(AccessionService accessionService) : Con
     {
         return await accessionService.ProcessApplicationAsync(info).ConfigureAwait(false) switch
         {
-            ApplicationProcessResult.Ok => Models.Response.Response.Success("Application submitted, please wait for approval", ServerKeys.ServerLicenseApplySucceed),
-            ApplicationProcessResult.ReCaptchaVerificationFailed => Models.Response.Response.Fail(ReturnCode.ReCaptchaVerifyFailed, "Application failed: reCAPTCHA verification failed", ServerKeys.ServerLicenseApplyReCaptchaFailed),
-            ApplicationProcessResult.UsetNotExists => Models.Response.Response.Fail(ReturnCode.UserNameNotExists, "Application failed: account does not exist", ServerKeys.ServerLicenseApplyUserNotFound),
-            ApplicationProcessResult.AlreadyApplied => Models.Response.Response.Fail(ReturnCode.AlreadyAppliedForLicense, "Application already submitted; please do not apply again", ServerKeys.ServerLicenseApplyAlreadyApplied),
+            ApplicationProcessResult.Ok => Success("Application submitted, please wait for approval", ServerKeys.ServerLicenseApplySucceed),
+            ApplicationProcessResult.ReCaptchaVerificationFailed => Fail("Application failed: reCAPTCHA verification failed", ReturnCode.ReCaptchaVerifyFailed, ServerKeys.ServerLicenseApplyReCaptchaFailed),
+            ApplicationProcessResult.UsetNotExists => Fail("Application failed: account does not exist", ReturnCode.UserNameNotExists, ServerKeys.ServerLicenseApplyUserNotFound),
+            ApplicationProcessResult.AlreadyApplied => Fail("Application already submitted; please do not apply again", ReturnCode.AlreadyAppliedForLicense, ServerKeys.ServerLicenseApplyAlreadyApplied),
             _ => throw new InvalidOperationException(),
         };
     }

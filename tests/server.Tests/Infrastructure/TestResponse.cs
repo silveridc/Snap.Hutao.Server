@@ -73,6 +73,10 @@ public static class ReturnCodes
     public const int ReCaptchaVerifyFailed = 515001;
     public const int ServiceKeyInvalid = 516001;
     public const int UserNameNotExists = 516002;
+    public const int SsoNotEnabled = 516003;
+    public const int WriteRequiresSsoAdmin = 516004;
+    public const int SsoTicketInvalid = 516005;
+    public const int SsoUpstreamFailed = 516006;
     public const int RedeemCodeInvalid = 518001;
     public const int RedeemCodeNotExists = 518002;
     public const int RedeemCodeAlreadyUsed = 518003;
@@ -83,6 +87,7 @@ public static class ReturnCodes
     public const int TooManyGachaLogUids = 533001;
     public const int PreviousRequestNotCompleted = 541001;
     public const int ComputingStatistics = 542001;
+    public const int InternalStateException = 551001;
     public const int VerifyCodeNotAllowed = 544001;
     public const int AlreadyAppliedForLicense = 545001;
     public const int GachaLogExtendDbException = 553002;

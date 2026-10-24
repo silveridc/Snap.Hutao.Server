@@ -1,15 +1,15 @@
-﻿using server.Extension;
+using server.Extension;
 using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
 
-public class HoyoPlayWallpaper(IHttpClientFactory httpClientFactory, IDistributedCache cache, ILogger<HoyoPlayWallpaper> logger)
+public class HoyoPlayWallpaper(IHttpClientFactory httpClientFactory, IDistributedCache cache, ILogger<HoyoPlayWallpaper> logger, TimeProvider timeProvider)
 {
-    private const string WallpaperType = "hyp";
+    private const string _wallpaperType = "hyp";
 
     public async Task<WallPaperResponse> GetTodayWallpaperAsync()
     {
-        string todayKey = $"{WallpaperType}Wallpaper_{DateTime.UtcNow:yyyyMMdd}";
+        string todayKey = $"{_wallpaperType}Wallpaper_{timeProvider.GetUtcNow().UtcDateTime:yyyyMMdd}";
         const string apiPath = "https://hyp-api.mihoyo.com/hyp/hyp-connect/api/getAllGameBasicInfo?launcher_id=jGHBHlcOq1&language=zh-cn";
 
         if (cache.TryGetValue(todayKey, out WallPaperResponse? cresult))

@@ -18,9 +18,9 @@ public sealed class PatchController(ReleaseService releaseService) : ControllerB
         HutaoPackageInformation? info = await releaseService.GetCurrentPackageAsync().ConfigureAwait(false);
         if (info is null)
         {
-            return Models.Response.Response.Fail(ReturnCode.NotFound, "Update information is not configured yet", ServerKeys.ServerPatchUpdateInfoNotConfigured);
+            return Fail("Update information is not configured yet", ReturnCode.NotFound, ServerKeys.ServerPatchUpdateInfoNotConfigured);
         }
 
-        return Response<HutaoPackageInformation>.Success("Update information acquired successfully", ServerKeys.ServerPatchUpdateInfoSucceed, info);
+        return Success<HutaoPackageInformation>("Update information acquired successfully", info, ServerKeys.ServerPatchUpdateInfoSucceed);
     }
 }

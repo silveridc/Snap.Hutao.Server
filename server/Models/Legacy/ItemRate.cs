@@ -1,9 +1,8 @@
-﻿namespace server.Models.Legacy
-{
-    public class ItemRate<TItem, TRate>(TItem item, TRate rate)
-    {
-        public TItem Item { get; set; } = item;
+﻿namespace server.Models.Legacy;
 
-        public TRate Rate { get; set; } = rate;
-    }
+public class ItemRate<TItem, TRate>(TItem item, TRate rate)
+{
+    public TItem Item { get; set; } = item;
+
+    public TRate Rate { get; set; } = rate;
 }

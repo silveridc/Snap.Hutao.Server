@@ -1,19 +1,18 @@
-﻿namespace server.Services.Afdian
+﻿namespace server.Services.Afdian;
+
+public enum AfdianOrderStatus
 {
-    public enum AfdianOrderStatus
-    {
-        Ok,
-        NoSkuDetails,
-        SkuIdNotSupported,
-        ValidationRequestFailed,
-        ValidationResponseInvalid,
-        ValidationResponseNoOrder,
-        ValidationResponseNoSkuDetail,
-        ValidationResponseSkuDetailNotMatch,
-        GachaLogTermExtendNoSuchUser,
-        GachaLogTermExtendDbError,
-        CdnTermExtendNoSuchUser,
-        CdnTermExtendDbError,
-        InvalidUserName,
-    }
+    Ok,
+    NoSkuDetails,
+    SkuIdNotSupported,
+    ValidationRequestFailed,
+    ValidationResponseInvalid,
+    ValidationResponseNoOrder,
+    ValidationResponseNoSkuDetail,
+    ValidationResponseSkuDetailNotMatch,
+    GachaLogTermExtendNoSuchUser,
+    GachaLogTermExtendDbError,
+    CdnTermExtendNoSuchUser,
+    CdnTermExtendDbError,
+    InvalidUserName,
 }

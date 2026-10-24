@@ -1,8 +1,7 @@
-namespace server.Options
+namespace server.Options;
+
+public sealed class SocketOptions
 {
-    public sealed class SocketOptions
-    {
-        public required bool Status { get; set; } = false;
-        public required string Path { get; set; } = "/tmp/server.sock";
-    }
+    public required bool Status { get; set; } = false;
+    public required string Path { get; set; } = "/tmp/server.sock";
 }

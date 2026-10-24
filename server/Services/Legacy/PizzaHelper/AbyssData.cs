@@ -1,35 +1,34 @@
-﻿namespace server.Services.Legacy.PizzaHelper
+namespace server.Services.Legacy.PizzaHelper;
+
+internal sealed class AbyssData
 {
-    internal sealed class AbyssData
-    {
-        [JsonPropertyName("submitId")]
-        public Guid SubmitId { get; } = Guid.NewGuid();
+    [JsonPropertyName("submitId")]
+    public Guid SubmitId { get; } = Guid.NewGuid();
 
-        [JsonPropertyName("uid")]
-        public string Uid { get; set; } = default!;
+    [JsonPropertyName("uid")]
+    public string Uid { get; set; } = default!;
 
-        [JsonPropertyName("submitTime")]
-        public long SubmitTime { get; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+    [JsonPropertyName("submitTime")]
+    public long SubmitTime { get; } = TimeProvider.System.GetUnixTimeSeconds();
 
-        [JsonPropertyName("abyssSeason")]
-        public string AbyssSeason { get; set; } = default!;
+    [JsonPropertyName("abyssSeason")]
+    public string AbyssSeason { get; set; } = default!;
 
-        [JsonPropertyName("server")]
-        public string Server { get; set; } = default!;
+    [JsonPropertyName("server")]
+    public string Server { get; set; } = default!;
 
-        [JsonPropertyName("submitDetails")]
-        public List<SubmitDetailModel> SubmitDetails { get; set; } = default!;
+    [JsonPropertyName("submitDetails")]
+    public List<SubmitDetailModel> SubmitDetails { get; set; } = default!;
 
-        [JsonPropertyName("abyssRank")]
-        public AbyssRankModel? AbyssRank { get; set; }
+    [JsonPropertyName("abyssRank")]
+    public AbyssRankModel? AbyssRank { get; set; }
 
-        [JsonPropertyName("owningChars")]
-        public List<int> OwningChars { get; set; } = default!;
+    [JsonPropertyName("owningChars")]
+    public List<int> OwningChars { get; set; } = default!;
 
-        [JsonPropertyName("battleCount")]
-        public int BattleCount { get; set; }
+    [JsonPropertyName("battleCount")]
+    public int BattleCount { get; set; }
 
-        [JsonPropertyName("winCount")]
-        public int WinCount { get; set; }
-    }
+    [JsonPropertyName("winCount")]
+    public int WinCount { get; set; }
 }

@@ -1,31 +1,30 @@
 ﻿using server.Models.Metadata;
 
-namespace server.Models.GachaLog
+namespace server.Models.GachaLog;
+
+public sealed class EndIds : Dictionary<string, long>
 {
-    public sealed class EndIds : Dictionary<string, long>
+    public static readonly FrozenSet<GachaConfigType> QueryTypes = FrozenSet.ToFrozenSet(
+    [
+        GachaConfigType.NewBie,
+        GachaConfigType.Standard,
+        GachaConfigType.ActivityAvatar,
+        GachaConfigType.ActivityWeapon,
+        GachaConfigType.ActivityCity,
+    ]);
+
+    public void Add(GachaConfigType type, long id)
     {
-        public static readonly FrozenSet<GachaConfigType> QueryTypes = FrozenSet.ToFrozenSet(
-        [
-            GachaConfigType.NewBie,
-            GachaConfigType.Standard,
-            GachaConfigType.ActivityAvatar,
-            GachaConfigType.ActivityWeapon,
-            GachaConfigType.ActivityCity,
-        ]);
+        Add($"{type:D}", id);
+    }
 
-        public void Add(GachaConfigType type, long id)
+    public IEnumerable<KeyValuePair<GachaConfigType, long>> EnumerateAsNewest()
+    {
+        foreach ((string type, long endId) in this)
         {
-            Add($"{type:D}", id);
-        }
-
-        public IEnumerable<KeyValuePair<GachaConfigType, long>> EnumerateAsNewest()
-        {
-            foreach ((string type, long endId) in this)
-            {
-                GachaConfigType configType = Enum.Parse<GachaConfigType>(type);
-                long exactEndId = endId == 0 ? long.MaxValue : endId;
-                yield return new(configType, exactEndId);
-            }
+            GachaConfigType configType = Enum.Parse<GachaConfigType>(type);
+            long exactEndId = endId == 0 ? long.MaxValue : endId;
+            yield return new(configType, exactEndId);
         }
     }
 }

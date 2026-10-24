@@ -77,7 +77,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     public async Task<IActionResult> GetGachaEntriesAsync()
     {
         List<GachaEntry> entries = await gachaLogService.GetGachaEntriesForUserAsync(this.GetUserId()).ConfigureAwait(false);
-        return Response<List<GachaEntry>>.Success("Entries acquired successfully", ServerKeys.ServerGachaLogGetEntriesSucceed, entries);
+        return Success<List<GachaEntry>>("Entries acquired successfully", entries, ServerKeys.ServerGachaLogGetEntriesSucceed);
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     public async Task<IActionResult> GetEndIdsAsync([FromQuery(Name = "Uid")] string uid)
     {
         EndIds endIds = await gachaLogService.GetNewestEndIdsAsync(this.GetUserId(), uid).ConfigureAwait(false);
-        return Response<EndIds>.Success("EndIds acquired successfully", ServerKeys.ServerGachaLogGetEndIdsSucceed, endIds);
+        return Success<EndIds>("EndIds acquired successfully", endIds, ServerKeys.ServerGachaLogGetEndIdsSucceed);
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     {
         int userId = this.GetUserId();
         List<SimpleGachaItem> gachaItems = await gachaLogService.GetGachaItemsEarlyThanEndIdsAsync(userId, uidAndEndIds).ConfigureAwait(false);
-        return Response<List<SimpleGachaItem>>.Success(userId.ToString(), gachaItems);
+        return Success<List<SimpleGachaItem>>(userId.ToString(), gachaItems);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     {
         int userId = this.GetUserId();
         List<SimpleGachaItem> gachaItems = await gachaLogService.GetLimitedGachaItemsEarlyThanEndIdsAsync(userId, uid, (GachaConfigType)configType, endId, count).ConfigureAwait(false);
-        return Response<List<SimpleGachaItem>>.Success(userId.ToString(), gachaItems);
+        return Success<List<SimpleGachaItem>>(userId.ToString(), gachaItems);
     }
 
     /// <summary>
@@ -142,10 +142,10 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
 
         return result.Kind switch
         {
-            GachaLogSaveResultKind.Ok => Response<GachaLogSaveResult>.Success($"Uploaded {uidAndItems.Items.Count} items of Uid {uidAndItems.Uid}, stored {result.SaveCount} items", result),
-            GachaLogSaveResultKind.UidPerUserLimitExceeded => Models.Response.Response.Fail(ReturnCode.TooManyGachaLogUids, "A Snap Hutao account can store gacha logs of at most 5 Uids", ServerKeys.ServerGachaLogServiceInsufficientRecordSlot),
-            GachaLogSaveResultKind.InvalidGachaItemDetected => Models.Response.Response.Fail(ReturnCode.InvalidGachaLogItems, "Invalid data, unable to save to the cloud", ServerKeys.ServerGachaLogServiceInvalidGachaLogData),
-            GachaLogSaveResultKind.DatebaseOperationFailed => Models.Response.Response.Fail(ReturnCode.GachaLogDbException, "Data error, unable to save to the cloud", ServerKeys.ServerGachaLogServiceServerDatabaseError),
+            GachaLogSaveResultKind.Ok => Success<GachaLogSaveResult>($"Uploaded {uidAndItems.Items.Count} items of Uid {uidAndItems.Uid}, stored {result.SaveCount} items", result),
+            GachaLogSaveResultKind.UidPerUserLimitExceeded => Fail("A Snap Hutao account can store gacha logs of at most 5 Uids", ReturnCode.TooManyGachaLogUids, ServerKeys.ServerGachaLogServiceInsufficientRecordSlot),
+            GachaLogSaveResultKind.InvalidGachaItemDetected => Fail("Invalid data, unable to save to the cloud", ReturnCode.InvalidGachaLogItems, ServerKeys.ServerGachaLogServiceInvalidGachaLogData),
+            GachaLogSaveResultKind.DatebaseOperationFailed => Fail("Data error, unable to save to the cloud", ReturnCode.GachaLogDbException, ServerKeys.ServerGachaLogServiceServerDatabaseError),
             _ => throw new InvalidOperationException(),
         };
     }
@@ -161,7 +161,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     public async Task<IActionResult> DeleteAsync([FromQuery(Name = "Uid")] string uid)
     {
         int count = await gachaLogService.DeleteGachaItemsAsync(this.GetUserId(), uid).ConfigureAwait(false);
-        return Response<int>.Success($"Deleted {count} records", count);
+        return Success<int>($"Deleted {count} records", count);
     }
 
     /// <summary>
@@ -177,13 +177,9 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
 
         if (data is null)
         {
-            return Models.Response.Response.Fail(
-                ReturnCode.ComputingStatistics,
-                "Statistics are being computed or do not exist",
-                ServerKeys.ServerGachaLogStatisticsUnavailable
-            );
+            return Fail("Statistics are being computed or do not exist", ReturnCode.ComputingStatistics, ServerKeys.ServerGachaLogStatisticsUnavailable);
         }
 
-        return Response<T>.Success("Gacha log statistics acquired successfully", ServerKeys.ServerGachaLogStatisticsSucceed, data);
+        return Success<T>("Gacha log statistics acquired successfully", data, ServerKeys.ServerGachaLogStatisticsSucceed);
     }
 }

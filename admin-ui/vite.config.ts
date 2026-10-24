@@ -8,7 +8,7 @@ import svgLoader from 'vite-svg-loader';
 const CWD = process.cwd();
 
 // 后端接口前缀，开发期统一代理到线上服务
-const API_PREFIXES = ['/Passport', '/Service', '/Redeem', '/Accession', '/patch', '/wallpaper', '/Announcement', '/Enka'];
+const API_PREFIXES = ['/Passport', '/Service', '/Admin', '/Redeem', '/Accession', '/patch', '/wallpaper', '/Announcement', '/Enka'];
 const PROXY_TARGET = 'https://localhost:7013';
 
 // https://vitejs.dev/config/

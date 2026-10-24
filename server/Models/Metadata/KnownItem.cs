@@ -1,11 +1,10 @@
-﻿namespace server.Models.Metadata
-{
-    [Table("known_items")]
-    public sealed class KnownItem
-    {
-        [Key]
-        public uint Id { get; set; }
+﻿namespace server.Models.Metadata;
 
-        public uint Quality { get; set; }
-    }
+[Table("known_items")]
+public sealed class KnownItem
+{
+    [Key]
+    public uint Id { get; set; }
+
+    public uint Quality { get; set; }
 }

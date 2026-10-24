@@ -1,9 +1,8 @@
-﻿namespace server.Services.Expire
+﻿namespace server.Services.Expire;
+
+public enum TermExtendResultKind
 {
-    public enum TermExtendResultKind
-    {
-        Ok,
-        NoSuchUser,
-        DbError,
-    }
+    Ok,
+    NoSuchUser,
+    DbError,
 }
