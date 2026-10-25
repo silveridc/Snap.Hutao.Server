@@ -205,9 +205,6 @@ public static class Program
             .AddScoped<ValidateAdminWritePermission>()
             .AddScoped<GachaLogStatisticsService>()
             .AddScoped<YaeMetadataService>()
-            .AddScoped<MetadataStoreService>()
-            .AddScoped<MetadataTranslationService>()
-            .AddScoped<MetadataProjectionService>()
 
             .AddScoped<AfdianWebhookService>()
             .AddSingleton<CacheService>()

@@ -28,7 +28,6 @@ public sealed class ApiSmokeTests
         "/api/OAuth/Callback",
         "/api/Webhook",
         "/api/client",
-        "/metadata",
         "/Admin/Sso/Callback",
         "/Passport/Sso/Callback",
     ];
@@ -84,10 +83,6 @@ public sealed class ApiSmokeTests
         // 启动器功能配置（裸 JSON，未同步过的版本返回 404）
         { "GET", "/api/client/AchievementFieldId_0.0.0.json", null },
         { "GET", "/api/client/UnknownFeature_1.0.0.json", null },
-
-        // metadata 原文档（裸 JSON，没导入过返回 404）。散文件路径 /metadata/Genshin/{locale}/Avatar/{id}.json
-        // 与下面的模板段数不同，路由匹配器只认这一段深度的地址，语义断言见 MetadataTests
-        { "GET", "/metadata/Genshin/AAA/Achievement.json", null },
 
         // 公告
         { "POST", "/api/Announcement/List", "[]" },

@@ -5,7 +5,6 @@ import {
   ChartBubbleIcon,
   CloudUploadIcon,
   DashboardIcon,
-  DataBaseIcon,
   GiftIcon,
   HistoryIcon,
   KeyIcon,
@@ -58,8 +57,7 @@ export default [
   single('datatools', 'DataTools', '数据维护', 'Data Tools', ToolsIcon, 9),
   single('cache', 'Cache', '缓存管理', 'Cache', ServerIcon, 10),
   single('audit', 'Audit', '审计日志', 'Audit Log', HistoryIcon, 11),
-  single('metadata', 'Metadata', '元数据管理', 'Metadata', DataBaseIcon, 12),
-  single('license', 'License', '开源许可证', 'License', CertificateIcon, 13),
-  single('adminaccount', 'AdminAccount', '后台账号', 'Admin Accounts', KeyIcon, 14),
+  single('license', 'License', '开源许可证', 'License', CertificateIcon, 12),
+  single('adminaccount', 'AdminAccount', '后台账号', 'Admin Accounts', KeyIcon, 13),
   single('settings', 'Settings', '系统设置', 'Settings', SettingIcon, 99),
 ] satisfies RouteRecordRaw[];

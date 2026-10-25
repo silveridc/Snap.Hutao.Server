@@ -28,7 +28,7 @@ Tests (`dotnet test` from the repo root or `tests/server.Tests`; ~15s):
 
 ## Architecture
 
-**Two EF Core DbContexts.** `AppDbContext` is the primary DB and owns all migrations — always pass `--context AppDbContext`. `MetadataDbContext` has no migrations. Both use Pomelo MySQL and are pooled.
+**Two EF Core DbContexts.** `AppDbContext` is the primary DB and owns all migrations — always pass `--context AppDbContext`. `MetadataDbContext` has no migrations. Both use Pomelo MySQL and are pooled. `MetadataDbContext` currently covers only `yae_achievement_metadata` (feeding `/api/client/AchievementFieldId_{version}.json`), `known_items` and `gacha_events`; the metadata-to-DB feature (`metadata_document` / `metadata_object` / i18n / translation / projection + its `/metadata/*` controller, admin panel page and import tool) was deliberately removed — clients keep reading metadata from the original path, and the code is recoverable from git history if that work resumes.
 
 **Migrations are generated offline.** The production MySQL is not reachable from the dev/build environment, so `DesignTimeAppDbContextFactory` pins `MySqlServerVersion(8,0,32)` instead of `ServerVersion.AutoDetect` (runtime `Program.cs` still AutoDetects the real server). Migrations **auto-apply only in RELEASE builds** at startup (`Program.MigrateDatabase`, `[Conditional("RELEASE")]`) — there is no manual `database update` step. After generating a migration, open the `Up()`/`Down()` and confirm it contains only the intended schema ops before deploying.
 

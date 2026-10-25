@@ -210,38 +210,6 @@ export function resetSystemConfig(key) {
   return http.post('/api/Service/Config/Reset', null, { params: { key } })
 }
 
-// ===== metadata 元数据管理 =====
-
-// 已导入的原文档清单 (locale 省略时为全部语言)
-export function getMetadataDocuments(locale) {
-  return http.get('/api/Service/Metadata/Documents', { params: { locale } })
-}
-
-// 已写入的 i18n 覆盖
-export function getMetadataTranslations(locale, name) {
-  return http.get('/api/Service/Metadata/Translations', { params: { locale, name } })
-}
-
-// 分表读模型 (metadata_object 那一套) 的投影状态
-export function getMetadataKinds() {
-  return http.get('/api/Service/Metadata/Kinds')
-}
-
-// 把一个文档的字符串叶子摊平出来，与对照语言逐条比较
-export function getMetadataLeaves(name, locale, baseline) {
-  return http.get('/api/Service/Metadata/Leaves', { params: { name, locale, baseline } })
-}
-
-// 写一条覆盖，服务端会立刻贴进文档本体并重算哈希与 Meta.json
-export function setMetadataTranslation(locale, name, pointer, value) {
-  return http.post('/api/Service/Metadata/Translation', null, { params: { locale, name, pointer, value } })
-}
-
-// 删一条覆盖并把文档还原成原文
-export function removeMetadataTranslation(locale, name, pointer) {
-  return http.post('/api/Service/Metadata/Translation/Remove', null, { params: { locale, name, pointer } })
-}
-
 // ===== 后台专属账号 (SSO) =====
 
 // 后台账号清单，当前调用者的那一行会带 IsCurrent

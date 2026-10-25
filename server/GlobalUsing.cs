@@ -50,7 +50,6 @@ global using server.Services.Github;
 global using server.Services.Legacy;
 global using server.Services.Legacy.PizzaHelper;
 global using server.Services.Licensing;
-global using server.Services.Metadata;
 global using server.Services.OAuth;
 global using server.Services.Ranking;
 global using server.Services.ReCaptcha;

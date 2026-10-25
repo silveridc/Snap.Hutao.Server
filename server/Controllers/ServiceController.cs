@@ -32,9 +32,6 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     private readonly AccessionService _accessionService = serviceProvider.GetRequiredService<AccessionService>();
     private readonly IRankService _rankService = serviceProvider.GetRequiredService<IRankService>();
     private readonly YaeMetadataService _yaeMetadataService = serviceProvider.GetRequiredService<YaeMetadataService>();
-    private readonly MetadataStoreService _metadataStoreService = serviceProvider.GetRequiredService<MetadataStoreService>();
-    private readonly MetadataTranslationService _metadataTranslationService = serviceProvider.GetRequiredService<MetadataTranslationService>();
-    private readonly MetadataProjectionService _metadataProjectionService = serviceProvider.GetRequiredService<MetadataProjectionService>();
     private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
 
     /// <summary>
@@ -654,97 +651,6 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     {
         List<YaeMetadataService.Summary> items = await _yaeMetadataService.ListAsync(token).ConfigureAwait(false);
         return Success<List<YaeMetadataService.Summary>>("Yae metadata list acquired successfully", items);
-    }
-
-    /// <summary>
-    /// 列出已导入的 metadata 原文档（不返回文档正文，只返回提列）。
-    /// </summary>
-    /// <param name="locale">限定语言，省略时返回全部 locale。</param>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>文档清单。</returns>
-    [HttpGet("Metadata/Documents")]
-    public async Task<IActionResult> MetadataDocumentsAsync([FromQuery] string? locale = null, CancellationToken token = default)
-    {
-        List<MetadataStoreService.Summary> items = await _metadataStoreService.ListAsync(locale, token).ConfigureAwait(false);
-        return Success<List<MetadataStoreService.Summary>>($"Metadata document list acquired successfully, {items.Count} documents", items);
-    }
-
-    /// <summary>
-    /// 列出人工写过的 i18n 覆盖（每行都带原文，便于回滚前先看一眼）。
-    /// </summary>
-    /// <param name="locale">限定语言。</param>
-    /// <param name="name">限定文档。</param>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>覆盖列表。</returns>
-    [HttpGet("Metadata/Translations")]
-    public async Task<IActionResult> MetadataTranslationsAsync([FromQuery] string? locale = null, [FromQuery] string? name = null, CancellationToken token = default)
-    {
-        List<MetadataTranslationService.Row> rows = await _metadataTranslationService.ListAsync(locale, name, token).ConfigureAwait(false);
-        return Success<List<MetadataTranslationService.Row>>($"Metadata translation list acquired successfully, {rows.Count} overrides", rows);
-    }
-
-    /// <summary>
-    /// 把一个文档里所有字符串叶子摊平出来，与对照语言逐条比较，供人工挑要翻译的词条。
-    /// </summary>
-    /// <param name="name">文档名，不带 .json。</param>
-    /// <param name="locale">要看的语言。</param>
-    /// <param name="baseline">对照语言，通常填 CHS。</param>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>词条列表；两侧任一没导入过返回 NotFound。</returns>
-    [HttpGet("Metadata/Leaves")]
-    public async Task<IActionResult> MetadataLeavesAsync([FromQuery] string name, [FromQuery] string locale, [FromQuery] string baseline, CancellationToken token = default)
-    {
-        List<MetadataTranslationService.Leaf>? leaves = await _metadataTranslationService.LeavesAsync(name, locale, baseline, token).ConfigureAwait(false);
-        return leaves is null
-            ? Fail($"Either {locale}/{name} or {baseline}/{name} is not imported", ReturnCode.NotFound)
-            : Success<List<MetadataTranslationService.Leaf>>($"Metadata leaves of {locale}/{name} against {baseline} acquired, {leaves.Count} strings", leaves);
-    }
-
-    /// <summary>
-    /// 写一条 i18n 覆盖，并立刻把译文贴进文档本体、重算哈希与该语言的 <c>Meta.json</c>。
-    /// </summary>
-    /// <param name="locale">语言。</param>
-    /// <param name="name">文档名，不带 .json。</param>
-    /// <param name="pointer">RFC 6901 JSON Pointer，必须指向一个已有的字符串叶子。</param>
-    /// <param name="value">译文。</param>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>成功时带新的文档哈希；指针落点不对、文档没导入或参数非法都返回失败。</returns>
-    [HttpPost("Metadata/Translation")]
-    public async Task<IActionResult> MetadataSetTranslationAsync([FromQuery] string locale, [FromQuery] string name, [FromQuery] string pointer, [FromQuery] string value, CancellationToken token = default)
-    {
-        MetadataTranslationService.Outcome outcome = await _metadataTranslationService.SetAsync(locale, name, pointer, value, token).ConfigureAwait(false);
-        return outcome.Succeeded
-            ? Success<MetadataTranslationService.Outcome>($"Translation set on {locale}/{name}{pointer}, document hash is now {outcome.Hash}", outcome)
-            : Fail($"Cannot set translation: {outcome.Error}", ReturnCode.InvalidQueryString);
-    }
-
-    /// <summary>
-    /// 删一条 i18n 覆盖，并把文档上那一处还原成原文。
-    /// </summary>
-    /// <param name="locale">语言。</param>
-    /// <param name="name">文档名，不带 .json。</param>
-    /// <param name="pointer">要撤销的 JSON Pointer。</param>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>成功时带新的文档哈希。</returns>
-    [HttpPost("Metadata/Translation/Remove")]
-    public async Task<IActionResult> MetadataRemoveTranslationAsync([FromQuery] string locale, [FromQuery] string name, [FromQuery] string pointer, CancellationToken token = default)
-    {
-        MetadataTranslationService.Outcome outcome = await _metadataTranslationService.RemoveAsync(locale, name, pointer, token).ConfigureAwait(false);
-        return outcome.Succeeded
-            ? Success<MetadataTranslationService.Outcome>($"Translation removed on {locale}/{name}{pointer}, document hash is now {outcome.Hash}", outcome)
-            : Fail($"Cannot remove translation: {outcome.Error}", ReturnCode.InvalidQueryString);
-    }
-
-    /// <summary>
-    /// 列出分表读模型（<c>metadata_object</c> 那一套）的投影状态。
-    /// </summary>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>每个分类一行，<c>StaleSince</c> 非空表示投影之后正文又被改过。</returns>
-    [HttpGet("Metadata/Kinds")]
-    public async Task<IActionResult> MetadataKindsAsync(CancellationToken token)
-    {
-        List<MetadataProjectionService.KindStatus> kinds = await _metadataProjectionService.ListKindsAsync(token).ConfigureAwait(false);
-        return Success<List<MetadataProjectionService.KindStatus>>($"Metadata projection status acquired successfully, {kinds.Count} kinds, {kinds.Count(kind => kind.StaleSince is not null)} stale", kinds);
     }
 
     private static bool TryParseHash(string? raw, out uint? hash)

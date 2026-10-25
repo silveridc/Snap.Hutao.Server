@@ -360,22 +360,6 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         return await selector(appDbContext);
     }
 
-    /// <summary>在独立作用域中执行一段 metadata 库操作（MetadataDbContext 没有迁移，表由 CreateTablesAsync 建）。</summary>
-    public async Task WithMetadataDbContextAsync(Func<MetadataDbContext, Task> action)
-    {
-        using IServiceScope scope = Services.CreateScope();
-        MetadataDbContext metadataDbContext = scope.ServiceProvider.GetRequiredService<MetadataDbContext>();
-        await action(metadataDbContext);
-    }
-
-    /// <summary>在独立作用域中读取 metadata 库。</summary>
-    public async Task<T> WithMetadataDbContextAsync<T>(Func<MetadataDbContext, Task<T>> selector)
-    {
-        using IServiceScope scope = Services.CreateScope();
-        MetadataDbContext metadataDbContext = scope.ServiceProvider.GetRequiredService<MetadataDbContext>();
-        return await selector(metadataDbContext);
-    }
-
     private sealed class LoopbackRemoteIpStartupFilter : IStartupFilter
     {
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)

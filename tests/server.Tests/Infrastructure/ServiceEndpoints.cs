@@ -154,14 +154,6 @@ public static class ServiceEndpoints
         // 两个分支由 YaeTests 断言，这里只要求它穿过维护者权限过滤器
         new("POST", "/api/Service/Yae/SyncMetadata", null, null),
 
-        // metadata：只用没导入过的 locale 与文档名，保证与 MetadataTests 的写入互不影响
-        new("GET", "/api/Service/Metadata/Documents?locale=ZZZ", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Metadata/Kinds", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Metadata/Translations?locale=ZZZ", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Metadata/Leaves?name=NoSuchDocument&locale=ZZA&baseline=ZZB", null, ReturnCodes.NotFound),
-        new("POST", "/api/Service/Metadata/Translation?locale=ZZA&name=NoSuchDocument&pointer=%2FName&value=smoke", null, ReturnCodes.InvalidQueryString),
-        new("POST", "/api/Service/Metadata/Translation/Remove?locale=ZZA&name=NoSuchDocument&pointer=%2FName", null, ReturnCodes.InvalidQueryString),
-
         // 后台专属账号（SSO）：SSO 未启用的宿主里写门禁整体放行，维护者可到达业务逻辑。
         // Add 有状态（唯一 subject，重复调用会走到「已存在」分支），只要求穿过权限过滤器；
         // SetEnabled/Remove 用越界 accountId，稳定落在「账号不存在」分支。
