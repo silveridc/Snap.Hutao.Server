@@ -4,7 +4,7 @@ using server.Models.Redeem;
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "Redeem")]
 public class RedeemController(IServiceProvider serviceProvider) : ControllerBase
 {

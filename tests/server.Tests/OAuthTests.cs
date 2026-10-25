@@ -35,7 +35,7 @@ public sealed class OAuthTests
         StubGitHub(nodeId, $"user-{nodeId}");
 
         string state = TestOAuthState.BindState(userId, deviceId, CallbackUri);
-        using HttpResponseMessage response = await client.GetAsync($"/OAuth/Callback/GitHub?code=code-{Guid.NewGuid():N}&state={Uri.EscapeDataString(state)}",
+        using HttpResponseMessage response = await client.GetAsync($"/api/OAuth/Callback/GitHub?code=code-{Guid.NewGuid():N}&state={Uri.EscapeDataString(state)}",
             TestContext.Current.CancellationToken);
 
         Assert.True(response.StatusCode is HttpStatusCode.Redirect,
@@ -60,7 +60,7 @@ public sealed class OAuthTests
 
     private async Task<TestResponse> StatusAsync(string accessToken)
     {
-        using HttpResponseMessage response = await client.GetWithTokenAsync("/OAuth/Status?provider=Github", accessToken);
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/OAuth/Status?provider=Github", accessToken);
         return await response.ReadTestResponseAsync();
     }
 
@@ -68,7 +68,7 @@ public sealed class OAuthTests
     public async Task Auth_Anonymous_RedirectsToGitHubAuthorizeWithEncryptedState()
     {
         using HttpResponseMessage response = await client.GetAsync(
-            "/OAuth/Auth?provider=Github&device_id=device-auth&device_name=Test%20Device&device_os=Windows&callback=https://hutao.app/cb",
+            "/api/OAuth/Auth?provider=Github&device_id=device-auth&device_name=Test%20Device&device_os=Windows&callback=https://hutao.app/cb",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -85,7 +85,7 @@ public sealed class OAuthTests
     [InlineData("AAAAAAAAAAAAAAAAAAAAAAAAAAAA=")] // 合法 Base64，但不是本密钥的密文
     public async Task Callback_WithUndecryptableState_IsRejected(string state)
     {
-        using HttpResponseMessage response = await client.GetAsync($"/OAuth/Callback/GitHub?code=any&state={Uri.EscapeDataString(state)}",
+        using HttpResponseMessage response = await client.GetAsync($"/api/OAuth/Callback/GitHub?code=any&state={Uri.EscapeDataString(state)}",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -123,7 +123,7 @@ public sealed class OAuthTests
         // 同一用户再次绑定同一 GitHub 账号：仍然成功，且不会产生第二条绑定记录
         StubGitHub(nodeId, "renamed-login");
         string state = TestOAuthState.BindState(user.Id, deviceId, CallbackUri);
-        using HttpResponseMessage second = await client.GetAsync($"/OAuth/Callback/GitHub?code=code-2&state={Uri.EscapeDataString(state)}",
+        using HttpResponseMessage second = await client.GetAsync($"/api/OAuth/Callback/GitHub?code=code-2&state={Uri.EscapeDataString(state)}",
             TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.Redirect, second.StatusCode);
         Assert.Equal(CallbackUri, second.Headers.Location?.ToString());
@@ -141,7 +141,7 @@ public sealed class OAuthTests
         string nodeId = await BindGitHubAsync(owner.Id, $"device-owner-{Guid.NewGuid():N}");
 
         string state = TestOAuthState.BindState(attacker.Id, $"device-attacker-{Guid.NewGuid():N}", CallbackUri);
-        using HttpResponseMessage response = await client.GetAsync($"/OAuth/Callback/GitHub?code=code-3&state={Uri.EscapeDataString(state)}",
+        using HttpResponseMessage response = await client.GetAsync($"/api/OAuth/Callback/GitHub?code=code-3&state={Uri.EscapeDataString(state)}",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -161,7 +161,7 @@ public sealed class OAuthTests
 
         StubGitHub(nodeId, "login-account");
         string state = TestOAuthState.LoginState(deviceId, CallbackUri);
-        using HttpResponseMessage response = await client.GetAsync($"/OAuth/Callback/GitHub?code=code-4&state={Uri.EscapeDataString(state)}",
+        using HttpResponseMessage response = await client.GetAsync($"/api/OAuth/Callback/GitHub?code=code-4&state={Uri.EscapeDataString(state)}",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -170,7 +170,7 @@ public sealed class OAuthTests
         Assert.StartsWith($"{CallbackUri}?access_token=", location, StringComparison.Ordinal);
 
         string accessToken = QueryValue(location, "access_token");
-        using HttpResponseMessage userInfo = await client.GetWithTokenAsync("/Passport/v2/UserInfo", accessToken);
+        using HttpResponseMessage userInfo = await client.GetWithTokenAsync("/api/Passport/v2/UserInfo", accessToken);
         TestResponse parsed = await userInfo.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         Assert.Equal(user.UserName, parsed.Data.GetProperty("UserName").GetString());
@@ -182,7 +182,7 @@ public sealed class OAuthTests
         StubGitHub($"ND_{Guid.NewGuid():N}", "stranger");
 
         string state = TestOAuthState.LoginState($"device-stranger-{Guid.NewGuid():N}", CallbackUri);
-        using HttpResponseMessage response = await client.GetAsync($"/OAuth/Callback/GitHub?code=code-5&state={Uri.EscapeDataString(state)}",
+        using HttpResponseMessage response = await client.GetAsync($"/api/OAuth/Callback/GitHub?code=code-5&state={Uri.EscapeDataString(state)}",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -198,7 +198,7 @@ public sealed class OAuthTests
         factory.StubHttp.MapJson("github.com/login/oauth/access_token", """{"error":"invalid_grant"}""", HttpStatusCode.BadRequest);
 
         string state = TestOAuthState.BindState(user.Id, $"device-fail-{Guid.NewGuid():N}", CallbackUri);
-        using HttpResponseMessage response = await client.GetAsync($"/OAuth/Callback/GitHub?code=bad-code&state={Uri.EscapeDataString(state)}",
+        using HttpResponseMessage response = await client.GetAsync($"/api/OAuth/Callback/GitHub?code=bad-code&state={Uri.EscapeDataString(state)}",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -212,7 +212,7 @@ public sealed class OAuthTests
         await BindGitHubAsync(user.Id, $"device-unbind-{Guid.NewGuid():N}");
         Assert.True((await StatusAsync(user.AccessToken)).DeserializeData<OAuthBindStatus>()!.IsBinded);
 
-        using HttpResponseMessage unbind = await client.GetWithTokenAsync("/OAuth/Unbind?provider=Github", user.AccessToken);
+        using HttpResponseMessage unbind = await client.GetWithTokenAsync("/api/OAuth/Unbind?provider=Github", user.AccessToken);
         TestResponse parsed = await unbind.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
 
@@ -223,7 +223,7 @@ public sealed class OAuthTests
     [Fact]
     public async Task Status_And_Unbind_RequireSignIn()
     {
-        foreach (string url in new[] { "/OAuth/Status?provider=Github", "/OAuth/Unbind?provider=Github" })
+        foreach (string url in new[] { "/api/OAuth/Status?provider=Github", "/api/OAuth/Unbind?provider=Github" })
         {
             using HttpResponseMessage response = await client.GetAsync(url, TestContext.Current.CancellationToken);
             TestResponse parsed = await response.ReadTestResponseAsync();
@@ -234,7 +234,7 @@ public sealed class OAuthTests
     [Fact]
     public async Task UnknownProvider_IsRejected()
     {
-        using HttpResponseMessage response = await client.GetAsync("/OAuth/Auth?provider=9527&device_id=d&device_name=n&device_os=Windows&callback=https://hutao.app/cb",
+        using HttpResponseMessage response = await client.GetAsync("/api/OAuth/Auth?provider=9527&device_id=d&device_name=n&device_os=Windows&callback=https://hutao.app/cb",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

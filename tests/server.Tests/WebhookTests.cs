@@ -36,7 +36,7 @@ public sealed class WebhookTests
             ["Afdian2.SkuCdnService"] = CdnSku,
         });
 
-        using HttpRequestMessage request = new(HttpMethod.Post, "/Service/Config/Update")
+        using HttpRequestMessage request = new(HttpMethod.Post, "/api/Service/Config/Update")
         {
             Content = new StringContent(body, Encoding.UTF8, "application/json"),
         };
@@ -56,7 +56,7 @@ public sealed class WebhookTests
 
     private async Task<HttpResponseMessage> SendOrderAsync(string tradeNo, string skuId, int count, string remark)
     {
-        return await client.PostAsync("/Webhook",
+        return await client.PostAsync("/api/Webhook",
             new StringContent(TestData.AfdianOrderJson(tradeNo, skuId, count, remark), Encoding.UTF8, "application/json"),
             TestContext.Current.CancellationToken);
     }
@@ -78,7 +78,7 @@ public sealed class WebhookTests
 
     private async Task<UserInfo> UserInfoAsync(TestUser user)
     {
-        using HttpResponseMessage response = await client.GetWithTokenAsync("/Passport/v2/UserInfo", user.AccessToken);
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/Passport/v2/UserInfo", user.AccessToken);
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         return parsed.DeserializeData<UserInfo>()!;
@@ -171,7 +171,7 @@ public sealed class WebhookTests
             type = "order",
             data = new { order = new { out_trade_no = tradeNo, remark = buyer.UserName, sku_detail = Array.Empty<object>() } },
         });
-        using HttpResponseMessage response = await client.PostAsync("/Webhook",
+        using HttpResponseMessage response = await client.PostAsync("/api/Webhook",
             new StringContent(body, Encoding.UTF8, "application/json"), TestContext.Current.CancellationToken);
 
         await AssertAcceptedAsync(response);

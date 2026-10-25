@@ -5,7 +5,7 @@ using server.Models.Metadata;
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "GachaLog")]
 public class GachaLogController(GachaLogService gachaLogService) : ControllerBase
 {

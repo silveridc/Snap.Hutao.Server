@@ -2,7 +2,7 @@
 using server.Services.WallPaper;
 namespace server.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
 

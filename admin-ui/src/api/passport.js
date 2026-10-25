@@ -6,7 +6,7 @@ import { getDeviceHeaders } from '@/utils/device'
 export async function login(email, password) {
   const [UserName, Password] = await Promise.all([rsaEncrypt(email), rsaEncrypt(password)])
   const { data: envelope } = await bare.post(
-    '/Passport/v2/Login',
+    '/api/Passport/v2/Login',
     { UserName, Password },
     { headers: getDeviceHeaders() },
   )
@@ -20,6 +20,6 @@ export async function login(email, password) {
 
 // 获取当前登录用户信息 (含是否为维护者、各项服务到期时间)。
 export async function fetchUserInfo() {
-  const envelope = await http.get('/Passport/v2/UserInfo')
+  const envelope = await http.get('/api/Passport/v2/UserInfo')
   return envelope.data
 }

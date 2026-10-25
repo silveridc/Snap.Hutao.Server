@@ -40,9 +40,9 @@ public sealed class YaeTests
         ServeBucket(Bucket("9.9.9", (ConfiguredChineseHash, RvaGroup(1001U)), (OverseaHash, RvaGroup(2001U))));
 
         TestUser maintainer = await users.MaintainerAsync();
-        Assert.Equal(ReturnCodes.Success, (await SendServiceAsync("POST", "/Service/Yae/SyncMetadata", maintainer.AccessToken)).Retcode);
+        Assert.Equal(ReturnCodes.Success, (await SendServiceAsync("POST", "/api/Service/Yae/SyncMetadata", maintainer.AccessToken)).Retcode);
 
-        using HttpResponseMessage response = await client.GetAsync("/client/AchievementFieldId_9.9.9.json", TestContext.Current.CancellationToken);
+        using HttpResponseMessage response = await client.GetAsync("/api/client/AchievementFieldId_9.9.9.json", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.StartsWith("application/json", response.Content.Headers.ContentType?.ToString(), StringComparison.OrdinalIgnoreCase);
 
@@ -82,10 +82,10 @@ public sealed class YaeTests
         ServeBucket(Bucket("8.8.8", (UnconfiguredHashA, RvaGroup(3001U)), (UnconfiguredHashB, RvaGroup(4001U))));
 
         TestUser maintainer = await users.MaintainerAsync();
-        TestResponse sync = await SendServiceAsync("POST", $"/Service/Yae/SyncMetadata?chineseHash={UnconfiguredHashB}", maintainer.AccessToken);
+        TestResponse sync = await SendServiceAsync("POST", $"/api/Service/Yae/SyncMetadata?chineseHash={UnconfiguredHashB}", maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, sync.Retcode);
 
-        using HttpResponseMessage response = await client.GetAsync("/client/AchievementFieldId_8.8.8.json", TestContext.Current.CancellationToken);
+        using HttpResponseMessage response = await client.GetAsync("/api/client/AchievementFieldId_8.8.8.json", TestContext.Current.CancellationToken);
         string body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         using JsonDocument document = JsonDocument.Parse(body);
         JsonElement methodRva = document.RootElement.GetProperty("nativeConfig").GetProperty("methodRva");
@@ -100,12 +100,12 @@ public sealed class YaeTests
         ServeBucket(Bucket("7.7.7", (UnconfiguredHashA, RvaGroup(5001U)), (UnconfiguredHashB, RvaGroup(6001U))));
 
         TestUser maintainer = await users.MaintainerAsync();
-        TestResponse sync = await SendServiceAsync("POST", "/Service/Yae/SyncMetadata", maintainer.AccessToken);
+        TestResponse sync = await SendServiceAsync("POST", "/api/Service/Yae/SyncMetadata", maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InternalStateException, sync.Retcode);
         Assert.Contains("ChineseGameHashes", sync.Message, StringComparison.Ordinal);
 
-        using HttpResponseMessage response = await client.GetAsync("/client/AchievementFieldId_7.7.7.json", TestContext.Current.CancellationToken);
+        using HttpResponseMessage response = await client.GetAsync("/api/client/AchievementFieldId_7.7.7.json", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
@@ -117,7 +117,7 @@ public sealed class YaeTests
             _ => new HttpResponseMessage(HttpStatusCode.BadGateway));
 
         TestUser maintainer = await users.MaintainerAsync();
-        TestResponse sync = await SendServiceAsync("POST", "/Service/Yae/SyncMetadata", maintainer.AccessToken);
+        TestResponse sync = await SendServiceAsync("POST", "/api/Service/Yae/SyncMetadata", maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InternalStateException, sync.Retcode);
         Assert.Contains("bucket mirrors failed", sync.Message, StringComparison.Ordinal);
@@ -127,7 +127,7 @@ public sealed class YaeTests
     public async Task Sync_BadChineseHashParameter_IsRejectedAsInvalidQuery()
     {
         TestUser maintainer = await users.MaintainerAsync();
-        TestResponse sync = await SendServiceAsync("POST", "/Service/Yae/SyncMetadata?chineseHash=not-a-hash", maintainer.AccessToken);
+        TestResponse sync = await SendServiceAsync("POST", "/api/Service/Yae/SyncMetadata?chineseHash=not-a-hash", maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidQueryString, sync.Retcode);
     }
@@ -138,9 +138,9 @@ public sealed class YaeTests
         ServeBucket(Bucket("6.6.6", (ConfiguredChineseHash, RvaGroup(7001U)), (OverseaHash, RvaGroup(8001U))));
 
         TestUser maintainer = await users.MaintainerAsync();
-        Assert.Equal(ReturnCodes.Success, (await SendServiceAsync("POST", "/Service/Yae/SyncMetadata", maintainer.AccessToken)).Retcode);
+        Assert.Equal(ReturnCodes.Success, (await SendServiceAsync("POST", "/api/Service/Yae/SyncMetadata", maintainer.AccessToken)).Retcode);
 
-        TestResponse list = await SendServiceAsync("GET", "/Service/Yae/Metadata", maintainer.AccessToken);
+        TestResponse list = await SendServiceAsync("GET", "/api/Service/Yae/Metadata", maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, list.Retcode);
 
         using JsonDocument document = JsonDocument.Parse(list.Data.GetRawText());

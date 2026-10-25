@@ -3,7 +3,7 @@ using server.Services.PublicAPI;
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "Public")]
 public class PublicApiController(IpRegionService ipRegionService) : ControllerBase
 {

@@ -8,7 +8,7 @@ namespace server.Controllers;
 /// 这里返回裸 JSON 对象，不带 <c>retcode</c> 信封——客户端把响应体直接反序列化成对应的模型。
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(IgnoreApi = true)]
 public sealed class ClientController(YaeMetadataService yaeMetadataService) : ControllerBase
 {

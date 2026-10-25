@@ -3,7 +3,7 @@
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "Passport")]
 public sealed class AnnouncementController(AnnouncementService announcementService) : ControllerBase
 {

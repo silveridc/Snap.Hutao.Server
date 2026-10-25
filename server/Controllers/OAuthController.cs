@@ -3,7 +3,7 @@
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "OAuth")]
 public class OAuthController(IServiceProvider serviceProvider) : ControllerBase
 {

@@ -103,22 +103,22 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         string uid = "900000101";
 
-        TestResponse added = await SendAsync("POST", $"/Service/Ban/Add?uid={uid}&reason=integration", null, maintainer.AccessToken);
+        TestResponse added = await SendAsync("POST", $"/api/Service/Ban/Add?uid={uid}&reason=integration", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, added.Retcode);
 
         // 重复封禁同一个 Uid 不报错，只是不再新增
-        TestResponse again = await SendAsync("POST", $"/Service/Ban/Add?uid={uid}", null, maintainer.AccessToken);
+        TestResponse again = await SendAsync("POST", $"/api/Service/Ban/Add?uid={uid}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, again.Retcode);
 
-        TestResponse list = await SendAsync("GET", $"/Service/Ban/List?page=1&pageSize=100&keyword={uid}", null, maintainer.AccessToken);
+        TestResponse list = await SendAsync("GET", $"/api/Service/Ban/List?page=1&pageSize=100&keyword={uid}", null, maintainer.AccessToken);
         PagedResult<BanItem>? page = list.DeserializeData<PagedResult<BanItem>>();
         Assert.NotNull(page);
         Assert.Contains(page!.Items, item => item.Uid == uid && item.Reason == "integration");
 
-        TestResponse removed = await SendAsync("POST", $"/Service/Ban/Remove?uid={uid}", null, maintainer.AccessToken);
+        TestResponse removed = await SendAsync("POST", $"/api/Service/Ban/Remove?uid={uid}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, removed.Retcode);
 
-        TestResponse afterRemove = await SendAsync("GET", $"/Service/Ban/List?page=1&pageSize=100&keyword={uid}", null, maintainer.AccessToken);
+        TestResponse afterRemove = await SendAsync("GET", $"/api/Service/Ban/List?page=1&pageSize=100&keyword={uid}", null, maintainer.AccessToken);
         Assert.Empty(afterRemove.DeserializeData<PagedResult<BanItem>>()!.Items);
     }
 
@@ -131,7 +131,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", $"/Service/Ban/Add?uid={Uri.EscapeDataString(uid)}", null, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("POST", $"/api/Service/Ban/Add?uid={Uri.EscapeDataString(uid)}", null, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
     }
@@ -143,13 +143,13 @@ public sealed class ServiceTests
         List<string> uids = ["900000201", "900000202", "900000203"];
 
         string body = JsonSerializer.Serialize(new BatchUidRequest { Uids = uids, Reason = "batch" });
-        TestResponse parsed = await SendAsync("POST", "/Service/Ban/BatchAdd", body, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("POST", "/api/Service/Ban/BatchAdd", body, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         Assert.Equal(uids.Count, parsed.Data.GetInt32());
 
         // 再批量封禁同样的 Uid 时新增数量为 0
-        TestResponse again = await SendAsync("POST", "/Service/Ban/BatchAdd", body, maintainer.AccessToken);
+        TestResponse again = await SendAsync("POST", "/api/Service/Ban/BatchAdd", body, maintainer.AccessToken);
         Assert.Equal(0, again.Data.GetInt32());
     }
 
@@ -159,7 +159,7 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         string title = $"integration-{Guid.NewGuid():N}";
 
-        TestResponse uploaded = await SendAsync("POST", "/Service/Announcement/Upload", JsonSerializer.Serialize(new
+        TestResponse uploaded = await SendAsync("POST", "/api/Service/Announcement/Upload", JsonSerializer.Serialize(new
         {
             Title = title,
             Content = "integration content",
@@ -171,7 +171,7 @@ public sealed class ServiceTests
         long id = await FindAnnouncementIdAsync(maintainer, title);
         Assert.True(id > 0, "The uploaded announcement should appear in the admin list");
 
-        TestResponse updated = await SendAsync("POST", "/Service/Announcement/Update", JsonSerializer.Serialize(new
+        TestResponse updated = await SendAsync("POST", "/api/Service/Announcement/Update", JsonSerializer.Serialize(new
         {
             Id = id,
             Locale = "ALL",
@@ -182,14 +182,14 @@ public sealed class ServiceTests
         }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, updated.Retcode);
 
-        TestResponse disabled = await SendAsync("POST", $"/Service/Announcement/SetEnabled?id={id}&enabled=false", null, maintainer.AccessToken);
+        TestResponse disabled = await SendAsync("POST", $"/api/Service/Announcement/SetEnabled?id={id}&enabled=false", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, disabled.Retcode);
 
-        TestResponse deleted = await SendAsync("POST", $"/Service/Announcement/Delete?id={id}", null, maintainer.AccessToken);
+        TestResponse deleted = await SendAsync("POST", $"/api/Service/Announcement/Delete?id={id}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, deleted.Retcode);
 
         // 删除后同一条公告再删一次应报不存在
-        TestResponse again = await SendAsync("POST", $"/Service/Announcement/Delete?id={id}", null, maintainer.AccessToken);
+        TestResponse again = await SendAsync("POST", $"/api/Service/Announcement/Delete?id={id}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.NotFound, again.Retcode);
     }
 
@@ -201,7 +201,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", "/Service/Announcement/Update", JsonSerializer.Serialize(new
+        TestResponse parsed = await SendAsync("POST", "/api/Service/Announcement/Update", JsonSerializer.Serialize(new
         {
             Id = 1,
             Locale = "ALL",
@@ -219,7 +219,7 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         TestUser target = await users.CreateUniqueAsync("service-redeem");
 
-        TestResponse generated = await SendAsync("POST", "/Service/Redeem/Generate", JsonSerializer.Serialize(new
+        TestResponse generated = await SendAsync("POST", "/api/Service/Redeem/Generate", JsonSerializer.Serialize(new
         {
             Count = 2,
             Type = 1,
@@ -239,7 +239,7 @@ public sealed class ServiceTests
 
         // 生成的兑换码可以直接被普通用户使用，且给祈愿记录服务加 7 天
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Redeem/Use", new { Code = codes[0], Username = target.UserName }, token: null);
+            "/api/Redeem/Use", new { Code = codes[0], Username = target.UserName }, token: null);
 
         TestResponse used = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, used.Retcode);
@@ -251,7 +251,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse generated = await SendAsync("POST", "/Service/Redeem/Generate", JsonSerializer.Serialize(new
+        TestResponse generated = await SendAsync("POST", "/api/Service/Redeem/Generate", JsonSerializer.Serialize(new
         {
             Count = 1,
             Type = 1,
@@ -266,7 +266,7 @@ public sealed class ServiceTests
         string code = generated.Data.GetProperty("Codes")[0].GetString()!;
         uint id = await FindRedeemIdAsync(maintainer, code);
 
-        TestResponse updated = await SendAsync("POST", "/Service/Redeem/Update", JsonSerializer.Serialize(new
+        TestResponse updated = await SendAsync("POST", "/api/Service/Redeem/Update", JsonSerializer.Serialize(new
         {
             Id = id,
             Type = 1,
@@ -278,10 +278,10 @@ public sealed class ServiceTests
         }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, updated.Retcode);
 
-        TestResponse deleted = await SendAsync("POST", $"/Service/Redeem/Delete?id={id}", null, maintainer.AccessToken);
+        TestResponse deleted = await SendAsync("POST", $"/api/Service/Redeem/Delete?id={id}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, deleted.Retcode);
 
-        TestResponse again = await SendAsync("POST", $"/Service/Redeem/Delete?id={id}", null, maintainer.AccessToken);
+        TestResponse again = await SendAsync("POST", $"/api/Service/Redeem/Delete?id={id}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.NotFound, again.Retcode);
     }
 
@@ -291,16 +291,16 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         string header = $"Integration Hutao/{Guid.NewGuid():N}";
 
-        TestResponse added = await SendAsync("POST", $"/Service/AllowedVersion/Add?header={Uri.EscapeDataString(header)}", null, maintainer.AccessToken);
+        TestResponse added = await SendAsync("POST", $"/api/Service/AllowedVersion/Add?header={Uri.EscapeDataString(header)}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, added.Retcode);
 
-        TestResponse list = await SendAsync("GET", "/Service/AllowedVersion/List", null, maintainer.AccessToken);
+        TestResponse list = await SendAsync("GET", "/api/Service/AllowedVersion/List", null, maintainer.AccessToken);
         Assert.Contains(header, list.DeserializeData<List<string>>()!);
 
-        TestResponse removed = await SendAsync("POST", $"/Service/AllowedVersion/Remove?header={Uri.EscapeDataString(header)}", null, maintainer.AccessToken);
+        TestResponse removed = await SendAsync("POST", $"/api/Service/AllowedVersion/Remove?header={Uri.EscapeDataString(header)}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, removed.Retcode);
 
-        TestResponse afterRemove = await SendAsync("GET", "/Service/AllowedVersion/List", null, maintainer.AccessToken);
+        TestResponse afterRemove = await SendAsync("GET", "/api/Service/AllowedVersion/List", null, maintainer.AccessToken);
         Assert.DoesNotContain(header, afterRemove.DeserializeData<List<string>>()!);
     }
 
@@ -310,16 +310,16 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         string key = $"HutaoTest.Config.{Guid.NewGuid():N}";
 
-        TestResponse updated = await SendAsync("POST", "/Service/Config/Update", JsonSerializer.Serialize(new Dictionary<string, string?> { [key] = "42" }), maintainer.AccessToken);
+        TestResponse updated = await SendAsync("POST", "/api/Service/Config/Update", JsonSerializer.Serialize(new Dictionary<string, string?> { [key] = "42" }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, updated.Retcode);
 
-        TestResponse fetched = await SendAsync("GET", "/Service/Config/Get", null, maintainer.AccessToken);
+        TestResponse fetched = await SendAsync("GET", "/api/Service/Config/Get", null, maintainer.AccessToken);
         Assert.Equal("42", fetched.DeserializeData<Dictionary<string, string?>>()![key]);
 
-        TestResponse reset = await SendAsync("POST", $"/Service/Config/Reset?key={key}", null, maintainer.AccessToken);
+        TestResponse reset = await SendAsync("POST", $"/api/Service/Config/Reset?key={key}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, reset.Retcode);
 
-        TestResponse afterReset = await SendAsync("GET", "/Service/Config/Get", null, maintainer.AccessToken);
+        TestResponse afterReset = await SendAsync("GET", "/api/Service/Config/Get", null, maintainer.AccessToken);
         Assert.DoesNotContain(key, afterReset.DeserializeData<Dictionary<string, string?>>()!.Keys);
     }
 
@@ -328,7 +328,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", "/Service/Config/Update", "{}", maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("POST", "/api/Service/Config/Update", "{}", maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
     }
@@ -338,7 +338,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", "/Service/Config/Reset?key=", null, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("POST", "/api/Service/Config/Reset?key=", null, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
     }
@@ -349,24 +349,24 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         TestUser target = await users.CreateUniqueAsync("service-privilege");
 
-        TestResponse granted = await SendAsync("POST", "/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
+        TestResponse granted = await SendAsync("POST", "/api/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
         {
             UserId = target.Id,
             IsLicensedDeveloper = true,
         }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, granted.Retcode);
 
-        TestResponse detail = await SendAsync("GET", $"/Service/User/Detail?userId={target.Id}", null, maintainer.AccessToken);
+        TestResponse detail = await SendAsync("GET", $"/api/Service/User/Detail?userId={target.Id}", null, maintainer.AccessToken);
         Assert.True(detail.DeserializeData<UserDetail>()!.IsLicensedDeveloper);
 
-        TestResponse revoked = await SendAsync("POST", "/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
+        TestResponse revoked = await SendAsync("POST", "/api/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
         {
             UserId = target.Id,
             IsLicensedDeveloper = false,
         }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, revoked.Retcode);
 
-        TestResponse afterRevoke = await SendAsync("GET", $"/Service/User/Detail?userId={target.Id}", null, maintainer.AccessToken);
+        TestResponse afterRevoke = await SendAsync("GET", $"/api/Service/User/Detail?userId={target.Id}", null, maintainer.AccessToken);
         Assert.False(afterRevoke.DeserializeData<UserDetail>()!.IsLicensedDeveloper);
     }
 
@@ -375,7 +375,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", "/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
+        TestResponse parsed = await SendAsync("POST", "/api/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
         {
             UserId = maintainer.Id,
             IsMaintainer = false,
@@ -389,7 +389,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", "/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
+        TestResponse parsed = await SendAsync("POST", "/api/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest
         {
             UserId = int.MaxValue,
             IsMaintainer = true,
@@ -404,7 +404,7 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         TestUser target = await users.CreateUniqueAsync("service-resetpwd");
 
-        TestResponse parsed = await SendAsync("POST", "/Service/User/ResetPassword", JsonSerializer.Serialize(new UserResetPasswordRequest
+        TestResponse parsed = await SendAsync("POST", "/api/Service/User/ResetPassword", JsonSerializer.Serialize(new UserResetPasswordRequest
         {
             UserId = target.Id,
             NewPassword = "short",
@@ -420,7 +420,7 @@ public sealed class ServiceTests
         TestUser target = await users.CreateUniqueAsync("service-resetpwd-ok");
         const string newPassword = "AdminIssuedPassword1";
 
-        TestResponse parsed = await SendAsync("POST", "/Service/User/ResetPassword", JsonSerializer.Serialize(new UserResetPasswordRequest
+        TestResponse parsed = await SendAsync("POST", "/api/Service/User/ResetPassword", JsonSerializer.Serialize(new UserResetPasswordRequest
         {
             UserId = target.Id,
             NewPassword = newPassword,
@@ -428,7 +428,7 @@ public sealed class ServiceTests
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Login",
+            "/api/Passport/v2/Login",
             new Dictionary<string, object?>
             {
                 ["UserName"] = RsaPayload.Encrypt(target.UserName),
@@ -446,7 +446,7 @@ public sealed class ServiceTests
         TestUser target = await users.CreateUniqueAsync("service-list-keyword");
 
         TestResponse parsed = await SendAsync(
-            "GET", $"/Service/User/List?page=1&pageSize=10&keyword={Uri.EscapeDataString(target.UserName)}", null, maintainer.AccessToken);
+            "GET", $"/api/Service/User/List?page=1&pageSize=10&keyword={Uri.EscapeDataString(target.UserName)}", null, maintainer.AccessToken);
 
         PagedResult<UserListItem>? page = parsed.DeserializeData<PagedResult<UserListItem>>();
         Assert.NotNull(page);
@@ -458,7 +458,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("GET", "/Service/User/Statistics", null, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("GET", "/api/Service/User/Statistics", null, maintainer.AccessToken);
 
         UserStatistics? statistics = parsed.DeserializeData<UserStatistics>();
         Assert.NotNull(statistics);
@@ -471,7 +471,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", "/Service/Cache/Invalidate", JsonSerializer.Serialize(new
+        TestResponse parsed = await SendAsync("POST", "/api/Service/Cache/Invalidate", JsonSerializer.Serialize(new
         {
             Keys = new[] { "HutaoTest.Missing" },
             Patterns = new[] { "HutaoTest.Missing:*" },
@@ -488,7 +488,7 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         string version = $"1.99.{Random.Shared.Next(1000, 9999)}.0";
 
-        TestResponse published = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(version), maintainer.AccessToken);
+        TestResponse published = await SendAsync("POST", "/api/Service/Release/Publish", TestData.ReleasePublishJson(version), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, published.Retcode);
 
         HutaoReleaseItem? release = published.DeserializeData<HutaoReleaseItem>();
@@ -503,11 +503,11 @@ public sealed class ServiceTests
         Assert.Equal(version, patchParsed.Data.GetProperty("version").GetString());
 
         // 同一个版本号不能重复发布
-        TestResponse duplicate = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(version), maintainer.AccessToken);
+        TestResponse duplicate = await SendAsync("POST", "/api/Service/Release/Publish", TestData.ReleasePublishJson(version), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.InvalidUploadData, duplicate.Retcode);
 
         // 回滚到历史版本
-        TestResponse activated = await SendAsync("POST", "/Service/Release/Activate", JsonSerializer.Serialize(new HutaoReleaseActivateRequest { Id = release.Id }), maintainer.AccessToken);
+        TestResponse activated = await SendAsync("POST", "/api/Service/Release/Activate", JsonSerializer.Serialize(new HutaoReleaseActivateRequest { Id = release.Id }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, activated.Retcode);
     }
 
@@ -522,7 +522,7 @@ public sealed class ServiceTests
         string version = $"1.98.{Random.Shared.Next(1000, 9999)}.0";
         string minimum = $"1.90.{Random.Shared.Next(1000, 9999)}.0";
 
-        TestResponse published = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(version, minimum), maintainer.AccessToken);
+        TestResponse published = await SendAsync("POST", "/api/Service/Release/Publish", TestData.ReleasePublishJson(version, minimum), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, published.Retcode);
         Assert.Equal(minimum, published.DeserializeData<HutaoReleaseItem>()!.MinimumVersion);
 
@@ -533,11 +533,11 @@ public sealed class ServiceTests
 
         // 最低版本不得超过发布版本本身
         string later = $"1.97.{Random.Shared.Next(1000, 9999)}.0";
-        TestResponse rejected = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(later, "1.99.0.0"), maintainer.AccessToken);
+        TestResponse rejected = await SendAsync("POST", "/api/Service/Release/Publish", TestData.ReleasePublishJson(later, "1.99.0.0"), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.InvalidUploadData, rejected.Retcode);
 
         // 不带 minimumVersion 的发布（换版本号避开唯一索引），下发里字段应缺席
-        TestResponse plain = await SendAsync("POST", "/Service/Release/Publish", TestData.ReleasePublishJson(later), maintainer.AccessToken);
+        TestResponse plain = await SendAsync("POST", "/api/Service/Release/Publish", TestData.ReleasePublishJson(later), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, plain.Retcode);
         using HttpResponseMessage patchAgain = await client.GetWithTokenAsync("/patch/hutao", token: null);
         TestResponse parsed = await patchAgain.ReadTestResponseAsync();
@@ -594,7 +594,7 @@ public sealed class ServiceTests
             Mirrors = new[] { new { Url = "https://example.com/hutao.zip", MirrorName = "test", MirrorType = "Direct" } },
         });
 
-        TestResponse parsed = await SendAsync("POST", "/Service/Release/Publish", body, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("POST", "/api/Service/Release/Publish", body, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
     }
@@ -611,7 +611,7 @@ public sealed class ServiceTests
             Mirrors = new[] { new { Url = "http://example.com/hutao.zip", MirrorName = "test", MirrorType = "Direct" } },
         });
 
-        TestResponse parsed = await SendAsync("POST", "/Service/Release/Publish", body, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("POST", "/api/Service/Release/Publish", body, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
     }
@@ -621,7 +621,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("GET", "/Service/Rank/Leaderboard?key=", null, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("GET", "/api/Service/Rank/Leaderboard?key=", null, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
     }
@@ -631,7 +631,7 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse parsed = await SendAsync("POST", "/Service/License/Approve?userName=&code=", null, maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("POST", "/api/Service/License/Approve?userName=&code=", null, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.LicenseApprovalFailed, parsed.Retcode);
     }
@@ -655,10 +655,10 @@ public sealed class ServiceTests
         });
 
         TestResponse parsed = await SendAsync(
-            "POST", $"/Service/License/Approve?userName={Uri.EscapeDataString(applicant.UserName)}&code={approvalCode}", null, maintainer.AccessToken);
+            "POST", $"/api/Service/License/Approve?userName={Uri.EscapeDataString(applicant.UserName)}&code={approvalCode}", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
 
-        TestResponse detail = await SendAsync("GET", $"/Service/User/Detail?userId={applicant.Id}", null, maintainer.AccessToken);
+        TestResponse detail = await SendAsync("GET", $"/api/Service/User/Detail?userId={applicant.Id}", null, maintainer.AccessToken);
         Assert.True(detail.DeserializeData<UserDetail>()!.IsLicensedDeveloper);
     }
 
@@ -669,7 +669,7 @@ public sealed class ServiceTests
         string marker = $"audit-{Guid.NewGuid():N}";
 
         // 用带 Description 的写操作产生一条审计记录
-        TestResponse generated = await SendAsync("POST", "/Service/Redeem/Generate", JsonSerializer.Serialize(new
+        TestResponse generated = await SendAsync("POST", "/api/Service/Redeem/Generate", JsonSerializer.Serialize(new
         {
             Count = 1,
             Type = 1,
@@ -681,14 +681,14 @@ public sealed class ServiceTests
         }), maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, generated.Retcode);
 
-        TestResponse audit = await SendAsync("GET", "/Service/Audit/List?page=1&pageSize=100", null, maintainer.AccessToken);
+        TestResponse audit = await SendAsync("GET", "/api/Service/Audit/List?page=1&pageSize=100", null, maintainer.AccessToken);
         PagedResult<AuditLogItem>? page = audit.DeserializeData<PagedResult<AuditLogItem>>();
         Assert.NotNull(page);
 
         AuditLogItem? entry = page!.Items.FirstOrDefault(item => item.Detail?.Contains(marker, StringComparison.Ordinal) is true);
         Assert.NotNull(entry);
         Assert.Equal(maintainer.Id, entry!.AdminUserId);
-        Assert.Equal("/Service/Redeem/Generate", entry.Action);
+        Assert.Equal("/api/Service/Redeem/Generate", entry.Action);
         Assert.True(entry.Success);
     }
 
@@ -698,13 +698,13 @@ public sealed class ServiceTests
         TestUser maintainer = await users.MaintainerAsync();
         const string secret = "SuperSecretPassword1";
 
-        await SendAsync("POST", "/Service/User/ResetPassword", JsonSerializer.Serialize(new UserResetPasswordRequest
+        await SendAsync("POST", "/api/Service/User/ResetPassword", JsonSerializer.Serialize(new UserResetPasswordRequest
         {
             UserId = int.MaxValue,
             NewPassword = secret,
         }), maintainer.AccessToken);
 
-        TestResponse audit = await SendAsync("GET", "/Service/Audit/List?page=1&pageSize=100", null, maintainer.AccessToken);
+        TestResponse audit = await SendAsync("GET", "/api/Service/Audit/List?page=1&pageSize=100", null, maintainer.AccessToken);
         PagedResult<AuditLogItem>? page = audit.DeserializeData<PagedResult<AuditLogItem>>();
         Assert.NotNull(page);
 
@@ -717,18 +717,18 @@ public sealed class ServiceTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse run = await SendAsync("GET", "/Service/Statistics/Run", null, maintainer.AccessToken);
+        TestResponse run = await SendAsync("GET", "/api/Service/Statistics/Run", null, maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, run.Retcode);
 
-        using HttpResponseMessage overview = await client.GetWithTokenAsync("/Statistics/Overview", token: null);
+        using HttpResponseMessage overview = await client.GetWithTokenAsync("/api/Statistics/Overview", token: null);
         string body = await overview.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         TestResponse parsed = TestResponse.Parse(body);
-        Assert.True(parsed.Retcode == ReturnCodes.Success, $"/Statistics/Overview failed: {body}");
+        Assert.True(parsed.Retcode == ReturnCodes.Success, $"/api/Statistics/Overview failed: {body}");
     }
 
     private async Task<long> FindAnnouncementIdAsync(TestUser maintainer, string title)
     {
-        TestResponse list = await SendAsync("GET", "/Service/Announcement/List?page=1&pageSize=100", null, maintainer.AccessToken);
+        TestResponse list = await SendAsync("GET", "/api/Service/Announcement/List?page=1&pageSize=100", null, maintainer.AccessToken);
         PagedResult<server.Models.Entity.Announcement.EntityAnnouncement>? page =
             list.DeserializeData<PagedResult<server.Models.Entity.Announcement.EntityAnnouncement>>();
 
@@ -737,7 +737,7 @@ public sealed class ServiceTests
 
     private async Task<uint> FindRedeemIdAsync(TestUser maintainer, string code)
     {
-        TestResponse list = await SendAsync("GET", $"/Service/Redeem/List?page=1&pageSize=100&keyword={code}", null, maintainer.AccessToken);
+        TestResponse list = await SendAsync("GET", $"/api/Service/Redeem/List?page=1&pageSize=100&keyword={code}", null, maintainer.AccessToken);
         PagedResult<RedeemCodeItem>? page = list.DeserializeData<PagedResult<RedeemCodeItem>>();
 
         return page?.Items.FirstOrDefault(item => item.Code == code)?.Id ?? 0;

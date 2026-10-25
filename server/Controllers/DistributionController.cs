@@ -1,7 +1,7 @@
 ﻿namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "Distribution")]
 public class DistributionController(DistributionService distributionService) : ControllerBase
 {

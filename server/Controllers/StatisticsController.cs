@@ -4,7 +4,7 @@ using server.Models.Legacy;
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "SpiralAbyss")]
 public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatisticsService) : ControllerBase
 {

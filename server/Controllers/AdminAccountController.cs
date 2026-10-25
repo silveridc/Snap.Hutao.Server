@@ -13,7 +13,7 @@ namespace server.Controllers;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Service/AdminAccount")]
+[Route("api/Service/AdminAccount")]
 [ServiceFilter(typeof(ValidateMaintainPermission), Order = 1)]
 [ServiceFilter(typeof(ValidateAdminWritePermission), Order = 2)]
 [ServiceFilter(typeof(AuditLogActionFilter), Order = 3)]

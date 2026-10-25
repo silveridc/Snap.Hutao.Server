@@ -81,7 +81,7 @@ public sealed class MetadataTests
         Assert.Equal(expected, keys);
 
         // 提列与对外字节必须互相吻合：ETag 用的就是 Hash 列，Size 列是 UTF-8 字节数
-        TestResponse list = await SendServiceAsync("GET", "/Service/Metadata/Documents?locale=MTA", (await users.MaintainerAsync()).AccessToken);
+        TestResponse list = await SendServiceAsync("GET", "/api/Service/Metadata/Documents?locale=MTA", (await users.MaintainerAsync()).AccessToken);
         Assert.Equal(ReturnCodes.Success, list.Retcode);
         using JsonDocument rows = JsonDocument.Parse(list.Data.GetRawText());
         Assert.Equal(4, rows.RootElement.EnumerateArray().Count());
@@ -188,7 +188,7 @@ public sealed class MetadataTests
         Assert.Equal(translation, JsonNode.Parse(served)!.AsArray()[0]!["Name"]!.GetValue<string>());
         Assert.Equal("A blade that never changes", JsonNode.Parse(served)!.AsArray()[0]!["Description"]!.GetValue<string>());
 
-        TestResponse overrides = await SendServiceAsync("GET", "/Service/Metadata/Translations?locale=TSA", maintainer.AccessToken);
+        TestResponse overrides = await SendServiceAsync("GET", "/api/Service/Metadata/Translations?locale=TSA", maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, overrides.Retcode);
         using JsonDocument rows = JsonDocument.Parse(overrides.Data.GetRawText());
         JsonElement row = Assert.Single(rows.RootElement.EnumerateArray());
@@ -240,19 +240,19 @@ public sealed class MetadataTests
 
         TestResponse remove = await SendServiceAsync(
             "POST",
-            $"/Service/Metadata/Translation/Remove?locale=TRA&name=Achievement&pointer={Uri.EscapeDataString("/1/Description")}",
+            $"/api/Service/Metadata/Translation/Remove?locale=TRA&name=Achievement&pointer={Uri.EscapeDataString("/1/Description")}",
             maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, remove.Retcode);
         Assert.Equal(pristineHash, remove.Data.GetProperty("Hash").GetString());
 
         // 还原靠的是覆盖行里记的原文，不是重放导入，所以逐字节回到原来的哈希
         await AssertServedAsync("TRA", "Achievement", DocJson("TRA", "Achievement"));
-        TestResponse list = await SendServiceAsync("GET", "/Service/Metadata/Translations?locale=TRA", maintainer.AccessToken);
+        TestResponse list = await SendServiceAsync("GET", "/api/Service/Metadata/Translations?locale=TRA", maintainer.AccessToken);
         Assert.Empty(JsonDocument.Parse(list.Data.GetRawText()).RootElement.EnumerateArray());
 
         TestResponse again = await SendServiceAsync(
             "POST",
-            $"/Service/Metadata/Translation/Remove?locale=TRA&name=Achievement&pointer={Uri.EscapeDataString("/1/Description")}",
+            $"/api/Service/Metadata/Translation/Remove?locale=TRA&name=Achievement&pointer={Uri.EscapeDataString("/1/Description")}",
             maintainer.AccessToken);
         Assert.Equal(ReturnCodes.InvalidQueryString, again.Retcode);
         Assert.Contains("No translation override", again.Message, StringComparison.Ordinal);
@@ -282,7 +282,7 @@ public sealed class MetadataTests
         Assert.Null(JsonNode.Parse(await BodyAsync("RPA", "Achievement"))!["1"]!["Description"]);
 
         // 丢了落点的覆盖行留着：下一版键回来了，重贴就能自己长回去
-        TestResponse list = await SendServiceAsync("GET", "/Service/Metadata/Translations?locale=RPA", maintainer.AccessToken);
+        TestResponse list = await SendServiceAsync("GET", "/api/Service/Metadata/Translations?locale=RPA", maintainer.AccessToken);
         Assert.Equal(2, JsonDocument.Parse(list.Data.GetRawText()).RootElement.EnumerateArray().Count());
     }
 
@@ -297,7 +297,7 @@ public sealed class MetadataTests
         await ImportAsync(("LVA", Docs("LVA")), ("LVB", baselineWeapon));
         TestUser maintainer = await users.MaintainerAsync();
 
-        TestResponse translated = await SendServiceAsync("GET", "/Service/Metadata/Leaves?name=Achievement&locale=LVA&baseline=LVB", maintainer.AccessToken);
+        TestResponse translated = await SendServiceAsync("GET", "/api/Service/Metadata/Leaves?name=Achievement&locale=LVA&baseline=LVB", maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, translated.Retcode);
         using JsonDocument document = JsonDocument.Parse(translated.Data.GetRawText());
 
@@ -311,7 +311,7 @@ public sealed class MetadataTests
         Assert.False(shared.GetProperty("Differs").GetBoolean());
 
         // 对照侧没有这个指针：语言之间结构并不总是一致（实测 9877 个指针至少缺一处）
-        TestResponse absent = await SendServiceAsync("GET", "/Service/Metadata/Leaves?name=Weapon&locale=LVA&baseline=LVB", maintainer.AccessToken);
+        TestResponse absent = await SendServiceAsync("GET", "/api/Service/Metadata/Leaves?name=Weapon&locale=LVA&baseline=LVB", maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, absent.Retcode);
         using JsonDocument weapon = JsonDocument.Parse(absent.Data.GetRawText());
         JsonElement description = weapon.RootElement.EnumerateArray().Single(leaf => leaf.GetProperty("Pointer").GetString() == "/0/Description");
@@ -319,7 +319,7 @@ public sealed class MetadataTests
         Assert.Null(Text(description, "BaselineValue"));
         Assert.False(description.GetProperty("Differs").GetBoolean());
 
-        TestResponse none = await SendServiceAsync("GET", "/Service/Metadata/Leaves?name=Weapon&locale=LVA&baseline=ZZQ", maintainer.AccessToken);
+        TestResponse none = await SendServiceAsync("GET", "/api/Service/Metadata/Leaves?name=Weapon&locale=LVA&baseline=ZZQ", maintainer.AccessToken);
         Assert.Equal(ReturnCodes.NotFound, none.Retcode);
     }
 
@@ -732,7 +732,7 @@ public sealed class MetadataTests
 
     private async Task<TestResponse> SetTranslationAsync(string token, string locale, string name, string pointer, string value)
     {
-        string url = $"/Service/Metadata/Translation?locale={locale}&name={Uri.EscapeDataString(name)}&pointer={Uri.EscapeDataString(pointer)}&value={Uri.EscapeDataString(value)}";
+        string url = $"/api/Service/Metadata/Translation?locale={locale}&name={Uri.EscapeDataString(name)}&pointer={Uri.EscapeDataString(pointer)}&value={Uri.EscapeDataString(value)}";
         return await SendServiceAsync("POST", url, token);
     }
 

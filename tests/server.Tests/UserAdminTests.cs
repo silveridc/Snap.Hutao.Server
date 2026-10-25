@@ -80,7 +80,7 @@ public sealed class UserAdminTests
         TestUser victim = await users.CreateUniqueAsync("nostamp");
         await SetStampAsync(factory, victim.Id, null);
 
-        using HttpRequestMessage request = new(HttpMethod.Post, "/Service/User/ResetPassword");
+        using HttpRequestMessage request = new(HttpMethod.Post, "/api/Service/User/ResetPassword");
         request.Headers.Authorization = new("Bearer", maintainer.AccessToken);
         request.Content = JsonContent.Create(new { UserId = victim.Id, NewPassword });
 

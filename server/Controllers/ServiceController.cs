@@ -12,7 +12,7 @@ namespace server.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ServiceFilter(typeof(ValidateMaintainPermission), Order = 1)]
 [ServiceFilter(typeof(ValidateAdminWritePermission), Order = 2)]
 [ServiceFilter(typeof(AuditLogActionFilter), Order = 3)]

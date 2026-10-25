@@ -7,7 +7,7 @@ using server.Models.RoleCombat;
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "RoleCombat")]
 public class RoleCombatController(IServiceProvider serviceProvider, TimeProvider timeProvider)
 {

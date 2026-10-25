@@ -3,7 +3,7 @@
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(IgnoreApi = true)]
 public sealed class AccessionController(AccessionService accessionService) : ControllerBase
 {

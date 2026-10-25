@@ -4,7 +4,7 @@ using server.Models.Upload;
 namespace server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "SpiralAbyss")]
 public class RecordController(RecordService recordService, IRankService rankService) : ControllerBase
 {

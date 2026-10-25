@@ -46,7 +46,7 @@ async function refreshTokens() {
       try {
         const encrypted = await rsaEncrypt(refreshToken)
         const { data: envelope } = await bare.post(
-          '/Passport/v2/RefreshToken',
+          '/api/Passport/v2/RefreshToken',
           { RefreshToken: encrypted },
           { headers: getDeviceHeaders() },
         )

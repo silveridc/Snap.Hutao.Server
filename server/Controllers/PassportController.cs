@@ -6,7 +6,7 @@ namespace server.Controllers;
 
 [Obsolete]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiExplorerSettings(GroupName = "Passport")]
 public class PassportController(IServiceProvider serviceProvider) : ControllerBase
 {

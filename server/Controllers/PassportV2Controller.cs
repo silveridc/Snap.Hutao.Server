@@ -7,7 +7,7 @@ using server.Services.Admin;
 namespace server.Controllers;
 
 [ApiController]
-[Route("Passport/v2")]
+[Route("api/Passport/v2")]
 [ApiExplorerSettings(GroupName = "Passport")]
 public class PassportV2Controller(IServiceProvider serviceProvider) : ControllerBase
 {

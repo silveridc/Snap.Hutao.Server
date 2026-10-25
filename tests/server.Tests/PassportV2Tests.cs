@@ -94,7 +94,7 @@ public sealed class PassportV2Tests
     {
         factory.Smtp.Clear();
 
-        using HttpResponseMessage response = await client.PostJsonWithTokenAsync("/Passport/v2/Verify", body, token);
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync("/api/Passport/v2/Verify", body, token);
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
 
@@ -109,7 +109,7 @@ public sealed class PassportV2Tests
         string code = await RequestVerifyCodeAsync(Body(userName: email));
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Register", Body(userName: email, password: Password, verifyCode: code), token: null);
+            "/api/Passport/v2/Register", Body(userName: email, password: Password, verifyCode: code), token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
@@ -120,7 +120,7 @@ public sealed class PassportV2Tests
         Assert.False(string.IsNullOrEmpty(token.RefreshToken));
 
         // 首次注册会赠送 3 天祈愿记录与 CDN 服务
-        using HttpResponseMessage infoResponse = await client.GetWithTokenAsync("/Passport/v2/UserInfo", token.AccessToken);
+        using HttpResponseMessage infoResponse = await client.GetWithTokenAsync("/api/Passport/v2/UserInfo", token.AccessToken);
         TestResponse info = await infoResponse.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, info.Retcode);
 
@@ -137,7 +137,7 @@ public sealed class PassportV2Tests
         string email = NewEmail("v2-register-bad");
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Register", Body(userName: email, password: Password, verifyCode: "WRONGCOD"), token: null);
+            "/api/Passport/v2/Register", Body(userName: email, password: Password, verifyCode: "WRONGCOD"), token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.RegisterFail, parsed.Retcode);
@@ -151,7 +151,7 @@ public sealed class PassportV2Tests
         string code = await RequestVerifyCodeAsync(Body(userName: email));
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Register", Body(userName: email, password: "short", verifyCode: code), token: null);
+            "/api/Passport/v2/Register", Body(userName: email, password: "short", verifyCode: code), token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.TooShortPassword, parsed.Retcode);
@@ -164,7 +164,7 @@ public sealed class PassportV2Tests
         string email = existing.UserName;
 
         using HttpResponseMessage verifyResponse = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Verify", Body(userName: email), token: null);
+            "/api/Passport/v2/Verify", Body(userName: email), token: null);
 
         // 已存在的邮箱不允许申请注册验证码
         TestResponse verify = await verifyResponse.ReadTestResponseAsync();
@@ -176,10 +176,10 @@ public sealed class PassportV2Tests
     {
         string email = NewEmail("v2-verify-throttle");
 
-        using HttpResponseMessage first = await client.PostJsonWithTokenAsync("/Passport/v2/Verify", Body(userName: email), token: null);
+        using HttpResponseMessage first = await client.PostJsonWithTokenAsync("/api/Passport/v2/Verify", Body(userName: email), token: null);
         Assert.Equal(ReturnCodes.Success, (await first.ReadTestResponseAsync()).Retcode);
 
-        using HttpResponseMessage second = await client.PostJsonWithTokenAsync("/Passport/v2/Verify", Body(userName: email), token: null);
+        using HttpResponseMessage second = await client.PostJsonWithTokenAsync("/api/Passport/v2/Verify", Body(userName: email), token: null);
         Assert.Equal(ReturnCodes.VerifyCodeTooFrequently, (await second.ReadTestResponseAsync()).Retcode);
     }
 
@@ -187,7 +187,7 @@ public sealed class PassportV2Tests
     public async Task Verify_ForResetPasswordOfUnknownAccount_IsRejected()
     {
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Verify", Body(userName: NewEmail("v2-verify-unknown"), isResetPassword: true), token: null);
+            "/api/Passport/v2/Verify", Body(userName: NewEmail("v2-verify-unknown"), isResetPassword: true), token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.VerifyCodeNotAllowed, parsed.Retcode);
@@ -197,7 +197,7 @@ public sealed class PassportV2Tests
     public async Task Register_WithoutDeviceHeader_IsRejected()
     {
         // Register/Login/LoggedInDevices 会读取设备头，缺失时由异常处理中间件返回错误
-        using HttpRequestMessage request = new(HttpMethod.Post, "/Passport/v2/Register")
+        using HttpRequestMessage request = new(HttpMethod.Post, "/api/Passport/v2/Register")
         {
             Content = JsonContent.Create(Body(userName: NewEmail("v2-nodevice"), password: Password, verifyCode: "INVALID0")),
         };
@@ -217,7 +217,7 @@ public sealed class PassportV2Tests
         TestUser user = await users.CreateUniqueAsync("v2-login");
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Login", Body(userName: user.UserName, password: Password), token: null);
+            "/api/Passport/v2/Login", Body(userName: user.UserName, password: Password), token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
@@ -237,7 +237,7 @@ public sealed class PassportV2Tests
         TestUser user = await users.CreateUniqueAsync("v2-login-bad");
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Login", Body(userName: user.UserName, password: "WrongPassword123"), token: null);
+            "/api/Passport/v2/Login", Body(userName: user.UserName, password: "WrongPassword123"), token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
@@ -247,7 +247,7 @@ public sealed class PassportV2Tests
     public async Task Login_WithUnknownAccount_Fails()
     {
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Login", Body(userName: NewEmail("v2-login-unknown"), password: Password), token: null);
+            "/api/Passport/v2/Login", Body(userName: NewEmail("v2-login-unknown"), password: Password), token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
@@ -259,7 +259,7 @@ public sealed class PassportV2Tests
         TestUser user = await users.CreateUniqueAsync("v2-refresh");
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/RefreshToken",
+            "/api/Passport/v2/RefreshToken",
             new Dictionary<string, object?> { ["RefreshToken"] = RsaPayload.Encrypt(user.RefreshToken) },
             token: null);
 
@@ -275,7 +275,7 @@ public sealed class PassportV2Tests
     public async Task RefreshToken_WithEmptyToken_ReturnsInvalidRequestBody()
     {
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/RefreshToken", new Dictionary<string, object?> { ["RefreshToken"] = string.Empty }, token: null);
+            "/api/Passport/v2/RefreshToken", new Dictionary<string, object?> { ["RefreshToken"] = string.Empty }, token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.InvalidRequestBody, parsed.Retcode);
@@ -285,7 +285,7 @@ public sealed class PassportV2Tests
     public async Task RefreshToken_WithGarbageToken_Fails()
     {
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/RefreshToken",
+            "/api/Passport/v2/RefreshToken",
             new Dictionary<string, object?> { ["RefreshToken"] = RsaPayload.Encrypt("not-a-real-refresh-token") },
             token: null);
 
@@ -300,7 +300,7 @@ public sealed class PassportV2Tests
         TestUser user = await users.CreateUniqueAsync("v2-devices");
         TokenResponse token = await users.IssueTokenAsync(user.Id, new DeviceInfo(deviceId, "Integration Device", "Windows"));
 
-        using HttpRequestMessage request = new(HttpMethod.Get, "/Passport/v2/LoggedInDevices");
+        using HttpRequestMessage request = new(HttpMethod.Get, "/api/Passport/v2/LoggedInDevices");
         request.WithToken(token.AccessToken);
         request.WithDevice(deviceId, "Integration Device", "Windows");
 
@@ -325,13 +325,13 @@ public sealed class PassportV2Tests
         await users.IssueTokenAsync(user.Id, new DeviceInfo(deviceB, "Device B", "Windows"));
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/RevokeToken",
+            "/api/Passport/v2/RevokeToken",
             new Dictionary<string, object?> { ["DeviceId"] = RsaPayload.Encrypt(deviceA) },
             tokenA.AccessToken);
 
         Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
 
-        using HttpRequestMessage listRequest = new(HttpMethod.Get, "/Passport/v2/LoggedInDevices");
+        using HttpRequestMessage listRequest = new(HttpMethod.Get, "/api/Passport/v2/LoggedInDevices");
         listRequest.WithToken(tokenA.AccessToken);
         listRequest.WithDevice(deviceA);
 
@@ -349,7 +349,7 @@ public sealed class PassportV2Tests
         TestUser user = await users.CreateUniqueAsync("v2-revoke-empty");
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/RevokeToken", new Dictionary<string, object?> { ["DeviceId"] = string.Empty }, token: user.AccessToken);
+            "/api/Passport/v2/RevokeToken", new Dictionary<string, object?> { ["DeviceId"] = string.Empty }, token: user.AccessToken);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.InvalidRequestBody, parsed.Retcode);
@@ -362,12 +362,12 @@ public sealed class PassportV2Tests
         TokenResponse deviceToken = await users.IssueTokenAsync(user.Id, new DeviceInfo($"device-{Guid.NewGuid():N}", "Device", "Windows"));
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/RevokeAllTokens", new Dictionary<string, object?>(), token: deviceToken.AccessToken);
+            "/api/Passport/v2/RevokeAllTokens", new Dictionary<string, object?>(), token: deviceToken.AccessToken);
 
         Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
 
         using HttpResponseMessage refreshResponse = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/RefreshToken",
+            "/api/Passport/v2/RefreshToken",
             new Dictionary<string, object?> { ["RefreshToken"] = RsaPayload.Encrypt(deviceToken.RefreshToken) },
             token: null);
 
@@ -377,7 +377,7 @@ public sealed class PassportV2Tests
     [Fact]
     public async Task UserInfo_WithoutToken_ReturnsLoginFailEnvelope()
     {
-        using HttpResponseMessage response = await client.GetWithTokenAsync("/Passport/v2/UserInfo", token: null);
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/Passport/v2/UserInfo", token: null);
 
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
@@ -389,7 +389,7 @@ public sealed class PassportV2Tests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        using HttpResponseMessage response = await client.GetWithTokenAsync("/Passport/v2/UserInfo", maintainer.AccessToken);
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/Passport/v2/UserInfo", maintainer.AccessToken);
         UserInfo? info = (await response.ReadTestResponseAsync()).DeserializeData<UserInfo>();
 
         Assert.NotNull(info);
@@ -406,11 +406,11 @@ public sealed class PassportV2Tests
         string code = await RequestVerifyCodeAsync(Body(userName: user.UserName, isResetPassword: true));
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/ResetPassword", Body(userName: user.UserName, password: newPassword, verifyCode: code), token: null);
+            "/api/Passport/v2/ResetPassword", Body(userName: user.UserName, password: newPassword, verifyCode: code), token: null);
         Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
 
         using HttpResponseMessage loginResponse = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Login", Body(userName: user.UserName, password: newPassword), token: null);
+            "/api/Passport/v2/Login", Body(userName: user.UserName, password: newPassword), token: null);
 
         Assert.Equal(ReturnCodes.Success, (await loginResponse.ReadTestResponseAsync()).Retcode);
     }
@@ -423,7 +423,7 @@ public sealed class PassportV2Tests
         string code = await RequestVerifyCodeAsync(Body(userName: user.UserName, isResetPassword: true));
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/ResetPassword", Body(userName: user.UserName, password: Password, verifyCode: code), token: null);
+            "/api/Passport/v2/ResetPassword", Body(userName: user.UserName, password: Password, verifyCode: code), token: null);
 
         Assert.Equal(ReturnCodes.RegisterFail, (await response.ReadTestResponseAsync()).Retcode);
     }
@@ -438,13 +438,13 @@ public sealed class PassportV2Tests
         string newCode = await RequestVerifyCodeAsync(Body(userName: newEmail, isResetUserNameNew: true));
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/ResetUsername",
+            "/api/Passport/v2/ResetUsername",
             Body(userName: user.UserName, verifyCode: oldCode, newUserName: newEmail, newVerifyCode: newCode),
             token: null);
         Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
 
         using HttpResponseMessage loginResponse = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Login", Body(userName: newEmail, password: Password), token: null);
+            "/api/Passport/v2/Login", Body(userName: newEmail, password: Password), token: null);
 
         Assert.Equal(ReturnCodes.Success, (await loginResponse.ReadTestResponseAsync()).Retcode);
     }
@@ -457,11 +457,11 @@ public sealed class PassportV2Tests
         string code = await RequestVerifyCodeAsync(Body(userName: user.UserName, isCancelRegistration: true), user.AccessToken);
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Cancel", Body(userName: user.UserName, password: Password, verifyCode: code), token: null);
+            "/api/Passport/v2/Cancel", Body(userName: user.UserName, password: Password, verifyCode: code), token: null);
         Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
 
         using HttpResponseMessage loginResponse = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Login", Body(userName: user.UserName, password: Password), token: null);
+            "/api/Passport/v2/Login", Body(userName: user.UserName, password: Password), token: null);
 
         Assert.Equal(ReturnCodes.LoginFail, (await loginResponse.ReadTestResponseAsync()).Retcode);
     }
@@ -472,7 +472,7 @@ public sealed class PassportV2Tests
         TestUser user = await users.CreateUniqueAsync("v2-cancel-badcode");
 
         using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
-            "/Passport/v2/Cancel", Body(userName: user.UserName, password: Password, verifyCode: "INVALID0"), token: null);
+            "/api/Passport/v2/Cancel", Body(userName: user.UserName, password: Password, verifyCode: "INVALID0"), token: null);
 
         Assert.Equal(ReturnCodes.RegisterFail, (await response.ReadTestResponseAsync()).Retcode);
     }

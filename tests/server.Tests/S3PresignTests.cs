@@ -70,7 +70,7 @@ public sealed class S3PresignTests
         string version = $"1.96.{Random.Shared.Next(1000, 9999)}.0";
 
         // 发布两个镜像：一个主机名匹配 S3 配置，一个不匹配
-        using HttpRequestMessage publish = new(HttpMethod.Post, "/Service/Release/Publish");
+        using HttpRequestMessage publish = new(HttpMethod.Post, "/api/Service/Release/Publish");
         publish.WithToken(maintainer.AccessToken);
         publish.Content = new StringContent(
             $$"""
@@ -116,7 +116,7 @@ public sealed class S3PresignTests
 
         // 撤销配置后：同一下发不再带签名（下一版本发布前该 release 仍是 active，用 Release/Activate 复位不需要——
         // 直接验证未配置时 SignS3Mirrors 短路即可：发布一个同主机的新版本，URL 原样）
-        using HttpRequestMessage republish = new(HttpMethod.Post, "/Service/Release/Publish");
+        using HttpRequestMessage republish = new(HttpMethod.Post, "/api/Service/Release/Publish");
         string plainVersion = $"1.95.{Random.Shared.Next(1000, 9999)}.0";
         republish.WithToken(maintainer.AccessToken);
         republish.Content = new StringContent(

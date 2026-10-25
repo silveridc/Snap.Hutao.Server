@@ -23,11 +23,11 @@ public sealed class ApiSmokeTests
     /// <summary>不返回统一响应外壳的接口前缀（第三方透传、302 重定向、回调协议自有格式）。</summary>
     private static readonly string[] RawEndpointPrefixes =
     [
-        "/enka",
-        "/OAuth/Auth",
-        "/OAuth/Callback",
-        "/Webhook",
-        "/client",
+        "/api/Enka",
+        "/api/OAuth/Auth",
+        "/api/OAuth/Callback",
+        "/api/Webhook",
+        "/api/client",
         "/metadata",
         "/Admin/Sso/Callback",
         "/Passport/Sso/Callback",
@@ -82,97 +82,97 @@ public sealed class ApiSmokeTests
         { "GET", "/patch/hutao", null },
 
         // 启动器功能配置（裸 JSON，未同步过的版本返回 404）
-        { "GET", "/client/AchievementFieldId_0.0.0.json", null },
-        { "GET", "/client/UnknownFeature_1.0.0.json", null },
+        { "GET", "/api/client/AchievementFieldId_0.0.0.json", null },
+        { "GET", "/api/client/UnknownFeature_1.0.0.json", null },
 
         // metadata 原文档（裸 JSON，没导入过返回 404）。散文件路径 /metadata/Genshin/{locale}/Avatar/{id}.json
         // 与下面的模板段数不同，路由匹配器只认这一段深度的地址，语义断言见 MetadataTests
         { "GET", "/metadata/Genshin/AAA/Achievement.json", null },
 
         // 公告
-        { "POST", "/Announcement/List", "[]" },
-        { "POST", "/Announcement/List", "[1,2,3]" },
+        { "POST", "/api/Announcement/List", "[]" },
+        { "POST", "/api/Announcement/List", "[1,2,3]" },
 
         // 深渊统计
-        { "GET", "/Statistics/Overview", null },
-        { "GET", "/Statistics/Overview?Last=true", null },
-        { "GET", "/Statistics/Avatar/AttendanceRate", null },
-        { "GET", "/Statistics/Avatar/AttendanceRate?Last=true", null },
-        { "GET", "/Statistics/Avatar/UtilizationRate", null },
-        { "GET", "/Statistics/Avatar/HoldingRate", null },
-        { "GET", "/Statistics/Avatar/AvatarCollocation", null },
-        { "GET", "/Statistics/Weapon/WeaponCollocation", null },
-        { "GET", "/Statistics/Team/Combination", null },
+        { "GET", "/api/Statistics/Overview", null },
+        { "GET", "/api/Statistics/Overview?Last=true", null },
+        { "GET", "/api/Statistics/Avatar/AttendanceRate", null },
+        { "GET", "/api/Statistics/Avatar/AttendanceRate?Last=true", null },
+        { "GET", "/api/Statistics/Avatar/UtilizationRate", null },
+        { "GET", "/api/Statistics/Avatar/HoldingRate", null },
+        { "GET", "/api/Statistics/Avatar/AvatarCollocation", null },
+        { "GET", "/api/Statistics/Weapon/WeaponCollocation", null },
+        { "GET", "/api/Statistics/Team/Combination", null },
 
         // 深渊记录
-        { "GET", "/Record/Check?Uid=100000001", null },
-        { "GET", "/Record/Rank?Uid=100000001", null },
-        { "POST", "/Record/Upload", TestData.SimpleRecordJson("100000001") },
-        { "POST", "/Record/Upload?returningRank=true", TestData.SimpleRecordJson("100000002") },
+        { "GET", "/api/Record/Check?Uid=100000001", null },
+        { "GET", "/api/Record/Rank?Uid=100000001", null },
+        { "POST", "/api/Record/Upload", TestData.SimpleRecordJson("100000001") },
+        { "POST", "/api/Record/Upload?returningRank=true", TestData.SimpleRecordJson("100000002") },
 
         // 幻想真境剧诗
-        { "GET", "/RoleCombat/Statistics", null },
-        { "POST", "/RoleCombat/Upload", TestData.RoleCombatRecordJson("100000003") },
+        { "GET", "/api/RoleCombat/Statistics", null },
+        { "POST", "/api/RoleCombat/Upload", TestData.RoleCombatRecordJson("100000003") },
 
         // 祈愿记录（统计接口公开，其余需要登录）
-        { "GET", "/GachaLog/Statistics/CurrentEventStatistics", null },
-        { "GET", "/GachaLog/Statistics/Distribution/AvatarEvent", null },
-        { "GET", "/GachaLog/Statistics/Distribution/WeaponEvent", null },
-        { "GET", "/GachaLog/Statistics/Distribution/Chronicled", null },
-        { "GET", "/GachaLog/Statistics/Distribution/Standard", null },
-        { "GET", "/GachaLog/Entries", null },
-        { "GET", "/GachaLog/EndIds?Uid=100000001", null },
-        { "POST", "/GachaLog/Retrieve", """{"Uid":"100000001","EndIds":{}}""" },
-        { "GET", "/GachaLog/LimitedRetrieve?uid=100000001&configType=301", null },
-        { "POST", "/GachaLog/Upload", TestData.GachaItemsJson("100000001") },
-        { "GET", "/GachaLog/Delete?Uid=100000001", null },
+        { "GET", "/api/GachaLog/Statistics/CurrentEventStatistics", null },
+        { "GET", "/api/GachaLog/Statistics/Distribution/AvatarEvent", null },
+        { "GET", "/api/GachaLog/Statistics/Distribution/WeaponEvent", null },
+        { "GET", "/api/GachaLog/Statistics/Distribution/Chronicled", null },
+        { "GET", "/api/GachaLog/Statistics/Distribution/Standard", null },
+        { "GET", "/api/GachaLog/Entries", null },
+        { "GET", "/api/GachaLog/EndIds?Uid=100000001", null },
+        { "POST", "/api/GachaLog/Retrieve", """{"Uid":"100000001","EndIds":{}}""" },
+        { "GET", "/api/GachaLog/LimitedRetrieve?uid=100000001&configType=301", null },
+        { "POST", "/api/GachaLog/Upload", TestData.GachaItemsJson("100000001") },
+        { "GET", "/api/GachaLog/Delete?Uid=100000001", null },
 
         // 账户 v2
-        { "GET", "/Passport/v2/UserInfo", null },
-        { "GET", "/Passport/v2/LoggedInDevices", null },
-        { "POST", "/Passport/v2/RefreshToken", """{"RefreshToken":""}""" },
-        { "POST", "/Passport/v2/RevokeToken", """{"DeviceId":""}""" },
-        { "POST", "/Passport/v2/RevokeAllTokens", null },
-        { "POST", "/Passport/v2/Verify", PassportBody(userName: UniqueUser("v2-verify")) },
-        { "POST", "/Passport/v2/Register", PassportBody(userName: UniqueUser("v2-register"), password: "TestPassword123", verifyCode: "INVALID0") },
-        { "POST", "/Passport/v2/Cancel", PassportBody(userName: UniqueUser("v2-cancel"), password: "TestPassword123", verifyCode: "INVALID0") },
-        { "POST", "/Passport/v2/ResetPassword", PassportBody(userName: UniqueUser("v2-resetpwd"), password: "TestPassword123", verifyCode: "INVALID0") },
-        { "POST", "/Passport/v2/ResetUsername", PassportBody(userName: UniqueUser("v2-resetname"), verifyCode: "INVALID0", newUserName: UniqueUser("v2-resetname-new"), newVerifyCode: "INVALID1") },
-        { "POST", "/Passport/v2/Login", PassportBody(userName: UniqueUser("v2-login"), password: "TestPassword123") },
+        { "GET", "/api/Passport/v2/UserInfo", null },
+        { "GET", "/api/Passport/v2/LoggedInDevices", null },
+        { "POST", "/api/Passport/v2/RefreshToken", """{"RefreshToken":""}""" },
+        { "POST", "/api/Passport/v2/RevokeToken", """{"DeviceId":""}""" },
+        { "POST", "/api/Passport/v2/RevokeAllTokens", null },
+        { "POST", "/api/Passport/v2/Verify", PassportBody(userName: UniqueUser("v2-verify")) },
+        { "POST", "/api/Passport/v2/Register", PassportBody(userName: UniqueUser("v2-register"), password: "TestPassword123", verifyCode: "INVALID0") },
+        { "POST", "/api/Passport/v2/Cancel", PassportBody(userName: UniqueUser("v2-cancel"), password: "TestPassword123", verifyCode: "INVALID0") },
+        { "POST", "/api/Passport/v2/ResetPassword", PassportBody(userName: UniqueUser("v2-resetpwd"), password: "TestPassword123", verifyCode: "INVALID0") },
+        { "POST", "/api/Passport/v2/ResetUsername", PassportBody(userName: UniqueUser("v2-resetname"), verifyCode: "INVALID0", newUserName: UniqueUser("v2-resetname-new"), newVerifyCode: "INVALID1") },
+        { "POST", "/api/Passport/v2/Login", PassportBody(userName: UniqueUser("v2-login"), password: "TestPassword123") },
 
         // 账户（旧版，已标记 Obsolete）
-        { "GET", "/Passport/UserInfo", null },
-        { "POST", "/Passport/Login", PassportBody(userName: UniqueUser("login"), password: "TestPassword123") },
-        { "POST", "/Passport/Verify", PassportBody(userName: UniqueUser("verify")) },
-        { "POST", "/Passport/Register", PassportBody(userName: UniqueUser("register"), password: "TestPassword123", verifyCode: "INVALID0") },
-        { "POST", "/Passport/Cancel", PassportBody(userName: UniqueUser("cancel"), password: "TestPassword123", verifyCode: "INVALID0") },
-        { "POST", "/Passport/ResetPassword", PassportBody(userName: UniqueUser("resetpwd"), password: "TestPassword123", verifyCode: "INVALID0") },
-        { "POST", "/Passport/ResetUsername", PassportBody(userName: UniqueUser("resetname"), verifyCode: "INVALID0", newUserName: UniqueUser("resetname-new"), newVerifyCode: "INVALID1") },
+        { "GET", "/api/Passport/UserInfo", null },
+        { "POST", "/api/Passport/Login", PassportBody(userName: UniqueUser("login"), password: "TestPassword123") },
+        { "POST", "/api/Passport/Verify", PassportBody(userName: UniqueUser("verify")) },
+        { "POST", "/api/Passport/Register", PassportBody(userName: UniqueUser("register"), password: "TestPassword123", verifyCode: "INVALID0") },
+        { "POST", "/api/Passport/Cancel", PassportBody(userName: UniqueUser("cancel"), password: "TestPassword123", verifyCode: "INVALID0") },
+        { "POST", "/api/Passport/ResetPassword", PassportBody(userName: UniqueUser("resetpwd"), password: "TestPassword123", verifyCode: "INVALID0") },
+        { "POST", "/api/Passport/ResetUsername", PassportBody(userName: UniqueUser("resetname"), verifyCode: "INVALID0", newUserName: UniqueUser("resetname-new"), newVerifyCode: "INVALID1") },
 
         // CDN 分发
-        { "GET", "/Distribution/GetDownloadToken", null },
-        { "GET", "/Distribution/GetAcceleratedMirror?Filename=test.zip", null },
+        { "GET", "/api/Distribution/GetDownloadToken", null },
+        { "GET", "/api/Distribution/GetAcceleratedMirror?Filename=test.zip", null },
 
         // 兑换码
-        { "POST", "/Redeem/Use", """{"code":"000000000000000000"}""" },
+        { "POST", "/api/Redeem/Use", """{"code":"000000000000000000"}""" },
 
         // 开源许可
-        { "POST", "/Accession/ApplyOpenSourceLicense", """{"UserName":"a@example.com","ProjectUrl":"https://example.com","Token":"token"}""" },
+        { "POST", "/api/Accession/ApplyOpenSourceLicense", """{"UserName":"a@example.com","ProjectUrl":"https://example.com","Token":"token"}""" },
 
         // 遥测日志
-        { "POST", "/HutaoLog/Upload", """{"Id":"device-1","Time":1700000000,"Info":"{\"exception\":\"test\"}"}""" },
-        { "GET", "/HutaoLog/ByDeviceId?id=device-1", null },
+        { "POST", "/api/HutaoLog/Upload", """{"Id":"device-1","Time":1700000000,"Info":"{\"exception\":\"test\"}"}""" },
+        { "GET", "/api/HutaoLog/ByDeviceId?id=device-1", null },
 
         // OAuth
-        { "GET", "/OAuth/Auth?provider=Github&device_id=d&device_name=n&device_os=Windows&callback=https://example.com", null },
-        { "GET", "/OAuth/Status?provider=Github", null },
-        { "GET", "/OAuth/Unbind?provider=Github", null },
+        { "GET", "/api/OAuth/Auth?provider=Github&device_id=d&device_name=n&device_os=Windows&callback=https://example.com", null },
+        { "GET", "/api/OAuth/Status?provider=Github", null },
+        { "GET", "/api/OAuth/Unbind?provider=Github", null },
 
         // 伪造的 state 不是合法密文，回调应拒绝而不是 500（成功分支见 OAuthTests）
-        { "GET", "/OAuth/Callback/GitHub?code=smoke&state=c21va2U=", null },
+        { "GET", "/api/OAuth/Callback/GitHub?code=smoke&state=c21va2U=", null },
 
         // 爱发电订单回调：未知 sku 不做外部校验，直接判定为不支持（成功分支见 WebhookTests）
-        { "POST", "/Webhook", TestData.AfdianOrderJson("smoke-unknown-sku", "SKU-NOT-CONFIGURED", 1, "smoke@example.com") },
+        { "POST", "/api/Webhook", TestData.AfdianOrderJson("smoke-unknown-sku", "SKU-NOT-CONFIGURED", 1, "smoke@example.com") },
 
         // 后台单点登录：SSO 未启用的宿主里 Status 报未启用、Challenge/Exchange/Callback 走拒绝分支，
         // 全链路的成功分支见 SsoTests
@@ -188,12 +188,12 @@ public sealed class ApiSmokeTests
         { "POST", "/Passport/Sso/Exchange", """{"Ticket":"smoke"}""" },
 
         // 公共 API 与第三方透传
-        { "GET", "/publicapi/ip", null },
-        { "GET", "/enka/100000001", null },
-        { "GET", "/enka/100000001/info", null },
-        { "GET", "/Wallpaper/bing", null },
-        { "GET", "/Wallpaper/today", null },
-        { "GET", "/Wallpaper/hoyoplay", null },
+        { "GET", "/api/PublicApi/ip", null },
+        { "GET", "/api/Enka/100000001", null },
+        { "GET", "/api/Enka/100000001/info", null },
+        { "GET", "/api/Wallpaper/bing", null },
+        { "GET", "/api/Wallpaper/today", null },
+        { "GET", "/api/Wallpaper/hoyoplay", null },
     };
 
     /// <summary>
