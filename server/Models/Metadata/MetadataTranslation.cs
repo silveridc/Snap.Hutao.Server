@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// i18n 覆盖表：只记录「被人工改过」的字符串叶子，未改过的文档一行都不存。

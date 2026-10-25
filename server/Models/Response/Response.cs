@@ -1,10 +1,11 @@
-namespace server.Models.Response;
+﻿namespace server.Models.Response;
 
 /// <summary>
 /// 统一响应外壳。字段与启动器/后台的既有契约一致：<c>retcode</c>、<c>message</c>、
 /// <c>l10nKey</c>（空值省略）、<c>data</c>。序列化形态不得改动——
 /// 启动器按 <c>retcode</c> 判定成败，后台按 <c>l10nKey</c> 本地化消息。
 /// </summary>
+/// <typeparam name="T"><c>data</c> 字段的类型。</typeparam>
 public class Response<T>(ReturnCode code, string message, T? data = default)
 {
     [JsonPropertyName("retcode")]

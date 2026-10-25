@@ -1,4 +1,4 @@
-namespace server.Options;
+﻿namespace server.Options;
 
 /// <summary>
 /// 单点登录（外部 OIDC 身份源）配置。未开启时后台沿用主站维护者账号登录，且不做写操作门禁；

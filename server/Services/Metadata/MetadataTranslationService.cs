@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using server.Core.IO;
 using server.Models.Metadata;
 
@@ -11,9 +11,11 @@ namespace server.Services.Metadata;
 /// </summary>
 public sealed class MetadataTranslationService(MetadataDbContext metadataDbContext, MetadataStoreService metadataStoreService, TimeProvider timeProvider)
 {
-
     public sealed record Row(string Locale, string Name, string Pointer, string Value, string OriginalValue, DateTime UpdatedAt);
 
+    /// <summary>
+    /// 一个可翻译的叶子：某个 locale 上某份文档里某个指针的值，以及它与对照 locale 的差异。
+    /// </summary>
     /// <param name="Pointer">JSON Pointer（RFC 6901）。</param>
     /// <param name="BaselineValue">对照 locale 上同一指针的值，该侧不是字符串时为 <see langword="null"/>。</param>
     /// <param name="LocalValue">本 locale 上的值。</param>
@@ -33,6 +35,9 @@ public sealed class MetadataTranslationService(MetadataDbContext metadataDbConte
         }
     }
 
+    /// <summary>
+    /// 把已有译文贴回新版本文档后的统计。
+    /// </summary>
     /// <param name="RewrittenDocuments">重新贴过覆盖的文档数。</param>
     /// <param name="SkippedPointers">在新版本文档里已经找不到、因而没能贴回去的指针。</param>
     public sealed record ReapplyResult(int RewrittenDocuments, List<string> SkippedPointers);

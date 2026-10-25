@@ -1,4 +1,4 @@
-using server.Models.Admin;
+﻿using server.Models.Admin;
 using server.Services.Admin;
 
 namespace server.Controllers;
@@ -49,15 +49,15 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
             return Fail("Admin SSO is not enabled", ReturnCode.SsoNotEnabled, ServerKeys.ServerAdminSsoNotEnabled);
         }
 
-        (string? Url, string? Error) = await adminSsoService.CreateAuthorizeUrlAsync(returnPath, cancellationToken).ConfigureAwait(false);
+        (string? url, string? error) = await adminSsoService.CreateAuthorizeUrlAsync(returnPath, cancellationToken).ConfigureAwait(false);
 
-        if (Url is null)
+        if (url is null)
         {
-            logger.LogWarning("Admin SSO challenge was not issued: {Error}", Error);
-            return Fail(Error ?? "The identity provider is unavailable", ReturnCode.SsoUpstreamFailed, ServerKeys.ServerAdminSsoUpstreamFailed);
+            logger.LogWarning("Admin SSO challenge was not issued: {Error}", error);
+            return Fail(error ?? "The identity provider is unavailable", ReturnCode.SsoUpstreamFailed, ServerKeys.ServerAdminSsoUpstreamFailed);
         }
 
-        return Success<string>("Redirect to this url to start the admin SSO login", Url);
+        return Success<string>("Redirect to this url to start the admin SSO login", url);
     }
 
     /// <summary>

@@ -15,7 +15,6 @@ using server.Services.WallPaper;
 using server.Services.Yae;
 using StackExchange.Redis;
 
-
 namespace server;
 
 public static class Program
@@ -23,12 +22,9 @@ public static class Program
     private static ILogger? _logger;
     public const string applicationVersion = "server@v1.0.4";
     private const string _sentryProjectId = "7";
-#if RELEASE
     private const string _sentryDsn = "https://26b2259ad03e4fd26fedf7b08226eaa2@sentry.silveridc.cn/7";
-#else
-    private const string _sentryDsn = "";
-#endif
     private const string _otlpToken = "sentry sentry_key=26b2259ad03e4fd26fedf7b08226eaa2";
+
     public static async Task Main(string[] args)
     {
         WebApplicationBuilder appBuilder = WebApplication.CreateBuilder(args);
@@ -114,6 +110,7 @@ public static class Program
                 options.ForwardLimit = null;
             });
         }
+
         services.AddSentryTunneling();
         string assetsPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Assets");
 
@@ -125,15 +122,15 @@ public static class Program
             {
                 string connectionString = appBuilder.Configuration.GetConnectionString("PrimaryMysql8")!;
 
-                ILogger<AppDbContext> _logger = serviceProvider.GetRequiredService<ILogger<AppDbContext>>();
-                if (_logger.IsEnabled(LogLevel.Information))
+                ILogger<AppDbContext> logger = serviceProvider.GetRequiredService<ILogger<AppDbContext>>();
+                if (logger.IsEnabled(LogLevel.Information))
                 {
-                    _logger.LogInformation("AppDbContext Using connection string: [{Constr}]", connectionString);
+                    logger.LogInformation("AppDbContext Using connection string: [{Constr}]", connectionString);
                 }
 
                 options
                     .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug)))
+                    .ConfigureWarnings(action => action.Log((RelationalEventId.CommandExecuted, LogLevel.Debug)))
                     .EnableSensitiveDataLogging()
                     .EnableDetailedErrors();
             })
@@ -141,10 +138,10 @@ public static class Program
             {
                 string connectionString = appBuilder.Configuration.GetConnectionString("MetadataMysql8")!;
 
-                ILogger<MetadataDbContext> _logger = serviceProvider.GetRequiredService<ILogger<MetadataDbContext>>();
-                if (_logger.IsEnabled(LogLevel.Information))
+                ILogger<MetadataDbContext> logger = serviceProvider.GetRequiredService<ILogger<MetadataDbContext>>();
+                if (logger.IsEnabled(LogLevel.Information))
                 {
-                    _logger.LogInformation("MetadataDbContext Using connection string: [{Constr}]", connectionString);
+                    logger.LogInformation("MetadataDbContext Using connection string: [{Constr}]", connectionString);
                 }
 
                 options
@@ -160,13 +157,10 @@ public static class Program
                 options.ConnectionMultiplexerFactory = () => Task.FromResult(redisMultiplexer);
                 options.InstanceName = DistributedCacheExtension.InstanceName;
             })
-            .AddProblemDetails(options =>
+            .AddProblemDetails(options => options.CustomizeProblemDetails = context =>
             {
-                options.CustomizeProblemDetails = context =>
-                {
-                    context.ProblemDetails.Extensions["retcode"] = context.ProblemDetails.Status ?? (int)ReturnCode.InternalStateException;
-                    context.ProblemDetails.Extensions["message"] = context.Exception?.Message ?? string.Empty;
-                };
+                context.ProblemDetails.Extensions["retcode"] = context.ProblemDetails.Status ?? (int)ReturnCode.InternalStateException;
+                context.ProblemDetails.Extensions["message"] = context.Exception?.Message ?? string.Empty;
             })
             .AddQuartz(config =>
             {
@@ -269,6 +263,7 @@ public static class Program
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
+
         // Swagger
         services
             .AddEndpointsApiExplorer()
@@ -299,9 +294,10 @@ public static class Program
                     [new OpenApiSecuritySchemeReference("Bearer", document)] = [],
                 });
 
-                //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Snap.Hutao.Server.xml"));
+                // options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Snap.Hutao.Server.xml"));
                 options.EnableAnnotations();
             });
+
         // Mvc
         services.AddSingleton(TimeProvider.System);
         services
@@ -327,6 +323,7 @@ public static class Program
         {
             app.UseSentryTracing();
         }
+
         // 中间件的顺序敏感
         // https://learn.microsoft.com/zh-cn/aspnet/core/fundamentals/middleware/#middleware-order
         // ExceptionHandler
@@ -379,9 +376,7 @@ public static class Program
     }
 
     /// <summary>
-    /// <summary>
-    /// 启动时自动迁移：AppDbContext 应用全部待迁移（所有环境，含开发）；MetadataDbContext
-    /// 无迁移历史，仅在库为全新（无任何表）时按模型建表，已有库不碰——其结构仍由 DDL 文件管理。
+    /// 迁移数据库
     /// </summary>
     /// <param name="app">app</param>
     private static async Task MigrateDatabasesAsync(WebApplication app)
@@ -390,7 +385,7 @@ public static class Program
         AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         if (appDbContext.Database.IsRelational())
         {
-            string[] pending = [.. (await appDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false))];
+            string[] pending = [.. await appDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)];
             if (pending.Length is not 0)
             {
                 appDbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));

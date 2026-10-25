@@ -1,4 +1,4 @@
-namespace server.Controllers.Filter;
+﻿namespace server.Controllers.Filter;
 
 public sealed class ValidateCdnPermission(AppDbContext appDbContext, TimeProvider timeProvider) : IAsyncActionFilter
 {

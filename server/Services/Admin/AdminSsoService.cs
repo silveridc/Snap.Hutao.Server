@@ -922,6 +922,7 @@ public sealed class AdminSsoService(
         {
             account.LastLoginAt = now;
             await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
             // 显示名可能已在身份源里改过，缓存里的旧名字会误导审计
             await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
         }

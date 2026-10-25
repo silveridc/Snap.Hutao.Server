@@ -21,7 +21,9 @@ public sealed class AppOptions
     public byte[] OAuthStateEncryptKey { get; set; } = default!;
 
     public SocketOptions Socket { get; set; } = default!;
+
     public RealIpOptions RealIp { get; set; } = default!;
+
     public AfdianOptions Afdian { get; set; } = new();
 
     public Afdian2Options Afdian2 { get; set; } = default!;

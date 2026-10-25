@@ -1,4 +1,4 @@
-namespace server.Models.Yae;
+﻿namespace server.Models.Yae;
 
 /// <summary>
 /// <c>/client/AchievementFieldId_{version}.json</c> 的响应体。字段名必须与启动器

@@ -1,4 +1,4 @@
-using server.Core.IO;
+﻿using server.Core.IO;
 
 namespace server.Services.Metadata;
 
@@ -97,7 +97,11 @@ public static class MetadataTreeImport
     /// 写库：每个文档一行，落库前同样先去 CR，落库后按库里的哈希重建该 locale 的 <c>Meta.json</c>。
     /// 调用方必须先跑 <see cref="VerifyAsync"/> 并确认成功。
     /// </summary>
+    /// <param name="metadataDbContext">目标数据库上下文。</param>
+    /// <param name="root">metadata 树的根目录。</param>
+    /// <param name="locale">只导入这个 locale，null 表示全部。</param>
     /// <param name="progress">每个 locale 导完汇报一次，344 MB 的树跑几分钟，没有进度看起来像卡死。</param>
+    /// <param name="token">取消令牌。</param>
     public static async ValueTask<Report> ImportAsync(MetadataDbContext metadataDbContext, string root, string? locale, IProgress<string>? progress, CancellationToken token)
     {
         MetadataStoreService store = new(metadataDbContext, TimeProvider.System);

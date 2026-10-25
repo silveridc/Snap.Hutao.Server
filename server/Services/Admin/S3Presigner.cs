@@ -16,8 +16,8 @@ public static class S3Presigner
     /// </summary>
     /// <param name="objectUrl">对象的 https 绝对地址（虚拟主机风格或路径风格均可）。</param>
     /// <param name="region">区域名，如 us-east-1。</param>
-    /// <param name="accessKeyId">AccessKeyId。</param>
-    /// <param name="secretAccessKey">SecretAccessKey。</param>
+    /// <param name="accessKeyId">S3 访问密钥 ID。</param>
+    /// <param name="secretAccessKey">S3 访问密钥。</param>
     /// <param name="expiresSeconds">有效期（秒），S3 上限 7 天。</param>
     /// <param name="now">签名时刻（UTC），测试可注入。</param>
     /// <returns>带 X-Amz-Signature 的完整 URL。</returns>

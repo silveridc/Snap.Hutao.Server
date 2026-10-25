@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// 一个 metadata 分类（<c>Achievement</c>、<c>Material</c>、<c>Avatar</c>…）的投影注册表。

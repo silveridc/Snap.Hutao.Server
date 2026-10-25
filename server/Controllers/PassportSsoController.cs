@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.WebUtilities;
 using server.Models.Entity;
 using server.Models.Passport;
 using server.Services.Admin;
@@ -58,14 +58,14 @@ public sealed class PassportSsoController(
             return Fail("Single sign-on is not enabled for the launcher", ReturnCode.SsoNotEnabled, ServerKeys.ServerPassportSsoNotEnabled);
         }
 
-        (string? Url, string? Error) = await adminSsoService.CreateClientAuthorizeUrlAsync(cancellationToken).ConfigureAwait(false);
-        if (Url is null)
+        (string? url, string? error) = await adminSsoService.CreateClientAuthorizeUrlAsync(cancellationToken).ConfigureAwait(false);
+        if (url is null)
         {
-            logger.LogWarning("Client SSO challenge was not issued: {Error}", Error);
-            return Fail(Error ?? "The identity provider is unavailable", ReturnCode.SsoUpstreamFailed, ServerKeys.ServerAdminSsoUpstreamFailed);
+            logger.LogWarning("Client SSO challenge was not issued: {Error}", error);
+            return Fail(error ?? "The identity provider is unavailable", ReturnCode.SsoUpstreamFailed, ServerKeys.ServerAdminSsoUpstreamFailed);
         }
 
-        Response.Headers.Location = Url;
+        Response.Headers.Location = url;
         return StatusCode(StatusCodes.Status302Found);
     }
 
@@ -122,13 +122,16 @@ public sealed class PassportSsoController(
 
         TokenResponse token = await passportService.CreateTokenResponseAsync(user, this.GetDeviceInfo()).ConfigureAwait(false);
 
-        return Success<PassportSsoLoginResult>("Login succeeded", new PassportSsoLoginResult
-        {
-            AccessToken = token.AccessToken,
-            RefreshToken = token.RefreshToken,
-            ExpiresIn = token.ExpiresIn,
-            UserName = user.UserName ?? account.UserName,
-        }, ServerKeys.ServerPassportLoginSucceed);
+        return Success<PassportSsoLoginResult>(
+            "Login succeeded",
+            new PassportSsoLoginResult
+            {
+                AccessToken = token.AccessToken,
+                RefreshToken = token.RefreshToken,
+                ExpiresIn = token.ExpiresIn,
+                UserName = user.UserName ?? account.UserName,
+            },
+            ServerKeys.ServerPassportLoginSucceed);
     }
 
     private static string ToErrorSlug(PassportSsoCallbackStatus status)

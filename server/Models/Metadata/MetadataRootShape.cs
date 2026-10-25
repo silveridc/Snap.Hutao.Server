@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>文档根节点的形态，决定装配时怎么把对象拼回去。</summary>
 public enum MetadataRootShape

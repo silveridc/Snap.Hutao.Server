@@ -1,4 +1,4 @@
-using server.Models.Metadata;
+﻿using server.Models.Metadata;
 
 namespace server.Controllers;
 
@@ -10,12 +10,12 @@ public sealed class MetadataController(MetadataStoreService metadataStoreService
     private const string _extension = ".json";
 
     /// <summary>
-    /// get Metadata Document.
+    /// 获取元数据文档。
     /// </summary>
-    /// <param name="locale">(i18n) 语言</param>
-    /// <param name="name">metadata名称</param>
-    /// <param name="token">CancellationToken</param>
-    /// <returns></returns>
+    /// <param name="locale">（i18n）语言。</param>
+    /// <param name="name">元数据文档名称。</param>
+    /// <param name="token">取消令牌。</param>
+    /// <returns>元数据文档内容。</returns>
     [HttpGet("Genshin/{locale}/{**name}")]
     public async Task<IActionResult> DocumentAsync(string locale, string name, CancellationToken token)
     {
@@ -28,11 +28,13 @@ public sealed class MetadataController(MetadataStoreService metadataStoreService
         {
             return NotFound();
         }
+
         MetadataDocument? document = await metadataStoreService.FindAsync(localeKey, documentName, token).ConfigureAwait(false);
         if (document is null)
         {
             return NotFound();
         }
+
         string etag = $"\"{document.Hash}\"";
         if (string.Equals(Request.Headers.IfNoneMatch, etag, StringComparison.Ordinal))
         {
@@ -63,6 +65,7 @@ public sealed class MetadataController(MetadataStoreService metadataStoreService
         key = locale.ToUpperInvariant();
         return true;
     }
+
     private static bool TryDocumentName(string name, [NotNullWhen(true)] out string? documentName)
     {
         documentName = null;

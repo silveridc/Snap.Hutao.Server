@@ -1,4 +1,4 @@
-namespace server.Extension;
+﻿namespace server.Extension;
 
 /// <summary>
 /// <see cref="TimeProvider"/> 的 Unix 时间戳便捷读取。

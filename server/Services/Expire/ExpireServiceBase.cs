@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using server.Extension;
 
 namespace server.Services.Expire;
@@ -52,6 +52,7 @@ public abstract class ExpireServiceBase(IServiceProvider serviceProvider, TimePr
     {
         long now = timeProvider.GetUnixTimeSeconds();
         long seconds = Duration(days);
+
         // 属性每次访问都会新建表达式树；必须只取一次，保证 Body 与参数出自同一棵树
         Expression<Func<HutaoUser, long>> selector = ExpireAtSelector;
         ParameterExpression user = selector.Parameters[0];

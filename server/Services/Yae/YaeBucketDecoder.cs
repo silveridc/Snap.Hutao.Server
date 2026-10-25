@@ -1,4 +1,4 @@
-using server.Core.Protobuf;
+﻿using server.Core.Protobuf;
 using server.Models.Yae;
 
 namespace server.Services.Yae;
@@ -31,6 +31,9 @@ public static class YaeBucketDecoder
         public bool Succeeded => Error is null;
     }
 
+    /// <summary>
+    /// 解析 bucket 响应体：识别版本号与国服指纹，抽出成就字段号映射。
+    /// </summary>
     /// <param name="data">bucket 响应体原文。</param>
     /// <param name="chineseHashes">已确认为国服的 exe 指纹集合；命中其中一个的 RVA 组写进 chinese。</param>
     public static Result Decode(byte[] data, IReadOnlyCollection<uint> chineseHashes)

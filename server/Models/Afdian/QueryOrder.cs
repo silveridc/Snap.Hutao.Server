@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace server.Models.Afdian;
 
@@ -19,6 +19,7 @@ public class QueryOrder
     public static QueryOrder Create(string userId, string tradeNumber, string token)
     {
         string param = JsonSerializer.Serialize(new Param() { OutTradeNo = tradeNumber });
+
         // Ts 与签名必须同值：以前各取各的 UtcNow，跨秒时刻签名和请求体不一致，爱发电验签偶发失败
         long ts = TimeProvider.System.GetUnixTimeSeconds();
         return new QueryOrder

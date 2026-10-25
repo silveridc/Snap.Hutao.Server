@@ -1,4 +1,4 @@
-using server.Extension;
+﻿using server.Extension;
 using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
@@ -6,6 +6,7 @@ namespace server.Services.WallPaper;
 public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCache cache, ILogger<BingWallpaper> logger, TimeProvider timeProvider)
 {
     private const string _wallpaperType = "bing";
+
     public async Task<WallPaperResponse> GetTodayWallpaperAsync()
     {
         string todayKey = $"{_wallpaperType}Wallpaper_{timeProvider.GetUtcNow().UtcDateTime:yyyyMMdd}";
@@ -25,6 +26,7 @@ public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCac
             {
                 return null!;
             }
+
             string resUrl = $"https://www.bing.com{imgItem.UrlBase}_UHD.jpg";
             WallPaperResponse result = new(resUrl, imgItem.CopyrightLink, "Bing", imgItem.Copyright);
             cache.Set(todayKey, result, new DateTimeOffset(DateTime.Today.AddDays(1)));
@@ -55,6 +57,7 @@ file class BingImageItem
 
     [JsonPropertyName("copyrightlink")]
     public string CopyrightLink { get; set; } = string.Empty;
+
     [JsonPropertyName("copyright")]
     public string Copyright { get; set; } = string.Empty;
 

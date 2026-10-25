@@ -1,4 +1,4 @@
-using server.Core.IO;
+﻿using server.Core.IO;
 using server.Models.Metadata;
 
 namespace server.Services.Metadata;
@@ -8,6 +8,7 @@ public sealed class MetadataStoreService(MetadataDbContext metadataDbContext, Ti
     public const string MetaName = "Meta";
 
     public sealed record Summary(string Locale, string Name, uint Size, string Hash, DateTime UpdatedAt);
+
     public async ValueTask<MetadataDocument?> FindAsync(string locale, string name, CancellationToken token)
     {
         return await metadataDbContext.MetadataDocuments
@@ -32,6 +33,7 @@ public sealed class MetadataStoreService(MetadataDbContext metadataDbContext, Ti
             .ConfigureAwait(false);
         return items;
     }
+
     public async ValueTask<string> UpsertAsync(string locale, string name, string doc, CancellationToken token)
     {
         string normalized = MetadataHasher.NormalizeLineEndings(doc);
@@ -70,6 +72,7 @@ public sealed class MetadataStoreService(MetadataDbContext metadataDbContext, Ti
         await MarkKindStaleAsync(name, now, token).ConfigureAwait(false);
         return hash;
     }
+
     private async ValueTask MarkKindStaleAsync(string name, DateTime now, CancellationToken token)
     {
         MetadataKindRegistry.Definition? definition = MetadataKindRegistry.FindByName(name);
@@ -83,6 +86,7 @@ public sealed class MetadataStoreService(MetadataDbContext metadataDbContext, Ti
             .ExecuteUpdateAsync(setters => setters.SetProperty(kind => kind.StaleSince, now), token)
             .ConfigureAwait(false);
     }
+
     public async ValueTask<string> RebuildMetaAsync(string locale, CancellationToken token)
     {
         List<Summary> documents = await ListAsync(locale, token).ConfigureAwait(false);
@@ -103,6 +107,7 @@ public sealed class MetadataStoreService(MetadataDbContext metadataDbContext, Ti
         {
             withoutMeta[name] = hashes[name];
         }
+
         string self = MetadataHasher.Hash(MetadataHasher.Serialize(withoutMeta));
         List<string> orderedFlat = [.. flat];
         int insertAt = orderedFlat.FindIndex(name => string.CompareOrdinal(name, MetaName) > 0);
@@ -114,11 +119,13 @@ public sealed class MetadataStoreService(MetadataDbContext metadataDbContext, Ti
         {
             orderedFlat.Insert(insertAt, MetaName);
         }
+
         Dictionary<string, string> manifest = [];
         foreach (string name in orderedFlat.Concat(scattered))
         {
             manifest[name] = name == MetaName ? self : hashes[name];
         }
+
         return await UpsertAsync(locale, MetaName, MetadataHasher.Serialize(manifest), token).ConfigureAwait(false);
     }
 }

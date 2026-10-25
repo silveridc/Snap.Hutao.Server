@@ -1,4 +1,4 @@
-using server.Models.Metadata;
+﻿using server.Models.Metadata;
 
 namespace server.Services.Yae;
 
@@ -27,7 +27,11 @@ public sealed class YaeMetadataService(
     /// <summary>已同步的版本一览（不含 payload 原文），供维护后台核对覆盖了哪些游戏版本。</summary>
     public sealed record Summary(string Version, uint ChineseHash, uint OverseaHash, uint StoreCmdId, uint AchievementCmdId, uint ItemCount, uint GroupCount, DateTime SyncedAt);
 
+    /// <summary>
+    /// 拉取一次 Yae bucket：解码出成就字段映射与版本号，按版本号新增或覆盖落库。
+    /// </summary>
     /// <param name="chineseHash">本次同步强制指定的国服指纹，优先级高于配置；null 表示用配置里的集合。</param>
+    /// <param name="token">取消令牌。</param>
     public async Task<YaeBucketDecoder.Result> SyncAsync(uint? chineseHash, CancellationToken token = default)
     {
         (byte[]? data, string? fetchError) = await FetchBucketAsync(token).ConfigureAwait(false);

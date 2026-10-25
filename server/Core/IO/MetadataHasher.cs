@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 
 namespace server.Core.IO;
 
@@ -52,7 +52,10 @@ public static class MetadataHasher
         return NormalizeLineEndings(JsonSerializer.Serialize(value, WriteOptions));
     }
 
-    /// <summary>序列化并算出该字节串的哈希，落库时一次做完。</summary>
+    /// <summary>
+    /// 序列化并算出该字节串的哈希，落库时一次做完。
+    /// </summary>
+    /// <typeparam name="TValue">要序列化的类型。</typeparam>
     public static (string Doc, string Hash) SerializeWithHash<TValue>(TValue value)
     {
         string doc = Serialize(value);

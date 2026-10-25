@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using server.Core.IO;
 using server.Models.Metadata;
 

@@ -1,4 +1,4 @@
-using Quartz;
+﻿using Quartz;
 using server.Extension;
 
 namespace server.Job;

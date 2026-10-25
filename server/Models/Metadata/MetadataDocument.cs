@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// 启动器 metadata 的原文档表：一行 = 一个 locale 的一个 JSON 文档。

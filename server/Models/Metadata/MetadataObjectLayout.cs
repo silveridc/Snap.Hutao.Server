@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// 某个 locale 的某个文档里「有哪些对象、按什么顺序」。

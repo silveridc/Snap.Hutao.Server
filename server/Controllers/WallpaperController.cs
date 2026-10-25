@@ -1,5 +1,6 @@
 ﻿using server.Models.PublicAPI;
 using server.Services.WallPaper;
+
 namespace server.Controllers;
 
 [Route("api/[controller]")]

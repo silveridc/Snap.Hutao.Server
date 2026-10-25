@@ -1,4 +1,4 @@
-namespace server.Services.Metadata;
+﻿namespace server.Services.Metadata;
 
 /// <summary>
 /// <see cref="Models.Metadata.MetadataObjectRef"/> 的唯一数据来源：哪些字段是「指向别的分类的引用」。
@@ -17,6 +17,9 @@ namespace server.Services.Metadata;
 /// </summary>
 public static class MetadataRefRegistry
 {
+    /// <summary>
+    /// 一条引用边的定义：在 <c>Kind</c> 分类的对象里按 <c>Path</c> 取值，指向 <c>RefKinds</c> 里的分类。
+    /// </summary>
     /// <param name="Kind">发起引用的分类。</param>
     /// <param name="Path">对象内的路径，<c>*</c> 表示数组下标通配，如 <c>RewardList/*/Id</c>。</param>
     /// <param name="Role">边的语义名，进 <see cref="Models.Metadata.MetadataObjectRef.Role"/>。</param>

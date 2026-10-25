@@ -1,4 +1,4 @@
-namespace server.Services.Authorization;
+﻿namespace server.Services.Authorization;
 
 /// <summary>
 /// 后台专属账号（SSO）令牌的声明类型。这类令牌不含 <see cref="PassportClaimTypes.UserId"/>，

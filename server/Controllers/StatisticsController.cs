@@ -104,7 +104,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
         T? data = spiralAbyssStatisticsService.GetStatistics<T>(name, scheduleId);
         if (data is null && typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>))
         {
-            data = (T)Activator.CreateInstance(typeof(T))!;
+            data = Activator.CreateInstance<T>()!;
         }
 
         return Success<T?>("Spiral Abyss statistics acquired successfully", data, ServerKeys.ServerStatisticsAbyssSucceed);

@@ -8,7 +8,7 @@ public sealed class SpiralAbyssStatisticsService(AppDbContext appDbContext, IDis
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
     };
 
     public T? GetStatistics<T>(string name)

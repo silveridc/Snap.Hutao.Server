@@ -209,15 +209,18 @@ public class PassportController(IServiceProvider serviceProvider) : ControllerBa
             return Fail("User does not exist", ReturnCode.UserNameNotExists, ServerKeys.ServerPassportUserInfoNotExist);
         }
 
-        return Success<UserInfo>("User info acquired successfully", new()
-        {
-            NormalizedUserName = user.NormalizedUserName ?? user.UserName,
-            UserName = user.UserName,
-            IsLicensedDeveloper = user.IsLicensedDeveloper,
-            IsMaintainer = user.IsMaintainer,
-            GachaLogExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.GachaLogExpireAt),
-            CdnExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.CdnExpireAt),
-        }, ServerKeys.ServerPassportUserInfoSucceed);
+        return Success<UserInfo>(
+            "User info acquired successfully",
+            new()
+            {
+                NormalizedUserName = user.NormalizedUserName ?? user.UserName,
+                UserName = user.UserName,
+                IsLicensedDeveloper = user.IsLicensedDeveloper,
+                IsMaintainer = user.IsMaintainer,
+                GachaLogExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.GachaLogExpireAt),
+                CdnExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.CdnExpireAt),
+            },
+            ServerKeys.ServerPassportUserInfoSucceed);
     }
 
     /// <summary>

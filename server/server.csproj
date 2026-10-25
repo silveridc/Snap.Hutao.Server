@@ -13,6 +13,10 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<!-- StyleCop 的文档注释规则必须生成 XML 文档才会跑（否则 SA0001）。
+		     CS1591 = 未注释的可见成员缺文档，本仓库不要求每个成员都有注释，故只关这一条。 -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
 	</PropertyGroup>
 <!-- -->
 
@@ -39,6 +43,14 @@
 		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
 		<!-- metadata 落库要算 XXH64；这个包本来就被间接引用带进输出目录，显式写出不依赖传递关系 -->
 		<PackageReference Include="System.IO.Hashing" Version="10.0.13" />
+		<!-- 仅编译期分析器，PrivateAssets=all 不进运行时依赖、不随包部署 DLL -->
+		<PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<AdditionalFiles Include="stylecop.json" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="Resources\Assets\ipv4.xdb">

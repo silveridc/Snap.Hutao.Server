@@ -217,13 +217,16 @@ public class PassportV2Controller(IServiceProvider serviceProvider) : Controller
                 return Fail("User does not exist", ReturnCode.UserNameNotExists, ServerKeys.ServerPassportUserInfoNotExist);
             }
 
-            return Success<UserInfo>("User info acquired successfully", new()
-            {
-                UserName = admin.UserName,
-                NormalizedUserName = admin.UserName.ToUpperInvariant(),
-                AuthKind = "admin",
-                CanWrite = admin.IsEnabled,
-            }, ServerKeys.ServerPassportUserInfoSucceed);
+            return Success<UserInfo>(
+                "User info acquired successfully",
+                new()
+                {
+                    UserName = admin.UserName,
+                    NormalizedUserName = admin.UserName.ToUpperInvariant(),
+                    AuthKind = "admin",
+                    CanWrite = admin.IsEnabled,
+                },
+                ServerKeys.ServerPassportUserInfoSucceed);
         }
 
         HutaoUser? user = await this.GetUserAsync(_appDbContext.Users).ConfigureAwait(false);
@@ -238,16 +241,19 @@ public class PassportV2Controller(IServiceProvider serviceProvider) : Controller
             ? await _adminSsoService.IsUserProvisionedAsync(user.Id, HttpContext.RequestAborted).ConfigureAwait(false)
             : user.IsMaintainer;
 
-        return Success<UserInfo>("User info acquired successfully", new()
-        {
-            NormalizedUserName = user.NormalizedUserName ?? user.UserName,
-            UserName = user.UserName,
-            IsLicensedDeveloper = user.IsLicensedDeveloper,
-            IsMaintainer = user.IsMaintainer,
-            CanWrite = canWrite,
-            GachaLogExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.GachaLogExpireAt),
-            CdnExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.CdnExpireAt),
-        }, ServerKeys.ServerPassportUserInfoSucceed);
+        return Success<UserInfo>(
+            "User info acquired successfully",
+            new()
+            {
+                NormalizedUserName = user.NormalizedUserName ?? user.UserName,
+                UserName = user.UserName,
+                IsLicensedDeveloper = user.IsLicensedDeveloper,
+                IsMaintainer = user.IsMaintainer,
+                CanWrite = canWrite,
+                GachaLogExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.GachaLogExpireAt),
+                CdnExpireAt = DateTimeOffset.FromUnixTimeSeconds(user.CdnExpireAt),
+            },
+            ServerKeys.ServerPassportUserInfoSucceed);
     }
 
     /// <summary>

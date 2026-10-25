@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// 一个对象里随 locale 变化的那个叶子。骨架里对应位置是占位符，这里给值，

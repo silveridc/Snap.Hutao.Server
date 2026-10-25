@@ -12,8 +12,8 @@ public class WebhookController(AfdianWebhookService afdianWebhookService) : Cont
     /// </summary>
     /// <param name="request">爱发电订单回调数据。</param>
     /// <returns>处理结果。</returns>
-    //[HttpGet("Incoming/Afdian")]
-    //[HttpPost("Incoming/Afdian")]
+    // [HttpGet("Incoming/Afdian")]
+    // [HttpPost("Incoming/Afdian")]
     public async Task<IActionResult> IncomingAfdianAsync([FromBody] AfdianResponse<OrderWrapper> request)
     {
         await afdianWebhookService.ProcessIncomingOrderAsync(request.Data.Order).ConfigureAwait(false);

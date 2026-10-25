@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// 对象之间的引用边，供「哪个任务奖励了这颗魔拉」「这套圣遗物有哪些部件」这类反查。

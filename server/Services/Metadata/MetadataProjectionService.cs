@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json.Nodes;
 using server.Core.IO;
 using server.Models.Metadata;
@@ -154,7 +154,7 @@ public sealed class MetadataProjectionService(MetadataDbContext metadataDbContex
             .ConfigureAwait(false);
     }
 
-    private async ValueTask<(KindResult?, List<Issue>)> ProjectKindAsync(MetadataKindRegistry.Definition definition, CancellationToken token)
+    private async ValueTask<(KindResult? Result, List<Issue> Issues)> ProjectKindAsync(MetadataKindRegistry.Definition definition, CancellationToken token)
     {
         Stopwatch watch = Stopwatch.StartNew();
         List<string> names = await GroupNamesAsync(definition, token).ConfigureAwait(false);
@@ -213,21 +213,21 @@ public sealed class MetadataProjectionService(MetadataDbContext metadataDbContex
     private async ValueTask ProjectGroupAsync(KindState state, string name, CancellationToken token)
     {
         MetadataKindRegistry.Definition definition = state.Definition;
-        List<DocumentRow> _rows = await metadataDbContext.MetadataDocuments.AsNoTracking()
+        List<DocumentRow> rows = await metadataDbContext.MetadataDocuments.AsNoTracking()
             .Where(document => document.Name == name)
             .Select(document => new DocumentRow(document.Locale, document.Doc))
             .ToListAsync(token)
             .ConfigureAwait(false);
-        if (_rows.Count is 0)
+        if (rows.Count is 0)
         {
             return;
         }
 
-        string[] locales = [.. OrderedLocales(_rows.Select(row => row.Locale))];
+        string[] locales = [.. OrderedLocales(rows.Select(row => row.Locale))];
         state.Locales = Math.Max(state.Locales, locales.Length);
 
         Dictionary<string, string> docs = [];
-        foreach (DocumentRow row in _rows)
+        foreach (DocumentRow row in rows)
         {
             docs[row.Locale] = row.Doc;
         }
@@ -463,14 +463,14 @@ public sealed class MetadataProjectionService(MetadataDbContext metadataDbContex
             }
 
             token.ThrowIfCancellationRequested();
-            List<ObjectRow> _rows = await metadataDbContext.MetadataObjects.AsNoTracking()
+            List<ObjectRow> rows = await metadataDbContext.MetadataObjects.AsNoTracking()
                 .Where(item => item.Kind == definition.Kind)
                 .Select(item => new ObjectRow(item.GameId, item.SubId, item.Doc))
                 .ToListAsync(token)
                 .ConfigureAwait(false);
 
             int count = 0;
-            foreach (ObjectRow row in _rows)
+            foreach (ObjectRow row in rows)
             {
                 using JsonDocument document = JsonDocument.Parse(row.Doc);
                 foreach (MetadataRefRegistry.Edge edge in edges)
@@ -670,13 +670,13 @@ public sealed class MetadataProjectionService(MetadataDbContext metadataDbContex
 
     private async ValueTask<Dictionary<string, HashSet<ulong>>> LoadIdentitiesAsync(CancellationToken token)
     {
-        List<IdentityRow> _rows = await metadataDbContext.MetadataObjects.AsNoTracking()
+        List<IdentityRow> rows = await metadataDbContext.MetadataObjects.AsNoTracking()
             .Select(item => new IdentityRow(item.Kind, item.GameId))
             .ToListAsync(token)
             .ConfigureAwait(false);
 
         Dictionary<string, HashSet<ulong>> identities = [];
-        foreach (IdentityRow row in _rows)
+        foreach (IdentityRow row in rows)
         {
             if (!identities.TryGetValue(row.Kind, out HashSet<ulong>? set))
             {

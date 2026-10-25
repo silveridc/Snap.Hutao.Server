@@ -1,4 +1,4 @@
-namespace server.Core.Protobuf;
+﻿namespace server.Core.Protobuf;
 
 /// <summary>
 /// proto3 wire format 的最小读取器。只覆盖 Yae 那份 <c>schicksal/metadata</c> 用到的四种

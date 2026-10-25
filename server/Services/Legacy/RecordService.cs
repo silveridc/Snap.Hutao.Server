@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore.Storage;
 using server.Core;
 using server.Extension;

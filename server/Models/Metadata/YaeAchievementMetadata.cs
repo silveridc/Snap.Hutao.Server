@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// Yae 成就注入所需的一份版本配置。<see cref="Payload"/> 是原样吐给客户端的

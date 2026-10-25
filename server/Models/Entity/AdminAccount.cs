@@ -1,4 +1,4 @@
-namespace server.Models.Entity;
+﻿namespace server.Models.Entity;
 
 /// <summary>
 /// 后台专属账号。身份由外部 OIDC 身份源给出，库里只保存「哪些主体允许进后台」以及展示信息，

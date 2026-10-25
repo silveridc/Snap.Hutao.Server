@@ -1,4 +1,4 @@
-namespace server.Options;
+﻿namespace server.Options;
 
 /// <summary>
 /// Yae 成就注入配置，对应 appsettings 的 App:Yae 节点。

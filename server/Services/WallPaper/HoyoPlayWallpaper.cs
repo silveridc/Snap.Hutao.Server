@@ -1,4 +1,4 @@
-using server.Extension;
+﻿using server.Extension;
 using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
@@ -30,6 +30,7 @@ public class HoyoPlayWallpaper(IHttpClientFactory httpClientFactory, IDistribute
                 logger.LogWarning("解析图片失败");
                 return null!;
             }
+
             WallPaperResponse result = new(
                 Url: imgUrl,
                 SourceUrl: "https://ys.mihoyo.com",
@@ -51,20 +52,25 @@ public class HoyoPlayWallpaper(IHttpClientFactory httpClientFactory, IDistribute
 file record HypApiResponse(
     [property: JsonPropertyName("data")] HypData? Data
 );
+
 file record HypData(
     [property: JsonPropertyName("game_info_list")] List<HypGameItem>? GameInfoList
 );
+
 file record HypGameItem(
     [property: JsonPropertyName("game")] HypGame? Game,
     [property: JsonPropertyName("backgrounds")] List<HypBackground>? Backgrounds
 );
+
 file record HypGame(
     [property: JsonPropertyName("biz")] string? Biz
 );
+
 file record HypBackground(
     [property: JsonPropertyName("background")] HypUrl? Background,
     [property: JsonPropertyName("video")] HypUrl? Video
 );
+
 file record HypUrl(
     [property: JsonPropertyName("url")] string? Url
 );

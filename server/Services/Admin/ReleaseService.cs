@@ -205,18 +205,22 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
         {
             return ("Version must contain four numeric components, such as 1.17.2.0", ServerKeys.ServerAdminReleaseInvalidVersion);
         }
+
         if (minimumVersion is not null && (!VersionPattern().IsMatch(minimumVersion) || !Version.TryParse(minimumVersion, out _)))
         {
             return ("Minimum version must contain four numeric components, such as 1.17.2.0", ServerKeys.ServerAdminReleaseInvalidVersion);
         }
+
         if (minimumVersion is not null && Version.TryParse(minimumVersion, out Version? parsed) && Version.TryParse(version, out Version? current) && parsed > current)
         {
             return ("Minimum version must not be greater than the release version", ServerKeys.ServerAdminReleaseInvalidVersion);
         }
+
         if (!Sha256Pattern().IsMatch(validation))
         {
             return ("SHA-256 checksum must contain 64 hexadecimal characters", ServerKeys.ServerAdminReleaseInvalidChecksum);
         }
+
         if (mirrors.Count is < 1 or > _maxMirrors)
         {
             return ($"The number of download mirrors must be between 1 and {_maxMirrors}", null);
@@ -231,14 +235,17 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
             {
                 return ("Mirror name must not be empty or exceed 100 characters", ServerKeys.ServerAdminReleaseInvalidMirrorName);
             }
+
             if (!names.Add(mirror.MirrorName))
             {
                 return ("Mirror names must be unique", ServerKeys.ServerAdminReleaseDuplicateMirrorName);
             }
+
             if (!Enum.IsDefined(mirror.MirrorType))
             {
                 return ("Invalid mirror type", ServerKeys.ServerAdminReleaseInvalidMirrorType);
             }
+
             if (mirror.Url.Length > _maxUrlLength || !Uri.TryCreate(mirror.Url, UriKind.Absolute, out Uri? uri) ||
                 !string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ||
                 !string.IsNullOrEmpty(uri.UserInfo) || !string.IsNullOrEmpty(uri.Fragment))

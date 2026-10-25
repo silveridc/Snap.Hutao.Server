@@ -1,4 +1,4 @@
-namespace server.Models.Metadata;
+﻿namespace server.Models.Metadata;
 
 /// <summary>
 /// 一个游戏对象的中立骨架：全 locale 共用一份，随语言变化的叶子在骨架里只留占位符，

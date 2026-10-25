@@ -1,4 +1,4 @@
-namespace server.Models.Passport;
+﻿namespace server.Models.Passport;
 
 /// <summary>
 /// 启动器单点登录的可用状态。启动器据此决定登录界面显示 SSO 入口还是继续只走邮箱密码登录，

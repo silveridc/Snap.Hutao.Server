@@ -1,5 +1,6 @@
 using server.Models.PublicAPI;
 using server.Services.PublicAPI;
+
 namespace server.Controllers;
 
 [ApiController]
@@ -10,13 +11,7 @@ public class PublicApiController(IpRegionService ipRegionService) : ControllerBa
     /// <summary>
     /// Return ip and region data
     /// </summary>
-    /// <returns>
-    /// <list type="bullet">
-    /// <item>
-    /// <description><c></c></description>
-    /// </item>
-    /// </list>
-    /// </returns>
+    /// <returns>IP and region data.</returns>
     [HttpGet("ip")]
     [ProducesResponseType(typeof(IpResponse), 200)]
     public IActionResult GetIp()

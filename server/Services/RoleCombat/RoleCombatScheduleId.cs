@@ -1,4 +1,4 @@
-namespace server.Services.RoleCombat;
+﻿namespace server.Services.RoleCombat;
 
 public static class RoleCombatScheduleId
 {

@@ -53,7 +53,10 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 
     public async Task InitializeAsync()
     {
-        if (_initialized) return;
+        if (_initialized)
+        {
+            return;
+        }
 
         try
         {
@@ -97,12 +100,15 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
     public bool GetBool(string key, bool defaultValue = false)
     {
         string? value = Get(key);
-        if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return defaultValue;
+        }
+
         return bool.TryParse(value, out bool result) ? result : defaultValue;
     }
 
     // Typed accessors with AppOptions fallback
-
     public string PizzaHelperUidSalt => GetOrDefault(Keys.PizzaHelperUidSalt, appOptions.GenshinPizzaHelper?.UidSalt ?? string.Empty);
 
     public string PizzaHelperApiSalt => GetOrDefault(Keys.PizzaHelperApiSalt, appOptions.GenshinPizzaHelper?.ApiSalt ?? string.Empty);
@@ -159,7 +165,6 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
     };
 
     // Admin operations
-
     public async Task<Dictionary<string, string?>> GetAllAsync()
     {
         await InitializeAsync().ConfigureAwait(false);

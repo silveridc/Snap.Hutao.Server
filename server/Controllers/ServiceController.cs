@@ -184,6 +184,9 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     /// <param name="page">页码，从 1 开始。</param>
     /// <param name="pageSize">每页数量，1-100。</param>
     /// <param name="keyword">按用户名或邮箱模糊搜索。</param>
+    /// <param name="maintainer">只取维护者（<see langword="true"/>）或只取非维护者（<see langword="false"/>），null 不筛。</param>
+    /// <param name="developer">只取开发者（<see langword="true"/>）或只取非开发者（<see langword="false"/>），null 不筛。</param>
+    /// <param name="expiringInDays">只取这么多天内到期的授权，null 不筛。</param>
     /// <returns>分页用户列表。</returns>
     [HttpGet("User/List")]
     public async Task<IActionResult> UserListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? keyword = null, [FromQuery] bool? maintainer = null, [FromQuery] bool? developer = null, [FromQuery] int? expiringInDays = null)

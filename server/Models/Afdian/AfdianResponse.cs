@@ -9,7 +9,6 @@ public class AfdianResponse
     public string ErrorMessage { get; set; } = default!;
 }
 
-[SuppressMessage("", "SA1402")]
 public sealed class AfdianResponse<T> : AfdianResponse
 {
     [JsonPropertyName("data")]

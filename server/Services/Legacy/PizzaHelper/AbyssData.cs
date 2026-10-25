@@ -1,4 +1,4 @@
-namespace server.Services.Legacy.PizzaHelper;
+﻿namespace server.Services.Legacy.PizzaHelper;
 
 internal sealed class AbyssData
 {

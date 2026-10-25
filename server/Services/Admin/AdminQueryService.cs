@@ -10,7 +10,7 @@ public sealed class AdminQueryService(AppDbContext appDbContext)
 {
     public async Task<PagedResult<RedeemCodeItem>> GetRedeemCodesAsync(int page, int pageSize, string? keyword)
     {
-        //分页
+        // 分页
         page = page < 1 ? 1 : page;
         pageSize = Math.Clamp(pageSize, 1, 100);
 
@@ -71,6 +71,7 @@ public sealed class AdminQueryService(AppDbContext appDbContext)
         int removed = await appDbContext.RedeemCodes.Where(c => c.Id == id).ExecuteDeleteAsync().ConfigureAwait(false);
         return removed > 0;
     }
+
     public async Task<PagedResult<LicenseApplicationItem>> GetLicenseApplicationsAsync(int page, int pageSize, bool onlyPending)
     {
         page = page < 1 ? 1 : page;
@@ -183,6 +184,7 @@ public sealed class AdminQueryService(AppDbContext appDbContext)
                 Id = a.Id,
                 AdminUserId = a.AdminUserId,
                 AdminAccountId = a.AdminAccountId,
+
                 // 后台专属账号不在用户表里，显示名直接取写入时的快照
                 AdminUserName = a.AdminAccountName ?? appDbContext.Users.Where(u => u.Id == a.AdminUserId).Select(u => u.UserName).FirstOrDefault(),
                 Action = a.Action,
