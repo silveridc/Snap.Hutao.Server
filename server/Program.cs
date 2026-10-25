@@ -1,6 +1,8 @@
 ﻿using IP2Region.Net.Abstractions;
 using IP2Region.Net.XDB;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.OpenApi;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
@@ -319,7 +321,7 @@ public static class Program
 
         WebApplication app = appBuilder.Build();
         _logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Program");
-        MigrateDatabase(app);
+        await MigrateDatabasesAsync(app).ConfigureAwait(false);
         app.UseForwardedHeaders();
         if (!Debugger.IsAttached)
         {
@@ -377,18 +379,35 @@ public static class Program
     }
 
     /// <summary>
-    /// 迁移数据库
+    /// <summary>
+    /// 启动时自动迁移：AppDbContext 应用全部待迁移（所有环境，含开发）；MetadataDbContext
+    /// 无迁移历史，仅在库为全新（无任何表）时按模型建表，已有库不碰——其结构仍由 DDL 文件管理。
     /// </summary>
     /// <param name="app">app</param>
-    [Conditional("RELEASE")]
-    private static void MigrateDatabase(WebApplication app)
+    private static async Task MigrateDatabasesAsync(WebApplication app)
     {
         using IServiceScope scope = app.Services.CreateScope();
-        AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if (context.Database.IsRelational() && context.Database.GetPendingMigrations().Any())
+        AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (appDbContext.Database.IsRelational())
         {
-            context.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
-            context.Database.Migrate();
+            string[] pending = [.. (await appDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false))];
+            if (pending.Length is not 0)
+            {
+                appDbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
+                await appDbContext.Database.MigrateAsync().ConfigureAwait(false);
+                _logger?.LogInformation("Applied {Count} pending migrations: {Migrations}", pending.Length, string.Join(", ", pending));
+            }
+        }
+
+        MetadataDbContext metadataDbContext = scope.ServiceProvider.GetRequiredService<MetadataDbContext>();
+        if (metadataDbContext.Database.IsRelational())
+        {
+            IRelationalDatabaseCreator creator = metadataDbContext.Database.GetService<IRelationalDatabaseCreator>();
+            if (!await creator.HasTablesAsync().ConfigureAwait(false))
+            {
+                await creator.CreateTablesAsync().ConfigureAwait(false);
+                _logger?.LogInformation("Metadata database was empty; created all tables from the model");
+            }
         }
     }
 }
