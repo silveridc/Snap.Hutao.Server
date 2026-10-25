@@ -30,6 +30,10 @@
       "killSwitch": {
         "title": "功能熔断",
         "description": "紧急关闭客户端的注入类功能，经 /Patch/hutao 下发，客户端下次启动生效；关闭开关后客户端自动恢复用户本地设置。"
+      },
+      "s3Sign": {
+        "title": "更新包 S3 直链签名",
+        "description": "镜像地址匹配该主机名时，/Patch/hutao 下发前现场签发限时访问 URL，桶可保持私有。留空不启用。"
       }
     },
     "fields": {
@@ -128,6 +132,26 @@
       "disableIslandInjection": {
         "label": "禁用 Island 注入",
         "hint": "强制所有客户端本次会话内不启用 Island 注入"
+      },
+      "s3Host": {
+        "label": "对象主机名",
+        "hint": "如 my-bucket.s3.us-east-1.amazonaws.com"
+      },
+      "s3Region": {
+        "label": "区域",
+        "hint": "签名区域，如 us-east-1"
+      },
+      "s3AccessKeyId": {
+        "label": "AccessKeyId",
+        "hint": "AWS/S3 兼容存储的 AccessKeyId"
+      },
+      "s3SecretAccessKey": {
+        "label": "SecretAccessKey",
+        "hint": "仅服务端使用（密码框）"
+      },
+      "s3ExpiresHours": {
+        "label": "有效期（小时）",
+        "hint": "1-168，建议 24"
       }
     },
     "form": {

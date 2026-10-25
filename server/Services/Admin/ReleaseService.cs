@@ -30,9 +30,38 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
         {
             info.FpsUnlockDisabled = systemConfig.PatchDisableFpsUnlock ? true : null;
             info.IslandInjectionDisabled = systemConfig.PatchDisableIslandInjection ? true : null;
+            SignS3Mirrors(info);
         }
 
         return info;
+    }
+
+    /// <summary>
+    /// 配置了 S3 签名且镜像主机名匹配时，把镜像 URL 换成限时预签名 URL——桶保持私有，
+    /// 每次响应都重新签发，客户端拿到即下载，过期也不影响。
+    /// </summary>
+    private void SignS3Mirrors(HutaoPackageInformation info)
+    {
+        if (!systemConfig.IsPatchS3SigningEnabled)
+        {
+            return;
+        }
+
+        string host = systemConfig.PatchS3Host;
+        int expiresHours = Math.Clamp(int.TryParse(systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3ExpiresHours, "24"), out int parsed) ? parsed : 24, 1, 168);
+        string region = systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3Region, string.Empty).Trim();
+        string accessKeyId = systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3AccessKeyId, string.Empty).Trim();
+        string secretAccessKey = systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3SecretAccessKey, string.Empty);
+
+        foreach (server.Models.Patch.HutaoPackageMirror mirror in info.Mirrors)
+        {
+            if (Uri.TryCreate(mirror.Url, UriKind.Absolute, out Uri? uri) &&
+                uri.Authority is not null &&
+                string.Equals(uri.Authority, host, StringComparison.OrdinalIgnoreCase))
+            {
+                mirror.Url = S3Presigner.PresignGet(mirror.Url, region, accessKeyId, secretAccessKey, expiresHours * 3600, timeProvider.GetUtcNow());
+            }
+        }
     }
 
     public async Task<HutaoReleaseItem?> GetCurrentAsync()

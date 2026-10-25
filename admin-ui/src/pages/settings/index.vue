@@ -27,6 +27,17 @@ const CONFIG_SECTIONS = computed(() => [
     ],
   },
   {
+    title: t('pages.settings.sections.s3Sign.title'),
+    description: t('pages.settings.sections.s3Sign.description'),
+    fields: [
+      { key: 'Patch.S3.Host', label: t('pages.settings.fields.s3Host.label'), type: 'text', hint: t('pages.settings.fields.s3Host.hint') },
+      { key: 'Patch.S3.Region', label: t('pages.settings.fields.s3Region.label'), type: 'text', hint: t('pages.settings.fields.s3Region.hint') },
+      { key: 'Patch.S3.AccessKeyId', label: t('pages.settings.fields.s3AccessKeyId.label'), type: 'text', hint: t('pages.settings.fields.s3AccessKeyId.hint') },
+      { key: 'Patch.S3.SecretAccessKey', label: t('pages.settings.fields.s3SecretAccessKey.label'), type: 'password', hint: t('pages.settings.fields.s3SecretAccessKey.hint') },
+      { key: 'Patch.S3.ExpiresHours', label: t('pages.settings.fields.s3ExpiresHours.label'), type: 'text', hint: t('pages.settings.fields.s3ExpiresHours.hint') },
+    ],
+  },
+  {
     title: t('pages.settings.sections.pizzaHelper.title'),
     description: t('pages.settings.sections.pizzaHelper.description'),
     fields: [

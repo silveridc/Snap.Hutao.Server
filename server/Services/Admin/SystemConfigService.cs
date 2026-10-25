@@ -29,6 +29,13 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
         public const string PatchDisableFpsUnlock = "Patch.DisableFpsUnlock";
         public const string PatchDisableIslandInjection = "Patch.DisableIslandInjection";
 
+        // 更新包 S3 直链签名：镜像主机名匹配时 /Patch/hutao 下发前现场签发限时 URL，桶可保持私有。
+        public const string PatchS3Host = "Patch.S3.Host";
+        public const string PatchS3Region = "Patch.S3.Region";
+        public const string PatchS3AccessKeyId = "Patch.S3.AccessKeyId";
+        public const string PatchS3SecretAccessKey = "Patch.S3.SecretAccessKey";
+        public const string PatchS3ExpiresHours = "Patch.S3.ExpiresHours";
+
         // SSO（外部 OIDC 身份源）。任何键未在后台配置时回退到 appsettings/环境变量里的 App:Oidc，
         // 后台改动经 UpdateAsync 即时生效，无需重启。
         public const string OidcEnabled = "Oidc.Enabled";
@@ -117,6 +124,16 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 
     /// <summary>熔断：禁用客户端 Island 注入，经 /Patch/hutao 下发。</summary>
     public bool PatchDisableIslandInjection => GetBool(Keys.PatchDisableIslandInjection, false);
+
+    /// <summary>S3 直链签名：要签名的主机名（如 my-bucket.s3.us-east-1.amazonaws.com）。空 = 不启用。</summary>
+    public string PatchS3Host => GetOrDefault(Keys.PatchS3Host, string.Empty).Trim();
+
+    /// <summary>四项配置齐全才启用签名。</summary>
+    public bool IsPatchS3SigningEnabled =>
+        !string.IsNullOrWhiteSpace(PatchS3Host)
+        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3Region, string.Empty))
+        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty))
+        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty));
 
     public bool RegistrationEnabled => GetBool(Keys.RegistrationEnabled, true);
 

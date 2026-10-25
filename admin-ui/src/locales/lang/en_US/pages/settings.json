@@ -30,6 +30,10 @@
       "killSwitch": {
         "title": "Feature Kill Switches",
         "description": "Emergency-disable injection features on clients, delivered via /Patch/hutao and applied on next client launch; turning a switch off restores user-local settings."
+      },
+      "s3Sign": {
+        "title": "Update Package S3 Presigned URLs",
+        "description": "When a mirror URL matches this host name, /Patch/hutao issues a time-limited presigned URL on the fly before delivery, so the bucket can stay private. Leave empty to disable."
       }
     },
     "fields": {
@@ -128,6 +132,26 @@
       "disableIslandInjection": {
         "label": "Disable Island injection",
         "hint": "Force Island injection off for all clients in the current session"
+      },
+      "s3Host": {
+        "label": "Object host name",
+        "hint": "e.g. my-bucket.s3.us-east-1.amazonaws.com"
+      },
+      "s3Region": {
+        "label": "Region",
+        "hint": "Signing region, e.g. us-east-1"
+      },
+      "s3AccessKeyId": {
+        "label": "AccessKeyId",
+        "hint": "AccessKeyId of the AWS/S3-compatible storage"
+      },
+      "s3SecretAccessKey": {
+        "label": "SecretAccessKey",
+        "hint": "Server-side only (password input)"
+      },
+      "s3ExpiresHours": {
+        "label": "Expires (hours)",
+        "hint": "1-168, 24 recommended"
       }
     },
     "form": {
