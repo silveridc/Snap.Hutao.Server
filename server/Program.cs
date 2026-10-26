@@ -171,7 +171,7 @@ public static class Program
                 config.ScheduleJob<RoleCombatRecordCleanJob>(t => t.StartNow().WithCronSchedule("0 0 4 1 * ?"));
             })
             .AddQuartzHostedService(options => options.WaitForJobsToComplete = true)
-            .AddResponseCompression()
+            //.AddResponseCompression()
 
             .AddScoped<AccessionService>()
             .AddScoped<AnnouncementService>()
@@ -185,11 +185,13 @@ public static class Program
             .AddScoped<RecordService>()
             .AddScoped<SpiralAbyssStatisticsService>()
             .AddScoped<TelemetryService>()
+            .AddScoped<ClientVersionService>()
             .AddScoped<RedeemService>()
             .AddScoped<UserAdminService>()
             .AddScoped<BanService>()
             .AddScoped<AdminQueryService>()
             .AddScoped<AdminSsoService>()
+            .AddScoped<SystemOverviewService>()
             .AddSingleton<OidcMetadata>()
             .AddScoped<ReleaseService>()
             .AddScoped<BingWallpaper>()
@@ -199,6 +201,7 @@ public static class Program
             .AddScoped<ReCaptchaService>()
             .AddScoped<RoleCombatService>()
             .AddScoped<AuditLogActionFilter>()
+            .AddSingleton<ClientVersionTrackFilter>()
             .AddScoped<ValidateCdnPermission>()
             .AddScoped<ValidateGachaLogPermission>()
             .AddScoped<ValidateMaintainPermission>()
@@ -298,7 +301,11 @@ public static class Program
         // Mvc
         services.AddSingleton(TimeProvider.System);
         services
-            .AddControllers(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
+            .AddControllers(options =>
+            {
+                options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+                options.Filters.Add(new ServiceFilterAttribute(typeof(ClientVersionTrackFilter)));
+            })
             .AddJsonOptions(options =>
             {
                 JsonSerializerOptions jsonOptions = options.JsonSerializerOptions;
@@ -340,18 +347,18 @@ public static class Program
         });
         app.UseStaticFiles();
         app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/Public/swagger.json", "PublicApi");
-            options.SwaggerEndpoint("/swagger/Passport/swagger.json", "账户");
-            options.SwaggerEndpoint("/swagger/OAuth/swagger.json", "OAuth");
-            options.SwaggerEndpoint("/swagger/GachaLog/swagger.json", "祈愿记录");
-            options.SwaggerEndpoint("/swagger/SpiralAbyss/swagger.json", "深渊统计");
-            options.SwaggerEndpoint("/swagger/RoleCombat/swagger.json", "剧诗统计");
-            options.SwaggerEndpoint("/swagger/Distribution/swagger.json", "分发管理");
-            options.SwaggerEndpoint("/swagger/Redeem/swagger.json", "兑换码");
-            options.SwaggerEndpoint("/swagger/Services/swagger.json", "服务管理");
-        });
+        //app.UseSwaggerUI(options =>
+        //{
+        //    options.SwaggerEndpoint("/swagger/Public/swagger.json", "PublicApi");
+        //    options.SwaggerEndpoint("/swagger/Passport/swagger.json", "账户");
+        //    options.SwaggerEndpoint("/swagger/OAuth/swagger.json", "OAuth");
+        //    options.SwaggerEndpoint("/swagger/GachaLog/swagger.json", "祈愿记录");
+        //    options.SwaggerEndpoint("/swagger/SpiralAbyss/swagger.json", "深渊统计");
+        //    options.SwaggerEndpoint("/swagger/RoleCombat/swagger.json", "剧诗统计");
+        //    options.SwaggerEndpoint("/swagger/Distribution/swagger.json", "分发管理");
+        //    options.SwaggerEndpoint("/swagger/Redeem/swagger.json", "兑换码");
+        //    options.SwaggerEndpoint("/swagger/Services/swagger.json", "服务管理");
+        //});
 
         // Routes
         // CORS

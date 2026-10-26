@@ -18,6 +18,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
 
     public DbSet<AllowedVersion> AllowedVersions { get; set; } = default!;
 
+    public DbSet<ClientVersion> ClientVersions { get; set; } = default!;
+
     public DbSet<LicenseApplicationRecord> Licenses { get; set; } = default!;
 
     public DbSet<EntityAnnouncement> Announcements { get; set; } = default!;

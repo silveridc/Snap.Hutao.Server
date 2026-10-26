@@ -344,6 +344,28 @@ namespace server.Migrations
                     b.ToTable("announcements");
                 });
 
+            modelBuilder.Entity("server.Models.Entity.ClientVersion", b =>
+                {
+                    b.Property<string>("DeviceId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<long>("FirstSeenAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("LastSeenAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.HasKey("DeviceId");
+
+                    b.ToTable("client_versions");
+                });
+
             modelBuilder.Entity("server.Models.Entity.GachaLog.EntityGachaItem", b =>
                 {
                     b.Property<string>("Uid")
