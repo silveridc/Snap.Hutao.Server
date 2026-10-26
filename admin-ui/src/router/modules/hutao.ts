@@ -8,6 +8,7 @@ import {
   GiftIcon,
   HistoryIcon,
   KeyIcon,
+  LayersIcon,
   NotificationIcon,
   ServerIcon,
   SettingIcon,
@@ -59,5 +60,6 @@ export default [
   single('audit', 'Audit', '审计日志', 'Audit Log', HistoryIcon, 11),
   single('license', 'License', '开源许可证', 'License', CertificateIcon, 12),
   single('adminaccount', 'AdminAccount', '后台账号', 'Admin Accounts', KeyIcon, 13),
+  single('clientversion', 'ClientVersion', '版本统计', 'Client Versions', LayersIcon, 14),
   single('settings', 'Settings', '系统设置', 'Settings', SettingIcon, 99),
 ] satisfies RouteRecordRaw[];

@@ -168,23 +168,6 @@ onMounted(load);
 
 <template>
   <div class="hutao-page">
-    <t-card :bordered="false" class="hutao-card header-card">
-      <t-space align="center" style="width: 100%; justify-content: space-between">
-        <div>
-          <h3 style="margin: 0">{{ $t('pages.settings.header.title') }}</h3>
-          <p class="tip" style="margin: 4px 0 0">
-            {{ $t('pages.settings.header.tip') }}
-          </p>
-        </div>
-        <t-space>
-          <t-button variant="outline" :loading="loading" @click="load">{{ $t('pages.settings.header.reload') }}</t-button>
-          <t-button theme="primary" :loading="saving" :disabled="!getDirtyKeys().length" @click="save">
-            {{ $t('pages.settings.header.saveBtn', { n: getDirtyKeys().length }) }}
-          </t-button>
-        </t-space>
-      </t-space>
-    </t-card>
-
     <t-loading :loading="loading" show-overlay>
       <t-card
         v-for="section in CONFIG_SECTIONS"
@@ -196,40 +179,44 @@ onMounted(load);
         <template #subtitle>
           <span class="section-desc">{{ section.description }}</span>
         </template>
-        <t-form label-align="left" label-width="140px">
-          <t-row :gutter="16">
-            <t-col v-for="field in section.fields" :key="field.key" :span="field.type === 'switch' ? 4 : 6">
-              <t-form-item :label="field.label" :help="field.hint">
-                <template v-if="field.type === 'switch'">
-                  <t-switch v-model="form[field.key]" />
-                </template>
-                <template v-else>
-                  <t-space align="center" style="width: 100%">
-                    <t-input
-                      v-model="form[field.key]"
-                      :type="field.type === 'password' ? 'password' : 'text'"
-                      :placeholder="$t('pages.settings.form.emptyPlaceholder')"
-                      clearable
-                      style="max-width: 360px"
-                    />
-                    <t-tooltip :content="$t('pages.settings.form.resetTooltip')">
-                      <t-button
-                        variant="text"
-                        size="small"
-                        theme="default"
-                        @click="resetField(field.key)"
-                      >
-                        {{ $t('pages.settings.form.reset') }}
-                      </t-button>
-                    </t-tooltip>
-                  </t-space>
-                </template>
-              </t-form-item>
-            </t-col>
-          </t-row>
-        </t-form>
+        <div class="field-grid">
+          <div v-for="field in section.fields" :key="field.key" class="field">
+            <div class="field-label">{{ field.label }}</div>
+            <div class="field-control">
+              <t-switch v-if="field.type === 'switch'" v-model="form[field.key]" />
+              <template v-else>
+                <t-input
+                  v-model="form[field.key]"
+                  class="field-input"
+                  :type="field.type === 'password' ? 'password' : 'text'"
+                  :placeholder="$t('pages.settings.form.emptyPlaceholder')"
+                  clearable
+                />
+                <t-tooltip :content="$t('pages.settings.form.resetTooltip')">
+                  <t-button variant="text" size="small" theme="default" @click="resetField(field.key)">
+                    {{ $t('pages.settings.form.reset') }}
+                  </t-button>
+                </t-tooltip>
+              </template>
+            </div>
+            <div v-if="field.hint" class="field-hint">{{ field.hint }}</div>
+          </div>
+        </div>
       </t-card>
     </t-loading>
+
+    <div class="action-bar">
+      <div class="action-text">
+        <span class="action-title">{{ $t('pages.settings.header.title') }}</span>
+        <span class="tip">{{ $t('pages.settings.header.tip') }}</span>
+      </div>
+      <t-space>
+        <t-button variant="outline" :loading="loading" @click="load">{{ $t('pages.settings.header.reload') }}</t-button>
+        <t-button theme="primary" :loading="saving" :disabled="!getDirtyKeys().length" @click="save">
+          {{ $t('pages.settings.header.saveBtn', { n: getDirtyKeys().length }) }}
+        </t-button>
+      </t-space>
+    </div>
   </div>
 </template>
 
@@ -237,17 +224,73 @@ onMounted(load);
 .hutao-card {
   margin-bottom: 16px;
 }
-.header-card {
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 32px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.field-label {
+  color: var(--td-text-color-primary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.field-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+.field-input {
+  flex: 1;
+  min-width: 0;
+}
+.field-hint {
+  color: var(--td-text-color-placeholder);
+  font-size: 12px;
+  line-height: 18px;
+}
+.action-bar {
   position: sticky;
-  top: 0;
+  bottom: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 24px;
+  background: var(--td-bg-color-container);
+  border-radius: var(--td-radius-medium);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 10%);
+}
+.action-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.action-title {
+  color: var(--td-text-color-primary);
+  font-size: 15px;
+  font-weight: 600;
 }
 .tip {
   color: var(--td-text-color-secondary);
-  font-size: 13px;
+  font-size: 12px;
 }
 .section-desc {
   color: var(--td-text-color-placeholder);
   font-size: 12px;
+}
+@media (width <= 1100px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

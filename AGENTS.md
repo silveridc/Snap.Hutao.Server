@@ -13,16 +13,18 @@ Backend (run from `server/server`):
 - Run (Development): `dotnet run` — uses `appsettings.Development.json` (local MySQL at 127.0.0.1, local Redis)
 - Add migration: `dotnet ef migrations add <Name> --context AppDbContext`
 
-Frontend (run from `admin-ui`, Node >= 22.12):
-- Dev server: `npm run dev` — port 5173, proxies backend API prefixes to the production host (`vite.config.ts`)
-- Build: `npm run build` — outputs to `../server/wwwroot/admin`
+Frontend (run from `admin-ui`, Node >= 22.12, package manager is **pnpm** — CI installs with `pnpm install --frozen-lockfile`):
+- Dev server: `pnpm dev` — port 5173, proxies backend API prefixes to the production host (`vite.config.ts`)
+- Build: `pnpm build` — outputs to `../server/wwwroot/admin`
 - API smoke test: `node scripts/api-smoke.mjs`
+- Sentry: the panel reports to the self-hosted instance (`VITE_SENTRY_DSN` in `.env`, cleared in `.env.development`). The build emits **hidden** sourcemaps and, when `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` are all set in the environment, `@sentry/vite-plugin` uploads them and deletes them from the output — without those three the build skips the upload and leaves the maps on disk.
 
-Tests (`dotnet test` from the repo root or `tests/server.Tests`; ~15s):
+Tests (~15s). `dotnet test` does **not** work on SDK 10.0.4xx: xunit.v3 ships Microsoft.Testing.Platform, which refuses the VSTest host (`Testing with VSTest target is no longer supported`). Build, then run the test binary directly:
+`dotnet build tests/server.Tests/server.Tests.csproj -c Debug && ./tests/server.Tests/bin/Debug/net10.0/server.Tests.exe`
 - Requires a **local MySQL** the runner can create/drop databases on. Redis is *not* needed — `HutaoServerFactory` starts an in-process Garnet server. Everything else is self-contained: fake SMTP on port 25 (MailKit's default dial), all outbound `HttpClient` traffic routed to `StubHttpMessageHandler` (unmapped URLs return 502), Sentry/OpenTelemetry/Quartz disabled.
 - Overrides: `HUTAO_TEST_MYSQL_ADMIN` (admin connection, defaults to `root` on 127.0.0.1), `HUTAO_TEST_MYSQL` (test database connection, default db `snaphutao_test`), `HUTAO_TEST_SMTP_PORT`. The database is dropped and re-migrated per run, so a failed run leaves no state.
-- Single class / single test: `dotnet test --filter "FullyQualifiedName~OAuthTests"`.
-- Layout: `ApiSmokeTests` hits every registered route once and only asserts "no 500 + a well-formed envelope", so per-endpoint semantics live in `ClientFlowTests` (spiral abyss / role combat / gacha log sync / CDN / crash logs / license), `PassportV2Tests`, `OAuthTests`, `WebhookTests`, `ServiceTests`. Shared fixtures are under `Infrastructure/` (`HutaoServerFactory` = the collection host, `TestData` = request bodies that pass server-side validation, `StubHttpMessageHandler` = last-registered-rule-wins, `TestUsers` = seeded accounts).
+- Single class / single test: `-class server.Tests.OAuthTests` / `-method server.Tests.OAuthTests.<Name>` (the runner's `--help` lists the rest).
+- Layout: `ApiSmokeTests` hits every registered route once and only asserts "no 500 + a well-formed envelope", so per-endpoint semantics live in `ClientFlowTests` (spiral abyss / role combat / gacha log sync / CDN / crash logs / license / client version tracking), `PassportV2Tests`, `OAuthTests`, `WebhookTests`, `ServiceTests`. Shared fixtures are under `Infrastructure/` (`HutaoServerFactory` = the collection host, `TestData` = request bodies that pass server-side validation, `StubHttpMessageHandler` = last-registered-rule-wins, `TestUsers` = seeded accounts).
 - **Route coverage is enforced.** `ApiSmokeTests.EveryRegisteredRoute_IsListedInTheSmokeTables` enumerates the live endpoint table and requires every registered route to appear in `ApiSmokeTests.Endpoints` (public/client routes) or `Infrastructure.ServiceEndpoints` (`/Service/*`), and every listed URL to still resolve. Adding a controller action without a smoke row fails the suite — add the row.
 - The test host needs `App/RSAPrivateKey`; the project links the local `server/privkey.key` into its output. Test-only config (OAuth AES key, GitHub client id/secret, SMTP credentials) is set inside `HutaoServerFactory.ConfigureWebHost`.
 
