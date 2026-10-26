@@ -20,6 +20,9 @@ public sealed class AppOptions
 
     public byte[] OAuthStateEncryptKey { get; set; } = default!;
 
+    /// <summary>默认管理员的用户 Id，任何账号都不能将其降级。为 0 表示未配置，不做限制。</summary>
+    public int DefaultAdminUserId { get; set; }
+
     public SocketOptions Socket { get; set; } = default!;
 
     public RealIpOptions RealIp { get; set; } = default!;

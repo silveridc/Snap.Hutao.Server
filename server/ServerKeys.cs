@@ -84,7 +84,9 @@ public static class ServerKeys
     public const string ServerAdminBanSucceed = "ServerAdminBanSucceed";
     public const string ServerAdminCacheInvalidationSucceed = "ServerAdminCacheInvalidationSucceed";
     public const string ServerAdminCacheKeysSucceed = "ServerAdminCacheKeysSucceed";
+    public const string ServerAdminCannotDemoteDefaultAdmin = "ServerAdminCannotDemoteDefaultAdmin";
     public const string ServerAdminCannotRevokeOwnMaintainer = "ServerAdminCannotRevokeOwnMaintainer";
+    public const string ServerAdminClientVersionListSucceed = "ServerAdminClientVersionListSucceed";
     public const string ServerAdminConfigGetSucceed = "ServerAdminConfigGetSucceed";
     public const string ServerAdminConfigKeyRequired = "ServerAdminConfigKeyRequired";
     public const string ServerAdminConfigNotFound = "ServerAdminConfigNotFound";
@@ -127,6 +129,7 @@ public static class ServerKeys
     public const string ServerAdminSsoNotEnabled = "ServerAdminSsoNotEnabled";
     public const string ServerAdminSsoTicketInvalid = "ServerAdminSsoTicketInvalid";
     public const string ServerAdminSsoUpstreamFailed = "ServerAdminSsoUpstreamFailed";
+    public const string ServerAdminSystemOverviewSucceed = "ServerAdminSystemOverviewSucceed";
     public const string ServerAdminUnbanNotInList = "ServerAdminUnbanNotInList";
     public const string ServerAdminUnbanSucceed = "ServerAdminUnbanSucceed";
     public const string ServerAdminUpdatePrivilegeSucceed = "ServerAdminUpdatePrivilegeSucceed";

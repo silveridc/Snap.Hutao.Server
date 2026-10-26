@@ -20,6 +20,7 @@
     "ServerAdminCacheInvalidationSucceed": "缓存失效操作成功",
     "ServerAdminCacheKeysSucceed": "获取缓存键成功",
     "ServerAdminCannotRevokeOwnMaintainer": "不能取消自己的维护者权限",
+    "ServerAdminClientVersionListSucceed": "获取客户端版本统计成功",
     "ServerAdminConfigGetSucceed": "获取配置成功",
     "ServerAdminConfigKeyRequired": "配置键不能为空",
     "ServerAdminConfigNotFound": "该配置项不存在",
@@ -66,6 +67,7 @@
     "ServerAdminUserNameNotFound": "用户名不存在",
     "ServerAdminUserNotFound": "用户不存在",
     "ServerAdminUserStatisticsSucceed": "获取用户统计成功",
+    "ServerAdminWriteRequiresSso": "启用单点登录后，只有后台专属账号可以修改数据",
     "ServerAnnouncementGetSucceed": "获取公告成功",
     "ServerAnnouncementUploadSucceed": "上传公告成功",
     "ServerCdnDownloadTokenFailed": "获取下载令牌失败",
@@ -112,6 +114,8 @@
     "ServerPassportServiceInternalException": "注册失败，服务器异常，请尽快联系开发者解决",
     "ServerPassportServiceUnregisterPasswordIncorrect": "密码错误，注销失败",
     "ServerPassportServiceUnregisterUserNotFound": "用户不存在，注销失败",
+    "ServerPassportSsoNotEnabled": "服务器未开启单点登录",
+    "ServerPassportSsoTicketInvalid": "登录凭证已失效，请重新登录",
     "ServerPassportTokenRefreshSucceed": "令牌刷新成功",
     "ServerPassportTokenRevokeFailed": "令牌撤销失败",
     "ServerPassportTokenRevokeSuccess": "令牌撤销成功",
@@ -164,7 +168,6 @@
     "ServerAdminSsoUpstreamFailed": "身份源不可用，请稍后重试或改用账号密码登录",
     "ServerAdminSsoTicketInvalid": "登录票据无效或已过期，请重新发起单点登录",
     "ServerAdminSsoLoginSucceed": "后台单点登录成功",
-    "ServerAdminWriteRequiresSso": "启用单点登录后，只有后台专属账号可以修改数据",
     "ServerAdminAccountListSucceed": "后台账号清单获取成功",
     "ServerAdminAccountAddSucceed": "后台账号已添加",
     "ServerAdminAccountSubjectRequired": "身份主体标识无效（为空或过长）",
@@ -173,6 +176,14 @@
     "ServerAdminAccountSelfOperation": "不能停用或删除正在使用的后台账号",
     "ServerAdminAccountLastEnabled": "至少要保留一个可用的后台账号",
     "ServerAdminAccountSetEnabledSucceed": "后台账号状态已更新",
-    "ServerAdminAccountRemoveSucceed": "后台账号已删除"
+    "ServerAdminAccountRemoveSucceed": "后台账号已删除",
+    "ServerAdminAccountBindSucceed": "已绑定主站账号",
+    "ServerAdminAccountUnbindSucceed": "已解绑主站账号",
+    "ServerAdminAccountUserNotFound": "要绑定的主站账号不存在",
+    "ServerAdminAccountUserRequired": "请选择要绑定的主站账号",
+    "ServerAdminAccountUserTaken": "该主站账号已被其他后台账号绑定",
+    "ServerAdminAccountUserUnbound": "该后台账号未绑定主站账号",
+    "ServerAdminCannotDemoteDefaultAdmin": "默认管理员不能被降级",
+    "ServerAdminSystemOverviewSucceed": "获取系统概览成功"
   }
 }

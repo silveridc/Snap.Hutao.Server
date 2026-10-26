@@ -20,6 +20,7 @@
     "ServerAdminCacheInvalidationSucceed": "Cache invalidation succeeded",
     "ServerAdminCacheKeysSucceed": "Cache keys acquired successfully",
     "ServerAdminCannotRevokeOwnMaintainer": "You cannot revoke your own maintainer privilege",
+    "ServerAdminClientVersionListSucceed": "Client version statistics acquired successfully",
     "ServerAdminConfigGetSucceed": "Configuration retrieved successfully",
     "ServerAdminConfigKeyRequired": "Configuration key must not be empty",
     "ServerAdminConfigNotFound": "Configuration setting does not exist",
@@ -66,6 +67,7 @@
     "ServerAdminUserNameNotFound": "User name does not exist",
     "ServerAdminUserNotFound": "User does not exist",
     "ServerAdminUserStatisticsSucceed": "User statistics acquired successfully",
+    "ServerAdminWriteRequiresSso": "Only SSO admin accounts can modify data",
     "ServerAnnouncementGetSucceed": "Announcements acquired successfully",
     "ServerAnnouncementUploadSucceed": "Announcement uploaded successfully",
     "ServerCdnDownloadTokenFailed": "Failed to acquire download token",
@@ -112,6 +114,8 @@
     "ServerPassportServiceInternalException": "Register failed, server error, please contact developer to fix it",
     "ServerPassportServiceUnregisterPasswordIncorrect": "Incorrect password, logout failed",
     "ServerPassportServiceUnregisterUserNotFound": "User does not exist, failed to delete account",
+    "ServerPassportSsoNotEnabled": "Single sign-on is not enabled on the server",
+    "ServerPassportSsoTicketInvalid": "The login ticket is invalid or has expired, please sign in again",
     "ServerPassportTokenRefreshSucceed": "Token refreshed successfully",
     "ServerPassportTokenRevokeFailed": "Token revocation failed",
     "ServerPassportTokenRevokeSuccess": "Token revoked successfully",
@@ -164,7 +168,6 @@
     "ServerAdminSsoUpstreamFailed": "The identity provider is unavailable, please retry later",
     "ServerAdminSsoTicketInvalid": "The login ticket is invalid or has expired",
     "ServerAdminSsoLoginSucceed": "Admin SSO login succeeded",
-    "ServerAdminWriteRequiresSso": "Only SSO admin accounts can modify data",
     "ServerAdminAccountListSucceed": "Admin account list acquired successfully",
     "ServerAdminAccountAddSucceed": "Admin account added successfully",
     "ServerAdminAccountSubjectRequired": "The identity subject is invalid",
@@ -173,6 +176,14 @@
     "ServerAdminAccountSelfOperation": "You cannot disable or remove the admin account you are using",
     "ServerAdminAccountLastEnabled": "At least one enabled admin account must remain",
     "ServerAdminAccountSetEnabledSucceed": "Admin account state updated successfully",
-    "ServerAdminAccountRemoveSucceed": "Admin account removed successfully"
+    "ServerAdminAccountRemoveSucceed": "Admin account removed successfully",
+    "ServerAdminAccountBindSucceed": "Admin account bound successfully",
+    "ServerAdminAccountUnbindSucceed": "Admin account unbound successfully",
+    "ServerAdminAccountUserNotFound": "The Hutao account does not exist",
+    "ServerAdminAccountUserRequired": "The Hutao account is required",
+    "ServerAdminAccountUserTaken": "This Hutao account is already bound to another admin account",
+    "ServerAdminAccountUserUnbound": "This admin account is not bound to a Hutao account",
+    "ServerAdminCannotDemoteDefaultAdmin": "The default administrator cannot be demoted",
+    "ServerAdminSystemOverviewSucceed": "System overview acquired successfully"
   }
 }

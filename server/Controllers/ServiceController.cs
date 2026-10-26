@@ -32,7 +32,10 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     private readonly AccessionService _accessionService = serviceProvider.GetRequiredService<AccessionService>();
     private readonly IRankService _rankService = serviceProvider.GetRequiredService<IRankService>();
     private readonly YaeMetadataService _yaeMetadataService = serviceProvider.GetRequiredService<YaeMetadataService>();
+    private readonly ClientVersionService _clientVersionService = serviceProvider.GetRequiredService<ClientVersionService>();
+    private readonly SystemOverviewService _systemOverviewService = serviceProvider.GetRequiredService<SystemOverviewService>();
     private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
+    private readonly AppOptions _appOptions = serviceProvider.GetRequiredService<AppOptions>();
 
     /// <summary>
     /// 手动触发深渊统计数据刷新。
@@ -165,6 +168,18 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     }
 
     /// <summary>
+    /// 获取服务端运行状态概览（进程与机器、资源占用、数据库连接、Redis、Quartz 调度）。
+    /// </summary>
+    /// <param name="cancellationToken">请求取消令牌。</param>
+    /// <returns>系统概览数据。</returns>
+    [HttpGet("System/Overview")]
+    public async Task<IActionResult> SystemOverviewAsync(CancellationToken cancellationToken)
+    {
+        SystemOverview overview = await _systemOverviewService.GetOverviewAsync(cancellationToken).ConfigureAwait(false);
+        return Success<SystemOverview>("System overview acquired successfully", overview, ServerKeys.ServerAdminSystemOverviewSucceed);
+    }
+
+    /// <summary>
     /// 获取用户数据统计概览（总数、维护者、各服务在期人数、数据量等）。
     /// </summary>
     /// <returns>用户统计数据。</returns>
@@ -173,6 +188,17 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     {
         UserStatistics statistics = await _userAdminService.GetStatisticsAsync().ConfigureAwait(false);
         return Success<UserStatistics>("User statistics acquired successfully", statistics, ServerKeys.ServerAdminUserStatisticsSucceed);
+    }
+
+    /// <summary>
+    /// 获取胡桃客户端版本分布（每个版本在册的设备数、首次与最近上报时间）。
+    /// </summary>
+    /// <returns>客户端版本统计数据。</returns>
+    [HttpGet("ClientVersion/List")]
+    public async Task<IActionResult> ClientVersionListAsync()
+    {
+        ClientVersionStatistics statistics = await _clientVersionService.GetStatisticsAsync().ConfigureAwait(false);
+        return Success<ClientVersionStatistics>("Client version statistics acquired successfully", statistics, ServerKeys.ServerAdminClientVersionListSucceed);
     }
 
     /// <summary>
@@ -204,6 +230,13 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
         if (this.TryGetUserId(out int currentUserId) && request.UserId == currentUserId && request.IsMaintainer is false)
         {
             return Fail("You cannot revoke your own maintainer privilege", ReturnCode.ServiceKeyInvalid, ServerKeys.ServerAdminCannotRevokeOwnMaintainer);
+        }
+
+        // appsettings.json 里配置的默认管理员由服务端兜底保护，任何维护者都不能降级它，
+        // 否则后台权限可能被一次性摘干净、再也无法恢复
+        if (_appOptions.DefaultAdminUserId > 0 && request.UserId == _appOptions.DefaultAdminUserId && request.IsMaintainer is false)
+        {
+            return Fail("The default administrator cannot be demoted", ReturnCode.ServiceKeyInvalid, ServerKeys.ServerAdminCannotDemoteDefaultAdmin);
         }
 
         bool found = await _userAdminService.UpdatePrivilegeAsync(request.UserId, request.IsMaintainer, request.IsLicensedDeveloper).ConfigureAwait(false);

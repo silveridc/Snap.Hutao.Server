@@ -51,8 +51,8 @@ enOut.server.requestFailed = 'Request failed';
 enOut.server.httpError = 'Service error (HTTP {code})';
 enOut.server.networkError = 'Network error, please check your connection';
 
-// 后台单点登录与后台账号相关的键在 launcher 的 SH.resx 里不存在（客户端用不到），文案由本脚本维护
-const adminSsoOnly = {
+// 后台独有的键在 launcher 的 SH.resx 里不存在（客户端用不到），文案由本脚本维护
+const adminOnly = {
   ServerAdminSsoNotEnabled: ['后台未启用单点登录', 'Admin SSO is not enabled'],
   ServerAdminSsoUpstreamFailed: ['身份源不可用，请稍后重试或改用账号密码登录', 'The identity provider is unavailable, please retry later'],
   ServerAdminSsoTicketInvalid: ['登录票据无效或已过期，请重新发起单点登录', 'The login ticket is invalid or has expired'],
@@ -67,8 +67,16 @@ const adminSsoOnly = {
   ServerAdminAccountLastEnabled: ['至少要保留一个可用的后台账号', 'At least one enabled admin account must remain'],
   ServerAdminAccountSetEnabledSucceed: ['后台账号状态已更新', 'Admin account state updated successfully'],
   ServerAdminAccountRemoveSucceed: ['后台账号已删除', 'Admin account removed successfully'],
+  ServerAdminAccountBindSucceed: ['已绑定主站账号', 'Admin account bound successfully'],
+  ServerAdminAccountUnbindSucceed: ['已解绑主站账号', 'Admin account unbound successfully'],
+  ServerAdminAccountUserNotFound: ['要绑定的主站账号不存在', 'The Hutao account does not exist'],
+  ServerAdminAccountUserRequired: ['请选择要绑定的主站账号', 'The Hutao account is required'],
+  ServerAdminAccountUserTaken: ['该主站账号已被其他后台账号绑定', 'This Hutao account is already bound to another admin account'],
+  ServerAdminAccountUserUnbound: ['该后台账号未绑定主站账号', 'This admin account is not bound to a Hutao account'],
+  ServerAdminCannotDemoteDefaultAdmin: ['默认管理员不能被降级', 'The default administrator cannot be demoted'],
+  ServerAdminSystemOverviewSucceed: ['获取系统概览成功', 'System overview acquired successfully'],
 };
-for (const [key, [zhText, enText]] of Object.entries(adminSsoOnly)) {
+for (const [key, [zhText, enText]] of Object.entries(adminOnly)) {
   zhOut.server[key] = zhText;
   enOut.server[key] = enText;
 }
