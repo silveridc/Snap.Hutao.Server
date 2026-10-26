@@ -52,6 +52,16 @@ export function getUserStatistics() {
   return http.get('/api/Service/User/Statistics')
 }
 
+// 获取服务端运行状态概览（运行时/资源/数据库/Redis/定时任务）
+export function getSystemOverview() {
+  return http.get('/api/Service/System/Overview')
+}
+
+// 获取胡桃客户端版本分布（按版本汇总在册设备数）
+export function getClientVersionList() {
+  return http.get('/api/Service/ClientVersion/List')
+}
+
 // 分页获取用户列表
 export function getUserList(page = 1, pageSize = 20, keyword = '', filters = {}) {
   return http.get('/api/Service/User/List', { params: { page, pageSize, keyword, ...filters } })
