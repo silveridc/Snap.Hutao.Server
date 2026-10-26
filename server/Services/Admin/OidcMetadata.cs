@@ -4,12 +4,6 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace server.Services.Admin;
 
-/// <summary>
-/// OIDC 发现文档与签名密钥的进程内缓存。
-/// <see cref="ConfigurationManager{T}"/> 自带定时刷新，并在遇到未知 kid 时立即重取，
-/// 因此按 Authority+RequireHttps 键控缓存复用。SSO 配置来自后台（SystemConfigService，
-/// App:Oidc 兜底），Authority 改动后下一次取元数据自动按新地址重建，无需重启。
-/// </summary>
 public sealed class OidcMetadata(IHttpClientFactory httpClientFactory, SystemConfigService systemConfig)
 {
     private readonly ConcurrentDictionary<string, ConfigurationManager<OpenIdConnectConfiguration>> _managers =

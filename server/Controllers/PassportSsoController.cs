@@ -5,18 +5,6 @@ using server.Services.Admin;
 
 namespace server.Controllers;
 
-/// <summary>
-/// 启动器（客户端）的单点登录接口。四个地址都不需要登录态，也不返回任何密钥信息：
-/// <list type="bullet">
-/// <item><c>GET /Passport/Sso/Status</c>：启动器询问服务器是否支持单点登录，据此决定显示哪个登录入口；</item>
-/// <item><c>GET /Passport/Sso/Challenge</c>：302 跳到身份源（带 PKCE 与 state）；</item>
-/// <item><c>GET /Passport/Sso/Callback</c>：身份源回跳到这里，处理后用 302 把结果带回启动器拦截的哨兵地址；</item>
-/// <item><c>POST /Passport/Sso/Exchange</c>：用一次性票据换取主站令牌。</item>
-/// </list>
-/// 与后台登录共用同一套协议实现，但落地的身份不同：这里换到的是<b>主站账号令牌</b>（含刷新令牌，
-/// 与邮箱密码登录完全同构），启动器的其它代码不需要知道登录是怎么来的。
-/// 能不能登录由后台专属账号表决定，且该账号必须已绑定一个主站账号。
-/// </summary>
 [ApiController]
 [Route("Passport/Sso")]
 [ApiExplorerSettings(GroupName = "Passport")]

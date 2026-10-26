@@ -3,12 +3,6 @@ using System.Net;
 
 namespace server.Tests;
 
-/// <summary>
-/// Yae 成就注入配置：把 bucket 的 protobuf 转成启动器契约的过程。
-/// 断言集中在两件事上——chinese/oversea 是否按 exe 指纹对号，以及响应体的键名
-/// 是否与 <c>Snap.Hutao.Service.Yae.Achievement</c> 的 required 成员完全一致
-/// （少一个键或多一个键都会让客户端整体反序列化失败）。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class YaeTests
 {
@@ -222,7 +216,6 @@ public sealed class YaeTests
         return TestResponse.Parse(body);
     }
 
-    /// <summary>proto3 wire format 的最小写入器，只用于造测试数据。</summary>
     private sealed class ProtoBuilder
     {
         private readonly List<byte> bytes = [];

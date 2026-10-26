@@ -1,8 +1,5 @@
 namespace server.Extension;
 
-/// <summary>
-/// <see cref="IDistributedCache"/> 的类型化扩展，使用 JSON 序列化承载对象。
-/// </summary>
 public static class DistributedCacheExtension
 {
     /// <summary>

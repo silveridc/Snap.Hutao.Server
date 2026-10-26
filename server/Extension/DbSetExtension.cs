@@ -3,9 +3,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace server.Extension;
 
-/// <summary>
-/// 数据库集合扩展
-/// </summary>
 internal static class DbSetExtension
 {
     public static int AddAndSave<TEntity>(this DbSet<TEntity> dbSet, TEntity entity)

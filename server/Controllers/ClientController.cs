@@ -2,11 +2,6 @@
 
 namespace server.Controllers;
 
-/// <summary>
-/// 启动器的功能配置接口，路径与 <c>Snap.Hutao.Web.Endpoint.Hutao.IInfrastructureFeatureEndpoints</c>
-/// 一致：<c>{root}/client/{FeatureName}_{版本}.json</c>。
-/// 这里返回裸 JSON 对象，不带 <c>retcode</c> 信封——客户端把响应体直接反序列化成对应的模型。
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [ApiExplorerSettings(IgnoreApi = true)]

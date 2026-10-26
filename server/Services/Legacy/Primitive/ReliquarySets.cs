@@ -1,8 +1,5 @@
 ﻿namespace server.Services.Legacy.Primitive;
 
-/// <summary>
-/// 圣遗物套装
-/// </summary>
 public readonly struct ReliquarySets(string value) : IEquatable<ReliquarySets>
 {
     /// <summary>

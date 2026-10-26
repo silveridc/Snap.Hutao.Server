@@ -3,22 +3,11 @@ using server.Services.Admin;
 
 namespace server.Controllers;
 
-/// <summary>
-/// 后台单点登录接口。四个地址都不需要登录态，也不返回任何密钥信息：
-/// <list type="bullet">
-/// <item><c>GET /Admin/Sso/Status</c>：登录页询问是否显示 SSO 入口；</item>
-/// <item><c>GET /Admin/Sso/Challenge</c>：生成跳转身份源的授权地址（带 PKCE 与 state）；</item>
-/// <item><c>GET /Admin/Sso/Callback</c>：身份源回跳到这里，处理后用 302 把结果带回后台的 <c>/admin/#/sso</c>；</item>
-/// <item><c>POST /Admin/Sso/Exchange</c>：用一次性票据换取后台令牌。</item>
-/// </list>
-/// 票据与令牌都放在地址的 hash 片段或请求体里，服务端访问日志抓不到凭证。
-/// </summary>
 [ApiController]
 [Route("Admin/Sso")]
 [ApiExplorerSettings(GroupName = "Services")]
 public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<AdminSsoController> logger) : ControllerBase
 {
-    /// <summary>后台的单点登录回跳页（hash 路由）。</summary>
     private const string _callbackPage = "/admin/#/sso";
 
     /// <summary>

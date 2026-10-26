@@ -1,8 +1,5 @@
 ﻿namespace server.Services.Legacy.Primitive;
 
-/// <summary>
-/// 命座
-/// </summary>
 public readonly struct Constellation(int value) : IEquatable<Constellation>
 {
     /// <summary>

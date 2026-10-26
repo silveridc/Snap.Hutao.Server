@@ -3,11 +3,6 @@ using server.Extension;
 
 namespace server.Services.Expire;
 
-/// <summary>
-/// <see cref="IExpireService"/> 的共享实现：三个方法对 CDN 与抽卡日志完全同构，
-/// 只有「到期字段」不同。过去两个服务各抄一份，时钟 bug 要修两遍、以后每个 bug 都要修两遍——收口到这里。
-/// 内存读写走 Get/Set 委托；批量 SQL 路径用 <see cref="ExpireAtSelector"/> 组合表达式交给 EF 翻译。
-/// </summary>
 public abstract class ExpireServiceBase(IServiceProvider serviceProvider, TimeProvider timeProvider) : IExpireService
 {
     /// <summary>EF 翻译用的到期字段选择器（如 u =&gt; u.CdnExpireAt）。</summary>

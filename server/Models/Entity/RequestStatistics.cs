@@ -1,8 +1,5 @@
 ﻿namespace server.Models.Entity;
 
-/// <summary>
-/// 请求统计
-/// </summary>
 [Table("request_statistics")]
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public class RequestStatistics

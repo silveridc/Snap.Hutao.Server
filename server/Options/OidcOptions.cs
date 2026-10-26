@@ -1,9 +1,5 @@
 ﻿namespace server.Options;
 
-/// <summary>
-/// 单点登录（外部 OIDC 身份源）配置。未开启时后台沿用主站维护者账号登录，且不做写操作门禁；
-/// 启动器侧另由 <see cref="ClientRedirectUri"/> 决定是否开放。
-/// </summary>
 public sealed class OidcOptions
 {
     /// <summary>总开关。关闭时 <c>/Admin/Sso/*</c> 只返回未启用，写门禁对所有身份放行。</summary>

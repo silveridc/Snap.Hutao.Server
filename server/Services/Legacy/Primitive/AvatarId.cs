@@ -1,8 +1,5 @@
 ﻿namespace server.Services.Legacy.Primitive;
 
-/// <summary>
-/// 角色Id
-/// </summary>
 public readonly struct AvatarId(int value) : IEquatable<AvatarId>
 {
     /// <summary>

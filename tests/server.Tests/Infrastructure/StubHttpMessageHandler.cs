@@ -2,10 +2,6 @@ using System.Net;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>
-/// 拦截被测服务对外部网络（enka、Bing、HoYoPlay、reCAPTCHA、GitHub、CDN）的调用，
-/// 使测试不依赖外网且结果可复现；未登记的地址返回 502，避免用例意外打到真实站点。
-/// </summary>
 public sealed class StubHttpMessageHandler : HttpMessageHandler
 {
     private readonly List<Rule> rules = [];

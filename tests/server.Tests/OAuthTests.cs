@@ -6,10 +6,6 @@ using System.Net;
 
 namespace server.Tests;
 
-/// <summary>
-/// <c>/OAuth/*</c> 第三方登录与绑定接口。GitHub 侧的令牌交换与用户信息
-/// 由 <see cref="StubHttpMessageHandler"/> 提供，state 参数按服务端同样的 AES 规则构造。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class OAuthTests
 {

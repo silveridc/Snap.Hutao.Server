@@ -3,11 +3,6 @@ using System.Net;
 
 namespace server.Tests;
 
-/// <summary>
-/// 全量接口冒烟：遍历所有已注册的 HTTP 路由，用合法入参确认没有接口返回 500，
-/// 且除第三方透传接口外都返回 Snap Hutao 统一响应外壳。
-/// 逐个接口的语义断言见其余测试类。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class ApiSmokeTests
 {

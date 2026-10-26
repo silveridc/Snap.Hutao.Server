@@ -9,7 +9,6 @@ using server.Services.Legacy;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>构造满足服务端校验规则的请求体。</summary>
 public static class TestData
 {
     /// <summary>

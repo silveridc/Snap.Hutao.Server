@@ -2,11 +2,6 @@ using System.Security.Cryptography;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>
-/// OAuth 授权状态（<c>/OAuth/Auth</c> 产生的 state 参数）在服务端以 AES-CBC 加密，
-/// 密钥来自 <c>App:OAuthStateEncryptKey</c>。测试宿主把该密钥固定为 32 字节的
-/// <c>i * 7 + 1</c>，这里用同样的算法构造合法 state，以便走通回调分支。
-/// </summary>
 public static class TestOAuthState
 {
     private static readonly byte[] Key = CreateKey();

@@ -5,12 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace server.Tests;
 
-/// <summary>
-/// FiniteDouble/SingleJsonConverter 的读写语义与边界值。
-/// 该转换器要兜两类历史形态：库里以字符串字面量存的 "Infinity"/"NaN"（写入侧修复前的除零产物），
-/// 和运行时真实的非有限 double（缓存反序列化回来的值）。写侧一律归零——JSON 标准没有这两个字面量，
-/// MVC 默认 options 遇到会直接抛（/Statistics/Overview 稳定 500 的根因）。
-/// </summary>
 public sealed class FiniteNumberJsonConverterTests
 {
     /// <summary>与 SpiralAbyssStatisticsService/DistributedCacheExtension 一致的存储侧 options，

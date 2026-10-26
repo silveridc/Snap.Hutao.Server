@@ -3,11 +3,6 @@ using server.Models.Yae;
 
 namespace server.Services.Yae;
 
-/// <summary>
-/// 把 Yae 的 <c>schicksal/metadata</c>（AchievementInfo.proto 的 wire 数据）解成启动器的
-/// <c>/client/AchievementFieldId_{version}.json</c> 响应体。纯函数，不碰网络也不碰数据库，
-/// 便于单独核对字段号与键名的对应关系。
-/// </summary>
 public static class YaeBucketDecoder
 {
     // AchievementInfo.proto 的字段号
@@ -25,7 +20,6 @@ public static class YaeBucketDecoder
     // MethodRvaConfig 的字段号，与 MethodRvaPayload 的十个键一一对应
     private static readonly int[] RvaFieldNumbers = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
-    /// <summary>解码结果。失败时只带 <see cref="Error"/>，调用方据此给出可读的错误而不是 500。</summary>
     public sealed record Result(AchievementFieldIdPayload? Payload, string? Version, uint ChineseHash, uint OverseaHash, uint ItemCount, uint GroupCount, string? Error)
     {
         public bool Succeeded => Error is null;

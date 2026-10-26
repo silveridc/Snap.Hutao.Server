@@ -5,10 +5,6 @@ using System.Net;
 
 namespace server.Tests;
 
-/// <summary>
-/// <c>POST /Webhook</c> 爱发电订单回调：这是无鉴权的第三方入口，
-/// 用例覆盖服务时长发放、订单号去重、未配置 sku、用户不存在时改发兑换码等分支。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class WebhookTests
 {

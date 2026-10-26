@@ -2,10 +2,6 @@
 
 namespace server.Controllers.Filter;
 
-/// <summary>
-/// CDN 与抽卡日志上传共用的到期门禁：登录态 → IsLicensedDeveloper 或到期时间未过。
-/// 两个 <see cref="IAsyncActionFilter"/> 只有失败信封和到期字段不同——过去各抄一份 CanUse，收口到这里。
-/// </summary>
 internal static class ExpirePermissionGate
 {
     /// <summary>放行返回 null；拦截返回应写回的失败信封。</summary>

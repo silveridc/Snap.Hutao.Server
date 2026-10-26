@@ -4,11 +4,6 @@ using System.Text;
 
 namespace server.Services.Admin;
 
-/// <summary>
-/// S3 SigV4 查询串预签名（GET）。桶保持私有，/Patch/hutao 下发前现场签发限时 URL——
-/// 每次响应都是新签名，客户端拿到即下载，过期不影响。AWS S3 与 S3 兼容存储（R2/MinIO/OSS 等）通用。
-/// 纯 HMAC-SHA256 链实现，不引入 AWS SDK（AGENTS.md：新增 NuGet 依赖需随包部署 DLL）。
-/// </summary>
 public static class S3Presigner
 {
     /// <summary>

@@ -1,9 +1,5 @@
 ﻿namespace server.Models.Metadata;
 
-/// <summary>
-/// Yae 成就注入所需的一份版本配置。<see cref="Payload"/> 是原样吐给客户端的
-/// <c>/client/AchievementFieldId_{Version}.json</c> 响应体，不做任何再包装。
-/// </summary>
 [Table("yae_achievement_metadata")]
 public sealed class YaeAchievementMetadata
 {

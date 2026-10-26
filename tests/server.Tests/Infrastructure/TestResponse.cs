@@ -1,6 +1,5 @@
 namespace server.Tests.Infrastructure;
 
-/// <summary>服务端统一响应外壳（Models/Response/Response.cs）的测试侧镜像。</summary>
 public sealed class TestResponse
 {
     public int Retcode { get; init; }
@@ -42,7 +41,6 @@ public sealed class TestResponse
     }
 }
 
-/// <summary>响应读取扩展。</summary>
 public static class HttpResponseMessageExtension
 {
     public static async Task<TestResponse> ReadTestResponseAsync(this HttpResponseMessage response)
@@ -52,7 +50,6 @@ public static class HttpResponseMessageExtension
     }
 }
 
-/// <summary>服务端返回码（Models/Response/ReturnCode.cs）中测试会用到的取值。</summary>
 public static class ReturnCodes
 {
     public const int Success = 0;

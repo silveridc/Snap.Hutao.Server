@@ -2,7 +2,6 @@ using System.Net.Http.Headers;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>构造带鉴权与设备头的请求。</summary>
 public static class TestHttpClientExtension
 {
     public const string DeviceIdHeader = "x-hutao-device-id";

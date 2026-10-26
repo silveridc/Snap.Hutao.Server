@@ -3,10 +3,6 @@ using System.Net.Sockets;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>
-/// 测试运行环境的进程级资源：MySQL 测试库、Redis（Garnet）端口、假 SMTP 端口。
-/// 所有取值都可以通过环境变量覆盖，便于在 CI 与本地之间切换。
-/// </summary>
 public static class TestEnvironment
 {
     /// <summary>具备建库权限的连接串（默认使用本地 root）。</summary>

@@ -5,10 +5,6 @@ using System.Text.RegularExpressions;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>
-/// 极简 SMTP 服务端，只实现 MailKit 客户端所需的 EHLO / AUTH / MAIL / RCPT / DATA / QUIT 流程。
-/// 用于在测试中截获验证码邮件，避免真实发信。
-/// </summary>
 public sealed partial class FakeSmtpServer : IDisposable
 {
     private readonly TcpListener listener;

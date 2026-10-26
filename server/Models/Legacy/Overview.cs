@@ -1,8 +1,5 @@
 ﻿namespace server.Models.Legacy;
 
-/// <summary>
-/// 总览数据
-/// </summary>
 public class Overview
 {
     public int ScheduleId { get; set; }

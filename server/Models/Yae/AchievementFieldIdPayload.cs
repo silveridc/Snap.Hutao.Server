@@ -1,11 +1,5 @@
 ﻿namespace server.Models.Yae;
 
-/// <summary>
-/// <c>/client/AchievementFieldId_{version}.json</c> 的响应体。字段名必须与启动器
-/// <c>Snap.Hutao.Service.Yae.Achievement</c> 下的模型逐一对应，且全部是必填：
-/// 启动器用 <c>required</c> 成员反序列化，少任何一个键整个文件都会失败。
-/// 返回的是裸对象，不带 retcode 信封。
-/// </summary>
 public sealed class AchievementFieldIdPayload
 {
     [JsonPropertyName("id")]
@@ -50,7 +44,6 @@ public sealed class MethodRvaWrapperPayload
     public required MethodRvaPayload Oversea { get; init; }
 }
 
-/// <summary>字段名照 Yae 的 <c>MethodRvaConfig</c>，注入 DLL 通过命名管道按此顺序读取 10 个 RVA。</summary>
 public sealed class MethodRvaPayload
 {
     [JsonPropertyName("doCmd")]

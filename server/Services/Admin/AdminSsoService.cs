@@ -11,16 +11,6 @@ using server.Models.Passport;
 
 namespace server.Services.Admin;
 
-/// <summary>
-/// 单点登录：外部 OIDC 授权码流程、后台专属账号、后台令牌签发、启动器登录身份与权限判定所需的状态查询。
-/// <para>
-/// 授权码流程带 PKCE(S256)；state 与 nonce 存放在分布式缓存中且一次性使用；
-/// ID Token 的签名、签发者、受众、有效期由 <see cref="JsonWebTokenHandler"/> 校验，nonce 由本类比对。
-/// 后台令牌沿用主站的 HS256 密钥签发，但只含 <see cref="AdminClaimTypes.AccountId"/>，
-/// 不含主站用户身份，因此不会误入任何以用户身份取数的代码路径。
-/// 启动器登录走同一套协议，但落地身份是绑定的主站账号，令牌由 <see cref="PassportService"/> 签发。
-/// </para>
-/// </summary>
 public sealed class AdminSsoService(
     AppDbContext appDbContext,
     AppOptions appOptions,
@@ -329,9 +319,6 @@ public sealed class AdminSsoService(
         return new(PassportSsoCallbackStatus.Success, Ticket: ticket, Subject: subject);
     }
 
-    /// <summary>
-    /// 授权流程失败的阶段，与两个业务侧的结果状态无关。
-    /// </summary>
     private enum FlowFailure
     {
         /// <summary>流程走通，声明可用。</summary>
@@ -961,11 +948,5 @@ public sealed class AdminSsoService(
         };
     }
 
-    /// <summary>
-    /// 发起登录时暂存的上下文，随 state 一起存放，取用即失效。
-    /// </summary>
-    /// <param name="Nonce">写入授权请求的 nonce。</param>
-    /// <param name="CodeVerifier">PKCE 校验器。</param>
-    /// <param name="ReturnPath">登录成功后的回跳路径。</param>
     private sealed record PendingLogin(string Nonce, string CodeVerifier, string? ReturnPath);
 }

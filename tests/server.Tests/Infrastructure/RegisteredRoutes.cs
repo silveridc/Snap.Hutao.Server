@@ -4,14 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>宿主里一条已注册的 HTTP 路由。</summary>
-/// <param name="Method">HTTP 方法；action 未声明动词（接受任意方法）时记为 <c>*</c>。</param>
-/// <param name="Template">路由模板，形如 <c>/enka/{uid}</c>。</param>
 public sealed record RouteKey(string Method, string Template);
 
-/// <summary>
-/// 从运行中的宿主枚举实际注册的路由，用于校验冒烟清单覆盖了每一个接口。
-/// </summary>
 public static class RegisteredRoutes
 {
     public static IReadOnlyList<RouteKey> Enumerate(IServiceProvider services)

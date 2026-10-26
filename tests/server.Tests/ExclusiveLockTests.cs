@@ -13,12 +13,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace server.Tests;
 
-/// <summary>
-/// 统计互斥锁的守卫。历史 bug：两个记录清理 job 复制模板时把锁标志粘成了
-/// <see cref="GachaLogStatisticsService.Working"/>——清理既不与各自的统计刷新互斥，
-/// 又会在运行期间误挡、finally 误清抽卡统计的锁。这里的用例直接编码正确行为：
-/// 清理 job 只认自己统计服务的 Working 标志，且对别的统计服务的标志视而不见。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class ExclusiveLockTests
 {

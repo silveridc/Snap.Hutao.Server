@@ -4,9 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace server.Extension;
 
-/// <summary>
-/// 枚举器扩展
-/// </summary>
 public static class EnumerableExtension
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

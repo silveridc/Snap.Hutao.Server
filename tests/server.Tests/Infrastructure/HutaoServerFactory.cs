@@ -18,15 +18,6 @@ using System.Net;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>
-/// 进程内托管整个 Web API 的测试宿主：
-/// <list type="bullet">
-/// <item>用 Garnet 提供 Redis 兼容服务（应用启动即要求 Redis 可达）；</item>
-/// <item>把两个 DbContext 指向独立的 MySQL 测试库（生产同样使用 MySQL，语义一致）；</item>
-/// <item>用假 SMTP 服务截获验证码邮件；</item>
-/// <item>关闭 Unix Socket、RealIp 与 Sentry/OpenTelemetry 上报。</item>
-/// </list>
-/// </summary>
 public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Context.AppDbContext>, IAsyncLifetime
 {
     private readonly string stateDirectory = Path.Combine(Path.GetTempPath(), $"hutao-tests-{Guid.NewGuid():N}");

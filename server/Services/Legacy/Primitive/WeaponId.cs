@@ -1,8 +1,5 @@
 ﻿namespace server.Services.Legacy.Primitive;
 
-/// <summary>
-/// 武器Id
-/// </summary>
 public readonly struct WeaponId(int value) : IEquatable<WeaponId>
 {
     /// <summary>

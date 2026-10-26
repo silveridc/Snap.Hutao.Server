@@ -6,13 +6,8 @@ using server.Services.Authorization;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>测试用账号，覆盖各鉴权分支。</summary>
 public sealed record TestUser(int Id, string UserName, string Password, string AccessToken, string RefreshToken);
 
-/// <summary>
-/// 通过 <see cref="UserManager{TUser}"/> 直接播种用户，并用被测项目的
-/// <see cref="PassportService"/> 签发真实 JWT，保证与线上鉴权路径一致。
-/// </summary>
 public sealed class TestUsers(HutaoServerFactory factory)
 {
     public const string Password = "TestPassword123";

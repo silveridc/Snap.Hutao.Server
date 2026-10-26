@@ -1,8 +1,5 @@
 ﻿namespace server.Services.Legacy.Primitive;
 
-/// <summary>
-/// 映射相关
-/// </summary>
 public static class Maps
 {
     internal static Map<Constellation, int> ForConstellation(AvatarId avatarId)

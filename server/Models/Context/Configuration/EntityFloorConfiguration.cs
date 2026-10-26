@@ -4,9 +4,6 @@ using server.Models.Upload;
 
 namespace server.Models.Context.Configuration;
 
-/// <summary>
-/// 层信息配置
-/// </summary>
 public class EntityFloorConfiguration : IEntityTypeConfiguration<EntityFloor>
 {
     /// <inheritdoc/>

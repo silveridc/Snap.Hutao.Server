@@ -284,6 +284,11 @@ dotnet_diagnostic.SA1615.severity = none
 dotnet_diagnostic.SA1629.severity = none
 dotnet_diagnostic.SA1642.severity = none
 # EF Core 生成的迁移文件：重新 scaffold 就会回到原样，不做风格检查
+
+# SA1512: Single-line comments should not be followed by blank line
+dotnet_diagnostic.SA1512.severity = none
+dotnet_diagnostic.SA1005.severity = none
+dotnet_diagnostic.SA1515.severity = none
 [Migrations/*.cs]
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = none
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.LayoutRules.severity = none

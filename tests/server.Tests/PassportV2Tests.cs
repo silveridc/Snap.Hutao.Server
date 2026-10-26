@@ -4,10 +4,6 @@ using System.Net;
 
 namespace server.Tests;
 
-/// <summary>
-/// <c>/Passport/v2/*</c> 账户接口：注册、登录、令牌刷新、设备管理与用户信息。
-/// 覆盖正常流程与各校验/鉴权失败分支。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class PassportV2Tests
 {

@@ -1,9 +1,5 @@
 namespace server.Models.Patch;
 
-/// <summary>
-/// /patch/hutao 返回的更新信息，字段与客户端 HutaoPackageInformation 对应。
-/// 同时作为配置绑定类型（App:Patch:Hutao）使用。
-/// </summary>
 public sealed class HutaoPackageInformation
 {
     /// <summary>

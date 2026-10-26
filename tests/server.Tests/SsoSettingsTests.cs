@@ -4,10 +4,6 @@ using server.Tests.Infrastructure;
 
 namespace server.Tests;
 
-/// <summary>
-/// SSO 后台配置的三态语义：system_settings 覆盖值优先，未配置的键回退 App:Oidc
-/// （appsettings/环境变量），删除覆盖键恢复跟随配置。管理端保存后下一次读取即生效。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class SsoSettingsTests
 {

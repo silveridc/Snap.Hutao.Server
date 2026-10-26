@@ -2,13 +2,6 @@
 
 namespace server.Services.Yae;
 
-/// <summary>
-/// 维护 Yae 成就注入所需的版本表：从 Yae 自己的 bucket 拉 protobuf，
-/// 交给 <see cref="YaeBucketDecoder"/> 转成启动器的契约后落库，
-/// 再由 <c>/client/AchievementFieldId_{version}.json</c> 原样吐出去。
-/// 启动器注入的 YaeAchievementLib.dll 不含任何版本数据，它只从命名管道读这些值，
-/// 所以这份数据必须由服务端提供，没有本地兜底。
-/// </summary>
 public sealed class YaeMetadataService(
     MetadataDbContext metadataDbContext,
     IHttpClientFactory httpClientFactory,
@@ -24,7 +17,6 @@ public sealed class YaeMetadataService(
         WriteIndented = false,
     };
 
-    /// <summary>已同步的版本一览（不含 payload 原文），供维护后台核对覆盖了哪些游戏版本。</summary>
     public sealed record Summary(string Version, uint ChineseHash, uint OverseaHash, uint StoreCmdId, uint AchievementCmdId, uint ItemCount, uint GroupCount, DateTime SyncedAt);
 
     /// <summary>

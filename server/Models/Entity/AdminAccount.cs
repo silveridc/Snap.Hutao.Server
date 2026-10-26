@@ -1,9 +1,5 @@
 ﻿namespace server.Models.Entity;
 
-/// <summary>
-/// 后台专属账号。身份由外部 OIDC 身份源给出，库里只保存「哪些主体允许进后台」以及展示信息，
-/// 主站账号（AspNetUsers）登录与否只由 <see cref="UserId"/> 这一个绑定决定。
-/// </summary>
 [Table("admin_accounts")]
 [Index(nameof(Provider), nameof(Subject), IsUnique = true)]
 public sealed class AdminAccount

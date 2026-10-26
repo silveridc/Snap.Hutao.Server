@@ -28,16 +28,6 @@ using System.Security.Cryptography;
 
 namespace server.Tests;
 
-/// <summary>
-/// 后台单点登录的完整链路：用桩 OIDC 身份源驱动
-/// 「授权地址 → 回调换 ID Token → 校验签名/nonce → 建立或命中后台账号 → 一次性票据 → 后台令牌」，
-/// 并覆盖未授权、已停用、票据只能用一次等失败分支，以及「启用后老账号只读、后台账号可写」的门禁语义。
-/// <para>
-/// 这里直接构造启用 SSO 的 <see cref="AdminSsoService"/>（其余依赖取自共享宿主），
-/// 因此不干扰 <c>HutaoServerFactory</c> 里默认关闭 SSO 的其余用例。桩身份源的密钥、
-/// 发现文档与签名都由本类现场生成，测试不依赖外网。
-/// </para>
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class SsoTests : IDisposable
 {

@@ -1,8 +1,5 @@
 ﻿namespace server.Models.Upload;
 
-/// <summary>
-/// 上传者身份
-/// </summary>
 public static class UploaderIdentities
 {
     public const string SnapHutao = "Snap Hutao";

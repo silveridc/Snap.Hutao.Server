@@ -2,9 +2,6 @@ using server.Models.Patch;
 
 namespace server.Options;
 
-/// <summary>
-/// 补丁 / 更新相关配置，对应 appsettings 的 App:Patch 节点。
-/// </summary>
 public sealed class PatchOptions
 {
     /// <summary>
