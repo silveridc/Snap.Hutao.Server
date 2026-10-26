@@ -13,13 +13,6 @@ using System.Text.Json.Nodes;
 
 namespace server.Tests;
 
-/// <summary>
-/// /Statistics/* 对「无 SecurityStamp 式历史毒行」的同类问题——非有限浮点字面量的守卫。
-/// 写入侧修复（StatisticsTracker 空期按 0 计）之前，空期把 TimeAverage 算成 Infinity/NaN，
-/// 以 AllowNamedFloatingPointLiterals 字面量落库；这样的行读回后 MVC 的 JSON 输出无法表达
-/// 非有限值，接口会稳定 500。FiniteDouble/SingleJsonConverter 必须把这类值安全写出（归零），
-/// 且不影响正常数字的往返；二次请求还要经过分布式缓存里的裸字面量往返。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class StatisticsTests
 {
@@ -57,7 +50,7 @@ public sealed class StatisticsTests
 
         // ?Last=true 查的是上一期，正是生产 500 的触发参数
         JsonNode root = JsonNode.Parse(
-            await (await client.GetAsync("/api/Statistics/Overview?Last=true")).Content.ReadAsStringAsync())!;
+            await (await client.GetAsync("/api/Statistics/Overview?Last=true", TestContext.Current.CancellationToken)).Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
         Assert.Equal(0, (int)root["retcode"]!);
         JsonNode data = root["data"]!;
         Assert.Equal(0, (double)data["TimeAverage"]!);
@@ -72,7 +65,7 @@ public sealed class StatisticsTests
             """{"ScheduleId":123,"RecordTotal":0,"SpiralAbyssTotal":0,"SpiralAbyssFullStar":0,"SpiralAbyssPassed":0,"SpiralAbyssStarTotal":0,"SpiralAbyssBattleTotal":0,"Timestamp":1791194700562,"TimeTotal":"NaN","TimeAverage":"-Infinity"}""");
 
         JsonNode root = JsonNode.Parse(
-            await (await client.GetAsync("/api/Statistics/Overview?Last=true")).Content.ReadAsStringAsync())!;
+            await (await client.GetAsync("/api/Statistics/Overview?Last=true", TestContext.Current.CancellationToken)).Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
         Assert.Equal(0, (int)root["retcode"]!);
         Assert.Equal(0, (double)root["data"]!["TimeTotal"]!);
         Assert.Equal(0, (double)root["data"]!["TimeAverage"]!);
@@ -88,10 +81,10 @@ public sealed class StatisticsTests
 
         for (int i = 1; i <= 2; i++)
         {
-            using HttpResponseMessage response = await client.GetAsync("/api/Statistics/Overview?Last=true");
+            using HttpResponseMessage response = await client.GetAsync("/api/Statistics/Overview?Last=true", TestContext.Current.CancellationToken);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
+            JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
             Assert.True((int)root["retcode"]! == 0, $"第 {i} 次请求失败：{root.ToJsonString()}");
             Assert.Equal(0, (double)root["data"]!["TimeAverage"]!);
         }
@@ -105,10 +98,10 @@ public sealed class StatisticsTests
         await PreparePoisonRowAsync(LegacyStatistics.AvatarAppearanceRank,
             """[{"Floor":9,"Ranks":[{"Item":10000002,"Rate":"NaN"}]}]""");
 
-        using HttpResponseMessage response = await client.GetAsync("/api/Statistics/Avatar/AttendanceRate?Last=true");
+        using HttpResponseMessage response = await client.GetAsync("/api/Statistics/Avatar/AttendanceRate?Last=true", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
+        JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
         Assert.Equal(0, (int)root["retcode"]!);
         JsonNode rank = root["data"]![0]!["Ranks"]![0]!;
         Assert.Equal(0, (double)rank["Rate"]!);

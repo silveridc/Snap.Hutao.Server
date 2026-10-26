@@ -7,25 +7,8 @@ using server.Models.Upload;
 
 namespace server.Tests.Infrastructure;
 
-/// <summary>
-/// <c>/Service/*</c> 维护接口清单中的一条路由。
-/// </summary>
-/// <param name="Method">HTTP 方法。</param>
-/// <param name="Url">相对地址（含查询串）。</param>
-/// <param name="Json">请求体；GET 或无需请求体时为 <see langword="null"/>。</param>
-/// <param name="MaintainerRetcode">
-/// 维护者身份调用时期望的返回码。取值只使用「不依赖其它用例副作用」的输入：
-/// 主键一律用 <see cref="int.MaxValue"/> 之类的越界值，Uid 用测试专用号段，
-/// 因此无论用例以何种顺序执行结果都一致。
-/// 有状态的接口（同一份数据重复调用会走到不同分支）取 <see langword="null"/>，
-/// 表示只要求它通过权限过滤器，业务分支交给专门的用例覆盖。
-/// </param>
 public sealed record ServiceEndpoint(string Method, string Url, string? Json, int? MaintainerRetcode);
 
-/// <summary>
-/// <c>/Service/*</c> 维护者后台的全部路由。冒烟测试与鉴权用例共用同一份清单，
-/// 保证每个接口都会被「未登录 / 非维护者 / 维护者」三种身份各跑一遍。
-/// </summary>
 public static class ServiceEndpoints
 {
     /// <summary>占位用的、不存在的账号名。</summary>
@@ -62,7 +45,9 @@ public static class ServiceEndpoints
         new("GET", "/api/Service/Distribution/Compensation?days=0", null, ReturnCodes.Success),
         new("GET", $"/api/Service/Distribution/Designation?userName={Uri.EscapeDataString(UnknownUser)}&days=0", null, ReturnCodes.UserNameNotExists),
 
+        new("GET", "/api/Service/System/Overview", null, ReturnCodes.Success),
         new("GET", "/api/Service/User/Statistics", null, ReturnCodes.Success),
+        new("GET", "/api/Service/ClientVersion/List", null, ReturnCodes.Success),
         new("GET", "/api/Service/User/List?page=1&pageSize=10&keyword=example.com", null, ReturnCodes.Success),
         new("GET", $"/api/Service/User/Detail?userId={int.MaxValue}", null, ReturnCodes.UserNameNotExists),
         new("POST", "/api/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest { UserId = int.MaxValue }), ReturnCodes.UserNameNotExists),

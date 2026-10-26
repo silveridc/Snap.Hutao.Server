@@ -4,6 +4,10 @@
     <Build />
     <Deploy />
   </Project>
+  <Project Path="apidoc/apidoc.esproj">
+    <Build />
+    <Deploy />
+  </Project>
   <Project Path="server/server.csproj" />
   <Project Path="tests/server.Tests/server.Tests.csproj" />
 </Solution>

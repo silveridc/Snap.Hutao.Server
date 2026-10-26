@@ -4,11 +4,6 @@ using System.Net.Http;
 
 namespace server.Tests;
 
-/// <summary>
-/// S3 预签名：结构正确（SigV4 查询参数齐全、签名 64 位十六进制）、确定性（同输入同签名、
-/// 区域变化签名变化）、以及 wire 级行为——配置齐全且主机名匹配时 /patch/hutao 下发的镜像
-/// 被现场签名，未配置或主机不匹配时 URL 原样返回。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class S3PresignTests
 {
@@ -78,7 +73,7 @@ public sealed class S3PresignTests
               {"url":"https://my-bucket.s3.us-east-1.amazonaws.com/hutao/pkg.msix","mirror_name":"s3","mirror_type":"Direct"},
               {"url":"https://example.com/pkg.msix","mirror_name":"plain","mirror_type":"Direct"}]}
             """, System.Text.Encoding.UTF8, "application/json");
-        using HttpResponseMessage published = await client.SendAsync(publish);
+        using HttpResponseMessage published = await client.SendAsync(publish, TestContext.Current.CancellationToken);
         Assert.True(published.IsSuccessStatusCode);
 
         try
@@ -90,10 +85,10 @@ public sealed class S3PresignTests
                 [SystemConfigService.Keys.PatchS3AccessKeyId] = "AKIAIOSFODNN7EXAMPLE",
                 [SystemConfigService.Keys.PatchS3SecretAccessKey] = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
                 [SystemConfigService.Keys.PatchS3ExpiresHours] = "24",
-            }, 0).ConfigureAwait(false);
+            }, 0);
 
-            using HttpResponseMessage signed = await client.GetAsync("/patch/hutao");
-            string body = await signed.Content.ReadAsStringAsync();
+            using HttpResponseMessage signed = await client.GetAsync("/patch/hutao", TestContext.Current.CancellationToken);
+            string body = await signed.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
             Assert.Contains("X-Amz-Signature=", body, StringComparison.Ordinal);
             Assert.Contains("https://my-bucket.s3.us-east-1.amazonaws.com/hutao/pkg.msix?X-Amz-Algorithm=AWS4-HMAC-SHA256", body, StringComparison.Ordinal);
             // 不匹配的镜像保持原样
@@ -110,7 +105,7 @@ public sealed class S3PresignTests
                 SystemConfigService.Keys.PatchS3ExpiresHours,
             })
             {
-                await config.DeleteAsync(key).ConfigureAwait(false);
+                await config.DeleteAsync(key);
             }
         }
 
@@ -124,11 +119,11 @@ public sealed class S3PresignTests
             {"Version":"{{plainVersion}}","Validation":"{{new string('a', 64)}}","Mirrors":[
               {"url":"https://my-bucket.s3.us-east-1.amazonaws.com/hutao/pkg2.msix","mirror_name":"s3","mirror_type":"Direct"}]}
             """, System.Text.Encoding.UTF8, "application/json");
-        using HttpResponseMessage republished = await client.SendAsync(republish);
+        using HttpResponseMessage republished = await client.SendAsync(republish, TestContext.Current.CancellationToken);
         Assert.True(republished.IsSuccessStatusCode);
 
-        using HttpResponseMessage plain = await client.GetAsync("/patch/hutao");
-        string plainBody = await plain.Content.ReadAsStringAsync();
+        using HttpResponseMessage plain = await client.GetAsync("/patch/hutao", TestContext.Current.CancellationToken);
+        string plainBody = await plain.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.Contains("\"url\":\"https://my-bucket.s3.us-east-1.amazonaws.com/hutao/pkg2.msix\"", plainBody, StringComparison.Ordinal);
         Assert.DoesNotContain("X-Amz-Signature", plainBody, StringComparison.Ordinal);
         Assert.False(config.IsPatchS3SigningEnabled);

@@ -12,13 +12,6 @@ using System.Text.Json.Nodes;
 
 namespace server.Tests;
 
-/// <summary>
-/// 后台重置用户密码对「无 SecurityStamp 的历史用户行」的容错及其边界。
-/// 正常注册走 UserManager.CreateAsync 会自动盖 stamp，但手工 SQL 插入/迁移来的行可能没有；
-/// UserManager 的令牌路径（GeneratePasswordResetTokenAsync → GetSecurityStampAsync）读到 null
-/// 会直接抛 InvalidOperationException，接口表现为 500（生产实测 UserId=2 即此症状）。
-/// 边界覆盖：null 与空串两种缺失形态、正常用户路径、不存在的用户、密码策略拒绝（不能误伤原密码）、连续重置。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class UserAdminTests
 {
@@ -84,10 +77,10 @@ public sealed class UserAdminTests
         request.Headers.Authorization = new("Bearer", maintainer.AccessToken);
         request.Content = JsonContent.Create(new { UserId = victim.Id, NewPassword });
 
-        using HttpResponseMessage response = await client.SendAsync(request);
+        using HttpResponseMessage response = await client.SendAsync(request, TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
+        JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
         Assert.True((int)root["retcode"]! == 0, $"重置历史无 stamp 用户的密码不应 500：{root.ToJsonString()}");
     }
 

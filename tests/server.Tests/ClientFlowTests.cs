@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using server.Models.Admin;
+using server.Models.Entity;
 using server.Models.GachaLog;
 using server.Models.Legacy;
 using server.Models.Metadata;
@@ -9,11 +11,6 @@ using System.Net;
 
 namespace server.Tests;
 
-/// <summary>
-/// 客户端数据链路：深渊/剧诗上传、祈愿记录云同步、CDN 分发、崩溃日志与开源许可证申请。
-/// 这些接口在 <see cref="ApiSmokeTests"/> 里只保证「不 500」，本类断言成功分支的真实
-/// 返回码与副作用（数据能被读回来）。
-/// </summary>
 [Collection(HutaoServerCollection.Name)]
 public sealed class ClientFlowTests
 {
@@ -407,4 +404,80 @@ public sealed class ClientFlowTests
         TestResponse ghost = await SendAsync("POST", "/api/Accession/ApplyOpenSourceLicense", new { UserName = $"ghost-{Guid.NewGuid():N}@example.com", ProjectUrl = "https://github.com/example/repo", Token = ghostToken });
         Assert.Equal(ReturnCodes.UserNameNotExists, ghost.Retcode);
     }
+
+    [Fact]
+    public async Task ClientVersionTrack_NewDeviceGetsARow_AndAVersionChangeRefreshesIt()
+    {
+        string deviceId = NewDeviceId();
+
+        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.17.1.0");
+
+        ClientVersion? tracked = await TrackRowAsync(deviceId);
+        Assert.NotNull(tracked);
+        Assert.Equal("1.17.1.0", tracked.Version);
+        Assert.Equal(tracked.FirstSeenAt, tracked.LastSeenAt);
+
+        // 同一设备升级客户端：仍然只有一行，版本被就地刷新
+        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.18.0.0");
+
+        ClientVersion? upgraded = await TrackRowAsync(deviceId);
+        Assert.NotNull(upgraded);
+        Assert.Equal("1.18.0.0", upgraded.Version);
+        Assert.True(upgraded.LastSeenAt >= upgraded.FirstSeenAt);
+    }
+
+    [Fact]
+    public async Task ClientVersionTrack_SameVersionWithinTheThrottleWindow_WritesOnce()
+    {
+        string deviceId = NewDeviceId();
+
+        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.17.1.0");
+        ClientVersion? first = await TrackRowAsync(deviceId);
+        Assert.NotNull(first);
+
+        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.17.1.0");
+
+        ClientVersion? second = await TrackRowAsync(deviceId);
+        Assert.NotNull(second);
+        Assert.Equal(first.FirstSeenAt, second.FirstSeenAt);
+        Assert.Equal(first.LastSeenAt, second.LastSeenAt);
+    }
+
+    [Fact]
+    public async Task ClientVersionList_ForMaintainer_AggregatesTrackedDevices()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+
+        await SendAsClientAsync("/api/Record/Check?Uid=100000000", NewDeviceId(), "9.9.9.9");
+        await SendAsClientAsync("/api/Record/Check?Uid=100000000", NewDeviceId(), "9.9.9.9");
+
+        TestResponse parsed = await SendAsync("GET", "/api/Service/ClientVersion/List", token: maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+        Assert.Equal(ServerKeys.ServerAdminClientVersionListSucceed, parsed.L10nKey);
+
+        ClientVersionStatistics? statistics = parsed.DeserializeData<ClientVersionStatistics>();
+        Assert.NotNull(statistics);
+        Assert.Equal(statistics.Versions.Sum(item => item.DeviceCount), statistics.TotalDevices);
+
+        ClientVersionCount? row = statistics.Versions.SingleOrDefault(item => item.Version == "9.9.9.9");
+        Assert.NotNull(row);
+        Assert.Equal(2, row.DeviceCount);
+    }
+
+    /// <summary>HutaoLogSingleItem.DeviceId 与 client_versions.DeviceId 都限长 32。</summary>
+    private static string NewDeviceId() => $"ver-{Guid.NewGuid():N}".Substring(0, 32);
+
+    /// <summary>以一个设备 id 和一个客户端版本发一次请求，触发版本记录过滤器。</summary>
+    private async Task SendAsClientAsync(string url, string deviceId, string version)
+    {
+        using HttpRequestMessage request = new(HttpMethod.Get, url);
+        request.WithDevice(deviceId);
+        request.WithClientVersion(version);
+
+        using HttpResponseMessage response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+        await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+    }
+
+    private Task<ClientVersion?> TrackRowAsync(string deviceId) => factory.WithDbContextAsync(context =>
+        context.ClientVersions.AsNoTracking().SingleOrDefaultAsync(item => item.DeviceId == deviceId, TestContext.Current.CancellationToken));
 }
