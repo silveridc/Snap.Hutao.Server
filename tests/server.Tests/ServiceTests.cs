@@ -272,6 +272,44 @@ public sealed class ServiceTests
     }
 
     [Fact]
+    public async Task RedeemUses_ListsTheUsersWhoRedeemedTheCode()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+        TestUser target = await users.CreateUniqueAsync("redeem-uses");
+
+        TestResponse generated = await SendAsync("POST", "/api/Service/Redeem/Generate", JsonSerializer.Serialize(new
+        {
+            Count = 1,
+            Type = 1,
+            ServiceType = 1,
+            Value = 3,
+            Description = "uses-listing",
+            ExpireTime = DateTimeOffset.UtcNow.AddDays(1),
+            Times = 1,
+        }), maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, generated.Retcode);
+
+        string code = generated.Data.GetProperty("Codes").Deserialize<List<string>>()![0];
+        uint id = await FindRedeemIdAsync(maintainer, code);
+
+        // 兑换前没有使用记录
+        TestResponse before = await SendAsync("GET", $"/api/Service/Redeem/Uses?id={id}", null, maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, before.Retcode);
+        Assert.Empty(before.DeserializeData<List<RedeemCodeUsageItem>>()!);
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/Redeem/Use", new { Code = code, Username = target.UserName }, token: null);
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        TestResponse after = await SendAsync("GET", $"/api/Service/Redeem/Uses?id={id}", null, maintainer.AccessToken);
+        List<RedeemCodeUsageItem>? usages = after.DeserializeData<List<RedeemCodeUsageItem>>();
+        Assert.NotNull(usages);
+        RedeemCodeUsageItem usage = Assert.Single(usages!);
+        Assert.Equal(target.Id, usage.UserId);
+        Assert.Equal(target.UserName, usage.UserName);
+    }
+
+    [Fact]
     public async Task RedeemUpdate_ThenDelete_RemovesTheCode()
     {
         TestUser maintainer = await users.MaintainerAsync();

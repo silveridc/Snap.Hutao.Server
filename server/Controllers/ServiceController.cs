@@ -355,6 +355,18 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     }
 
     /// <summary>
+    /// 某张兑换码的使用者清单。
+    /// </summary>
+    /// <param name="id">兑换码主键。</param>
+    /// <returns>使用该兑换码的用户与时间。</returns>
+    [HttpGet("Redeem/Uses")]
+    public async Task<IActionResult> RedeemUsesAsync([FromQuery] uint id)
+    {
+        List<RedeemCodeUsageItem> items = await _adminQueryService.GetRedeemCodeUsesAsync(id).ConfigureAwait(false);
+        return Success<List<RedeemCodeUsageItem>>("Redeem code usages acquired successfully", items, ServerKeys.ServerAdminRedeemUsesSucceed);
+    }
+
+    /// <summary>
     /// 编辑兑换码（服务、时长、备注、过期时间、可用次数）。
     /// </summary>
     [HttpPost("Redeem/Update")]

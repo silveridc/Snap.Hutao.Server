@@ -111,6 +111,7 @@ public static class ServerKeys
     public const string ServerAdminRedeemDeleteSucceed = "ServerAdminRedeemDeleteSucceed";
     public const string ServerAdminRedeemGenerateSucceed = "ServerAdminRedeemGenerateSucceed";
     public const string ServerAdminRedeemListSucceed = "ServerAdminRedeemListSucceed";
+    public const string ServerAdminRedeemUsesSucceed = "ServerAdminRedeemUsesSucceed";
     public const string ServerAdminRedeemUpdateSucceed = "ServerAdminRedeemUpdateSucceed";
     public const string ServerAdminReleaseActivateSucceed = "ServerAdminReleaseActivateSucceed";
     public const string ServerAdminReleaseAlreadyPublished = "ServerAdminReleaseAlreadyPublished";

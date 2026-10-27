@@ -60,7 +60,8 @@
     "actions": {
       "edit": "编辑",
       "delete": "删除",
-      "save": "保存"
+      "save": "保存",
+      "uses": "使用用户"
     },
     "dialog": {
       "removeHeader": "删除兑换码",
@@ -86,6 +87,14 @@
       "deleteFail": "删除失败",
       "noExportData": "没有可导出的数据",
       "exportFail": "导出失败"
+    },
+    "uses": {
+      "title": "兑换码 {code} 的使用用户",
+      "colUser": "用户",
+      "colUserId": "用户 ID",
+      "colTime": "使用时间",
+      "empty": "还没有人使用这张兑换码",
+      "loadFail": "获取使用记录失败"
     }
   }
 }

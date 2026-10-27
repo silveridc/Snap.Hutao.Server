@@ -46,6 +46,7 @@
     "ServerAdminRedeemGenerateSucceed": "生成兑换码成功",
     "ServerAdminRedeemListSucceed": "获取兑换码列表成功",
     "ServerAdminRedeemUpdateSucceed": "编辑兑换码成功",
+    "ServerAdminRedeemUsesSucceed": "获取兑换码使用记录成功",
     "ServerAdminReleaseActivateSucceed": "版本已激活",
     "ServerAdminReleaseAlreadyPublished": "该版本已发布，如需回滚请激活历史版本",
     "ServerAdminReleaseCurrentSucceed": "获取当前发布版本成功",

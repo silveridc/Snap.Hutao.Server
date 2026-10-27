@@ -78,6 +78,7 @@ public static class ServiceEndpoints
         new("POST", $"/api/Service/Announcement/Delete?id={UnknownId}", null, ReturnCodes.NotFound),
 
         new("GET", "/api/Service/Redeem/List?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("GET", "/api/Service/Redeem/Uses?id=1", null, ReturnCodes.Success),
         new("POST", "/api/Service/Redeem/Generate", JsonSerializer.Serialize(new RedeemGenerateRequest
         {
             Count = 1,

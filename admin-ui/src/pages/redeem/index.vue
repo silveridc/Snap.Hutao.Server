@@ -6,6 +6,7 @@ import {
   batchDeleteRedeemCodes,
   deleteRedeemCode,
   generateRedeemCodes,
+  getRedeemCodeUses,
   getRedeemList,
   updateRedeemCode,
   useRedeemCode,
@@ -118,6 +119,35 @@ const keyword = ref('');
 const rows = ref<any[]>([]);
 const pagination = reactive({ current: 1, pageSize: 10, total: 0 });
 
+// 使用记录弹窗：按需拉取，不跟列表一起查
+const usesDialog = reactive({
+  visible: false,
+  loading: false,
+  code: '',
+  items: [] as any[],
+});
+
+const usesColumns = computed(() => [
+  { colKey: 'UserName', title: t('pages.redeem.uses.colUser'), ellipsis: true, minWidth: 220 },
+  { colKey: 'UserId', title: t('pages.redeem.uses.colUserId'), width: 100 },
+  { colKey: 'UseTime', title: t('pages.redeem.uses.colTime'), width: 180 },
+]);
+
+async function openUses(row: any) {
+  usesDialog.visible = true;
+  usesDialog.code = row.Code;
+  usesDialog.items = [];
+  usesDialog.loading = true;
+  try {
+    const res: any = await getRedeemCodeUses(row.Id);
+    usesDialog.items = res.data ?? [];
+  } catch (err) {
+    MessagePlugin.error((err as Error).message || t('pages.redeem.uses.loadFail'));
+  } finally {
+    usesDialog.loading = false;
+  }
+}
+
 const listColumns = computed(() => [
   { colKey: 'row-select', type: 'multiple', width: 50 },
   { colKey: 'Code', title: t('pages.redeem.list.colCode'), width: 200 },
@@ -127,7 +157,7 @@ const listColumns = computed(() => [
   { colKey: 'UsedCount', title: t('pages.redeem.list.colUsed'), width: 70 },
   { colKey: 'Creator', title: t('pages.redeem.list.colCreator'), ellipsis: true, minWidth: 120 },
   { colKey: 'CreateTime', title: t('pages.redeem.list.colCreateTime'), width: 180 },
-  { colKey: 'op', title: t('pages.redeem.list.colOp'), width: 130, fixed: 'right' },
+  { colKey: 'op', title: t('pages.redeem.list.colOp'), width: 200, fixed: 'right' },
 ]);
 
 const selectedIds = ref<number[]>([]);
@@ -418,6 +448,7 @@ async function exportCsv() {
         <template #CreateTime="{ row }">{{ fmtTime(row.CreateTime) }}</template>
         <template #op="{ row }">
           <t-space size="small">
+            <t-link theme="primary" hover="color" :disabled="!row.UsedCount" @click="openUses(row)">{{ $t('pages.redeem.actions.uses') }}</t-link>
             <t-link theme="primary" hover="color" @click="openEdit(row)">{{ $t('pages.redeem.actions.edit') }}</t-link>
             <t-link theme="danger" hover="color" @click="removeCode(row)">{{ $t('pages.redeem.actions.delete') }}</t-link>
           </t-space>
@@ -482,18 +513,30 @@ async function exportCsv() {
         </t-row>
       </t-form>
     </t-dialog>
+
+    <t-dialog
+      v-model:visible="usesDialog.visible"
+      :header="$t('pages.redeem.uses.title', { code: usesDialog.code })"
+      width="720px"
+      :footer="false"
+    >
+      <t-table
+        row-key="UserId"
+        :data="usesDialog.items"
+        :columns="usesColumns"
+        :loading="usesDialog.loading"
+        size="small"
+        max-height="420"
+        cell-empty-content="—"
+      >
+        <template #empty>{{ $t('pages.redeem.uses.empty') }}</template>
+        <template #UseTime="{ row }">{{ fmtTime(row?.UseTime) }}</template>
+      </t-table>
+    </t-dialog>
   </div>
 </template>
 
 <style lang="less" scoped>
-.tip {
-  margin-bottom: 16px;
-  color: var(--td-text-color-secondary);
-  font-size: 13px;
-}
-.hutao-card {
-  margin-bottom: 16px;
-}
 .result {
   margin-top: 12px;
 }

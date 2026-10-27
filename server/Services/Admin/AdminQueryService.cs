@@ -8,6 +8,22 @@ namespace server.Services.Admin;
 // Scoped
 public sealed class AdminQueryService(AppDbContext appDbContext)
 {
+    /// <summary>某张兑换码的使用者清单，按使用时间倒序。</summary>
+    public Task<List<RedeemCodeUsageItem>> GetRedeemCodeUsesAsync(uint id)
+    {
+        return appDbContext.RedeemCodeUseItems
+            .AsNoTracking()
+            .Where(item => item.RedeemCodeId == id)
+            .OrderByDescending(item => item.UseTime)
+            .Select(item => new RedeemCodeUsageItem
+            {
+                UserId = item.UsedBy,
+                UserName = appDbContext.Users.Where(user => user.Id == item.UsedBy).Select(user => user.UserName).FirstOrDefault(),
+                UseTime = item.UseTime,
+            })
+            .ToListAsync();
+    }
+
     public async Task<PagedResult<RedeemCodeItem>> GetRedeemCodesAsync(int page, int pageSize, string? keyword)
     {
         // 分页

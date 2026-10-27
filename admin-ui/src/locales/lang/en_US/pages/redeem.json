@@ -60,7 +60,8 @@
     "actions": {
       "edit": "Edit",
       "delete": "Delete",
-      "save": "Save"
+      "save": "Save",
+      "uses": "Users"
     },
     "dialog": {
       "removeHeader": "Delete Redeem Code",
@@ -86,6 +87,14 @@
       "deleteFail": "Failed to delete",
       "noExportData": "No data to export",
       "exportFail": "Failed to export"
+    },
+    "uses": {
+      "title": "Users of {code}",
+      "colUser": "User",
+      "colUserId": "User ID",
+      "colTime": "Used At",
+      "empty": "Nobody has redeemed this code yet",
+      "loadFail": "Failed to load usages"
     }
   }
 }

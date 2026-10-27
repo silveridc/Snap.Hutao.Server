@@ -46,6 +46,7 @@
     "ServerAdminRedeemGenerateSucceed": "Redeem codes generated successfully",
     "ServerAdminRedeemListSucceed": "Redeem code list acquired successfully",
     "ServerAdminRedeemUpdateSucceed": "Redeem code updated successfully",
+    "ServerAdminRedeemUsesSucceed": "Redeem code usages acquired successfully",
     "ServerAdminReleaseActivateSucceed": "Release activated",
     "ServerAdminReleaseAlreadyPublished": "This version has already been published; activate a previous release to roll back",
     "ServerAdminReleaseCurrentSucceed": "Current release retrieved successfully",

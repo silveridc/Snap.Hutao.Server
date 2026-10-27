@@ -105,6 +105,11 @@ export function updateAnnouncement(payload) {
 }
 
 // 兑换码列表
+// 某张兑换码的使用者清单
+export function getRedeemCodeUses(id) {
+  return http.get('/api/Service/Redeem/Uses', { params: { id } })
+}
+
 export function getRedeemList(page = 1, pageSize = 20, keyword = '') {
   return http.get('/api/Service/Redeem/List', { params: { page, pageSize, keyword } })
 }
