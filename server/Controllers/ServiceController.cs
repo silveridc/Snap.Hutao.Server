@@ -34,6 +34,7 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     private readonly YaeMetadataService _yaeMetadataService = serviceProvider.GetRequiredService<YaeMetadataService>();
     private readonly ClientVersionService _clientVersionService = serviceProvider.GetRequiredService<ClientVersionService>();
     private readonly SystemOverviewService _systemOverviewService = serviceProvider.GetRequiredService<SystemOverviewService>();
+    private readonly AnalyticsService _analyticsService = serviceProvider.GetRequiredService<AnalyticsService>();
     private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
     private readonly AppOptions _appOptions = serviceProvider.GetRequiredService<AppOptions>();
 
@@ -177,6 +178,41 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     {
         SystemOverview overview = await _systemOverviewService.GetOverviewAsync(cancellationToken).ConfigureAwait(false);
         return Success<SystemOverview>("System overview acquired successfully", overview, ServerKeys.ServerAdminSystemOverviewSucceed);
+    }
+
+    /// <summary>
+    /// 卡池抽卡分布：按卡池类型汇总抽数与五星，并给出出得最多的五星物品。
+    /// </summary>
+    /// <param name="days">统计最近多少天，0 表示全部历史。</param>
+    /// <returns>抽卡分布。</returns>
+    [HttpGet("Analytics/Gacha")]
+    public async Task<IActionResult> GachaAnalyticsAsync([FromQuery] int days = 30)
+    {
+        GachaAnalytics analytics = await _analyticsService.GetGachaAsync(days).ConfigureAwait(false);
+        return Success<GachaAnalytics>("Gacha analytics acquired successfully", analytics, ServerKeys.ServerAdminAnalyticsGachaSucceed);
+    }
+
+    /// <summary>
+    /// 深渊玩法数据：深境螺旋与幻想真境剧诗的上传量、满星率与角色出场。
+    /// </summary>
+    /// <returns>深渊数据。</returns>
+    [HttpGet("Analytics/Abyss")]
+    public async Task<IActionResult> AbyssAnalyticsAsync()
+    {
+        AbyssAnalytics analytics = await _analyticsService.GetAbyssAsync().ConfigureAwait(false);
+        return Success<AbyssAnalytics>("Abyss analytics acquired successfully", analytics, ServerKeys.ServerAdminAnalyticsAbyssSucceed);
+    }
+
+    /// <summary>
+    /// 伤害分布：直接聚合 damage_ranks 明细，取伤害最高的若干角色。
+    /// </summary>
+    /// <param name="top">返回前多少名，1-50。</param>
+    /// <returns>伤害分布。</returns>
+    [HttpGet("Analytics/Damage")]
+    public async Task<IActionResult> DamageAnalyticsAsync([FromQuery] int top = 10)
+    {
+        DamageAnalytics analytics = await _analyticsService.GetDamageAsync(top).ConfigureAwait(false);
+        return Success<DamageAnalytics>("Damage analytics acquired successfully", analytics, ServerKeys.ServerAdminAnalyticsDamageSucceed);
     }
 
     /// <summary>

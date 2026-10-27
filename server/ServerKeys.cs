@@ -78,6 +78,9 @@ public static class ServerKeys
     public const string ServerAdminAnnouncementListSucceed = "ServerAdminAnnouncementListSucceed";
     public const string ServerAdminAnnouncementNotFound = "ServerAdminAnnouncementNotFound";
     public const string ServerAdminAnnouncementUpdateSucceed = "ServerAdminAnnouncementUpdateSucceed";
+    public const string ServerAdminAnalyticsAbyssSucceed = "ServerAdminAnalyticsAbyssSucceed";
+    public const string ServerAdminAnalyticsDamageSucceed = "ServerAdminAnalyticsDamageSucceed";
+    public const string ServerAdminAnalyticsGachaSucceed = "ServerAdminAnalyticsGachaSucceed";
     public const string ServerAdminAuditListSucceed = "ServerAdminAuditListSucceed";
     public const string ServerAdminBanAlreadyBanned = "ServerAdminBanAlreadyBanned";
     public const string ServerAdminBanListSucceed = "ServerAdminBanListSucceed";

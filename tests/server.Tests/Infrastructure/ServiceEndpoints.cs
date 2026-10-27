@@ -46,6 +46,9 @@ public static class ServiceEndpoints
         new("GET", $"/api/Service/Distribution/Designation?userName={Uri.EscapeDataString(UnknownUser)}&days=0", null, ReturnCodes.UserNameNotExists),
 
         new("GET", "/api/Service/System/Overview", null, ReturnCodes.Success),
+        new("GET", "/api/Service/Analytics/Gacha?days=30", null, ReturnCodes.Success),
+        new("GET", "/api/Service/Analytics/Abyss", null, ReturnCodes.Success),
+        new("GET", "/api/Service/Analytics/Damage?top=10", null, ReturnCodes.Success),
         new("GET", "/api/Service/User/Statistics", null, ReturnCodes.Success),
         new("GET", "/api/Service/ClientVersion/List", null, ReturnCodes.Success),
         new("GET", "/api/Service/User/List?page=1&pageSize=10&keyword=example.com", null, ReturnCodes.Success),

@@ -257,6 +257,21 @@ export function unbindAdminAccount(accountId) {
   return http.post('/api/Service/AdminAccount/Unbind', null, { params: { accountId } })
 }
 
+// 卡池抽卡分布（MySQL 明细聚合）
+export function getGachaAnalytics(days = 30) {
+  return http.get('/api/Service/Analytics/Gacha', { params: { days } })
+}
+
+// 深渊玩法数据：深境螺旋 + 幻想真境剧诗
+export function getAbyssAnalytics() {
+  return http.get('/api/Service/Analytics/Abyss')
+}
+
+// 伤害分布（MySQL damage_ranks 聚合）
+export function getDamageAnalytics(top = 10) {
+  return http.get('/api/Service/Analytics/Damage', { params: { top } })
+}
+
 // ===== 其它管理操作 =====
 
 // 使用兑换码 (username 为空则表示当前登录账号)

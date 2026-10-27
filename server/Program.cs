@@ -176,6 +176,7 @@ public static class Program
             .AddScoped<AdminQueryService>()
             .AddScoped<AdminSsoService>()
             .AddScoped<SystemOverviewService>()
+            .AddScoped<AnalyticsService>()
             .AddSingleton<OidcMetadata>()
             .AddScoped<ReleaseService>()
             .AddScoped<BingWallpaper>()

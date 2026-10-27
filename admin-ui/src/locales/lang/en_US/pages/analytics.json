@@ -1,0 +1,56 @@
+{
+  "analytics": {
+    "gacha": {
+      "title": "Gacha Distribution",
+      "colPool": "Pool",
+      "colPulls": "Pulls",
+      "colStar5": "5★",
+      "colRate": "5★ Rate",
+      "colAverage": "Pulls / 5★",
+      "totalPulls": "Valid Pulls",
+      "totalStar5": "5★ Count",
+      "star5Rate": "5★ Rate",
+      "untrusted": "Excluded (untrusted)",
+      "topItems": "Most Pulled 5★",
+      "days7": "7 days",
+      "days30": "30 days",
+      "days90": "90 days",
+      "daysAll": "All time",
+      "pool": {
+        "100": "Beginner",
+        "200": "Standard",
+        "301": "Character Event",
+        "302": "Weapon Event",
+        "400": "Chronicled",
+        "500": "City Event"
+      }
+    },
+    "abyss": {
+      "title": "Abyss Modes",
+      "spiral": "Spiral Abyss",
+      "theater": "Imaginarium Theater",
+      "records": "Records",
+      "uniqueUids": "Unique UIDs",
+      "fullStar": "Full-star Records",
+      "colFloor": "Floor",
+      "colRecords": "Records",
+      "colAverageStar": "Avg Stars",
+      "topAvatars": "Top Avatars",
+      "spiralTop": "Spiral Abyss Top Avatars"
+    },
+    "damage": {
+      "title": "Damage Distribution",
+      "tip": "Aggregated straight from the damage_ranks table (MySQL) without the Redis snapshot.",
+      "totalDamage": "Total Damage",
+      "samples": "Sample Records",
+      "colRank": "Rank",
+      "colAvatar": "Avatar ID",
+      "colDamage": "Total Damage",
+      "colShare": "Share"
+    },
+    "messages": {
+      "loadFail": "Failed to load analytics",
+      "noData": "No data"
+    }
+  }
+}
