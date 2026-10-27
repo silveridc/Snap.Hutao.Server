@@ -26,7 +26,6 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
         context.GachaItems.AsNoTracking().Where(g => g.Uid == uid).OrderBy(g => g.Id).AsQueryable());
 
     private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-    private readonly MetadataDbContext _metadataDbContext = serviceProvider.GetRequiredService<MetadataDbContext>();
     private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
 
     public async Task RunAsync()
@@ -51,7 +50,7 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
 
     private async Task<Map<int, int>> GetIdQualityMapAsync()
     {
-        List<KnownItem> knownItems = await _metadataDbContext.KnownItems.AsNoTracking().ToListAsync().ConfigureAwait(false);
+        List<KnownItem> knownItems = await _appDbContext.KnownItems.AsNoTracking().ToListAsync().ConfigureAwait(false);
         return new(knownItems.ToDictionary(x => (int)x.Id, x => (int)x.Quality));
     }
 
@@ -59,19 +58,19 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
     {
         DateTime now = timeProvider.GetLocalNow().DateTime;
 
-        GachaEventInfo? avatarEvent1 = await _metadataDbContext.GachaEvents
+        GachaEventInfo? avatarEvent1 = await _appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.ActivityAvatar)
             .ConfigureAwait(false);
 
-        GachaEventInfo? avatarEvent2 = await _metadataDbContext.GachaEvents
+        GachaEventInfo? avatarEvent2 = await _appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.SpeicalActivityAvatar)
             .ConfigureAwait(false);
 
-        GachaEventInfo? weaponEvent = await _metadataDbContext.GachaEvents
+        GachaEventInfo? weaponEvent = await _appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.ActivityWeapon)
             .ConfigureAwait(false);
 
-        GachaEventInfo? chronicled = await _metadataDbContext.GachaEvents
+        GachaEventInfo? chronicled = await _appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.ActivityCity)
             .ConfigureAwait(false);
 

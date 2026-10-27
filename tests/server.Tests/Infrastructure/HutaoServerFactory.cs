@@ -126,17 +126,13 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         stubHttp.MapJson("hutao-cdn.test/get", """{"retcode":0,"message":"ok","data":{"mirrorName":"stub","url":"https://hutao-cdn.test/files/hutao.zip"}}""");
     }
 
-    /// <summary>应用 AppDbContext 的迁移，并建出无迁移的 MetadataDbContext 表。</summary>
+    /// <summary>应用 AppDbContext 的迁移。元数据表已并入主库迁移链，不再单独建表。</summary>
     private async Task PrepareSchemaAsync()
     {
         using IServiceScope scope = Services.CreateScope();
 
         AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         await appDbContext.Database.MigrateAsync();
-
-        MetadataDbContext metadataDbContext = scope.ServiceProvider.GetRequiredService<MetadataDbContext>();
-        // MetadataDbContext 没有迁移，且库已存在，EnsureCreated 不会建表，直接建表
-        await metadataDbContext.Database.GetService<IRelationalDatabaseCreator>().CreateTablesAsync();
     }
 
     public override async ValueTask DisposeAsync()

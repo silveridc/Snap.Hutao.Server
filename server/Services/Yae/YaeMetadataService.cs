@@ -3,13 +3,18 @@
 namespace server.Services.Yae;
 
 public sealed class YaeMetadataService(
-    MetadataDbContext metadataDbContext,
+    AppDbContext appDbContext,
     IHttpClientFactory httpClientFactory,
     AppOptions appOptions,
+    IDistributedCache cache,
     ILogger<YaeMetadataService> logger,
     TimeProvider timeProvider
 )
 {
+    // 注入配置是整包下发（可能几十 KB），每次启动都会拉；内容只在同步新版本时变
+    private const string _payloadCacheKeyPrefix = "Yae:Payload:";
+    private static readonly TimeSpan PayloadCacheDuration = TimeSpan.FromDays(1);
+
     private static readonly JsonSerializerOptions PayloadOptions = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
@@ -40,7 +45,7 @@ public sealed class YaeMetadataService(
         }
 
         string json = JsonSerializer.Serialize(result.Payload, PayloadOptions);
-        YaeAchievementMetadata? existing = await metadataDbContext.YaeAchievementMetadata.FindAsync([result.Version], token).ConfigureAwait(false);
+        YaeAchievementMetadata? existing = await appDbContext.YaeAchievementMetadata.FindAsync([result.Version], token).ConfigureAwait(false);
         YaeAchievementMetadata entity = existing ?? new YaeAchievementMetadata { Version = result.Version! };
         entity.ChineseHash = result.ChineseHash;
         entity.OverseaHash = result.OverseaHash;
@@ -53,10 +58,11 @@ public sealed class YaeMetadataService(
 
         if (existing is null)
         {
-            metadataDbContext.YaeAchievementMetadata.Add(entity);
+            appDbContext.YaeAchievementMetadata.Add(entity);
         }
 
-        await metadataDbContext.SaveChangesAsync(token).ConfigureAwait(false);
+        await appDbContext.SaveChangesAsync(token).ConfigureAwait(false);
+        cache.Remove(_payloadCacheKeyPrefix + result.Version);
         logger.LogInformation("Yae metadata synced for game version {Version}, chinese hash {Chinese:X8}, oversea hash {Oversea:X8}", result.Version, result.ChineseHash, result.OverseaHash);
         return result;
     }
@@ -64,15 +70,27 @@ public sealed class YaeMetadataService(
     /// <summary>读取已同步的版本数据，返回原样吐给客户端的响应体；未同步过返回 null（调用方给 404）。</summary>
     public async Task<string?> GetPayloadAsync(string version, CancellationToken token = default)
     {
-        YaeAchievementMetadata? entity = await metadataDbContext.YaeAchievementMetadata.AsNoTracking().FirstOrDefaultAsync(item => item.Version == version, token).ConfigureAwait(false);
-        return entity?.Payload;
+        string cacheKey = _payloadCacheKeyPrefix + version;
+        if (cache.TryGetValue<string>(cacheKey, out string? cached) && !string.IsNullOrEmpty(cached))
+        {
+            return cached;
+        }
+
+        YaeAchievementMetadata? entity = await appDbContext.YaeAchievementMetadata.AsNoTracking().FirstOrDefaultAsync(item => item.Version == version, token).ConfigureAwait(false);
+        if (entity is null)
+        {
+            return null;
+        }
+
+        cache.Set(cacheKey, entity.Payload, PayloadCacheDuration);
+        return entity.Payload;
     }
 
     public async Task<List<Summary>> ListAsync(CancellationToken token = default)
     {
         return
         [
-            .. await metadataDbContext.YaeAchievementMetadata
+            .. await appDbContext.YaeAchievementMetadata
                 .AsNoTracking()
                 .OrderByDescending(item => item.SyncedAt)
                 .Select(item => new Summary(item.Version, item.ChineseHash, item.OverseaHash, item.StoreCmdId, item.AchievementCmdId, item.ItemCount, item.GroupCount, item.SyncedAt))

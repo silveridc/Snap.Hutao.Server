@@ -134,22 +134,6 @@ public static class Program
                     .EnableSensitiveDataLogging()
                     .EnableDetailedErrors();
             })
-            .AddDbContextPool<MetadataDbContext>((serviceProvider, options) =>
-            {
-                string connectionString = appBuilder.Configuration.GetConnectionString("MetadataMysql8")!;
-
-                ILogger<MetadataDbContext> logger = serviceProvider.GetRequiredService<ILogger<MetadataDbContext>>();
-                if (logger.IsEnabled(LogLevel.Information))
-                {
-                    logger.LogInformation("MetadataDbContext Using connection string: [{Constr}]", connectionString);
-                }
-
-                options
-                    .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug)))
-                    .EnableSensitiveDataLogging()
-                    .EnableDetailedErrors();
-            })
             .AddEndpointsApiExplorer()
             .AddHttpClient()
             .AddStackExchangeRedisCache(options =>
@@ -395,17 +379,6 @@ public static class Program
                 appDbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
                 await appDbContext.Database.MigrateAsync().ConfigureAwait(false);
                 _logger?.LogInformation("Applied {Count} pending migrations: {Migrations}", pending.Length, string.Join(", ", pending));
-            }
-        }
-
-        MetadataDbContext metadataDbContext = scope.ServiceProvider.GetRequiredService<MetadataDbContext>();
-        if (metadataDbContext.Database.IsRelational())
-        {
-            IRelationalDatabaseCreator creator = metadataDbContext.Database.GetService<IRelationalDatabaseCreator>();
-            if (!await creator.HasTablesAsync().ConfigureAwait(false))
-            {
-                await creator.CreateTablesAsync().ConfigureAwait(false);
-                _logger?.LogInformation("Metadata database was empty; created all tables from the model");
             }
         }
     }

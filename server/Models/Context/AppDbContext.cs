@@ -8,6 +8,7 @@ using server.Models.Entity.Redeem;
 using server.Models.Entity.RoleCombat;
 using server.Models.Entity.SpiralAbyss;
 using server.Models.Entity.Telemetry;
+using server.Models.Metadata;
 
 namespace server.Models.Context;
 
@@ -39,6 +40,14 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<HutaoRelease> HutaoReleases { get; set; } = default!;
 
     public DbSet<SystemSetting> SystemSettings { get; set; } = default!;
+
+    /// <summary>祈愿卡池配置（原独立元数据库，连接串与主库相同，已并入）。</summary>
+    public DbSet<GachaEventInfo> GachaEvents { get; set; } = default!;
+
+    public DbSet<KnownItem> KnownItems { get; set; } = default!;
+
+    public DbSet<YaeAchievementMetadata> YaeAchievementMetadata { get; set; } = default!;
+
     #endregion
 
     #region Telemetry

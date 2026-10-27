@@ -1146,6 +1146,152 @@ namespace server.Migrations
                     b.ToTable("hutao_log_items");
                 });
 
+            modelBuilder.Entity("server.Models.Metadata.GachaEventInfo", b =>
+                {
+                    b.Property<string>("Version")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Locale")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<uint>("Order")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<DateTime>("From")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("To")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<uint>("UpOrangeItem1")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem10")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem11")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem12")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem13")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem14")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem15")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem16")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem17")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem2")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem3")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem4")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem5")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem6")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem7")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem8")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpOrangeItem9")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpPurpleItem1")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpPurpleItem2")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpPurpleItem3")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpPurpleItem4")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("UpPurpleItem5")
+                        .HasColumnType("int unsigned");
+
+                    b.HasKey("Version", "Name", "Locale", "Order");
+
+                    b.ToTable("gacha_events");
+                });
+
+            modelBuilder.Entity("server.Models.Metadata.KnownItem", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<uint>("Quality")
+                        .HasColumnType("int unsigned");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("known_items");
+                });
+
+            modelBuilder.Entity("server.Models.Metadata.YaeAchievementMetadata", b =>
+                {
+                    b.Property<string>("Version")
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<uint>("AchievementCmdId")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("ChineseHash")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("GroupCount")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("ItemCount")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<uint>("OverseaHash")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<uint>("StoreCmdId")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<DateTime>("SyncedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Version");
+
+                    b.ToTable("yae_achievement_metadata");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)

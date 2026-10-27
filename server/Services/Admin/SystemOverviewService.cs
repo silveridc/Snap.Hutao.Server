@@ -13,7 +13,6 @@ namespace server.Services.Admin;
 // Scoped：用到池化的 DbContext，Redis 与 Quartz 的入口本身都是单例
 public sealed class SystemOverviewService(
     AppDbContext appDbContext,
-    MetadataDbContext metadataDbContext,
     IConnectionMultiplexer multiplexer,
     ISchedulerFactory schedulerFactory,
     ILogger<SystemOverviewService> logger)
@@ -62,7 +61,6 @@ public sealed class SystemOverviewService(
         List<DatabaseInfo> databases =
         [
             await ProbeDatabaseAsync("主库", appDbContext, cancellationToken).ConfigureAwait(false),
-            await ProbeDatabaseAsync("元数据库", metadataDbContext, cancellationToken).ConfigureAwait(false),
         ];
 
         return new SystemOverview(runtime, resource, databases, await ProbeRedisAsync(cancellationToken).ConfigureAwait(false), await ProbeSchedulerAsync(cancellationToken).ConfigureAwait(false));

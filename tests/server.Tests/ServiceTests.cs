@@ -109,7 +109,7 @@ public sealed class ServiceTests
 
         Assert.False(string.IsNullOrWhiteSpace(overview!.Runtime.MachineName));
         Assert.True(overview.Runtime.ProcessId > 0);
-        Assert.Equal(2, overview.Databases.Count);
+        Assert.Single(overview.Databases);
 
         // 测试宿主自带真 MySQL 与进程内 Garnet，探针拿不到连接就说明采集本身是坏的
         Assert.All(overview.Databases, database => Assert.True(database.Connected, $"{database.Name}: {database.Error}"));
