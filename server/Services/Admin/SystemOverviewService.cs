@@ -10,7 +10,7 @@ using StackExchange.Redis;
 
 namespace server.Services.Admin;
 
-// Scoped：用到池化的 DbContext，Redis 与 Quartz 的入口本身都是单例
+// Scoped
 public sealed class SystemOverviewService(
     AppDbContext appDbContext,
     IConnectionMultiplexer multiplexer,
@@ -204,7 +204,6 @@ public sealed class SystemOverviewService(
         }
         catch (Exception exception)
         {
-            // INFO 会被部分服务端关掉（Garnet 需要 admin 模式、受限 ACL），连通性已经确认过，只让 INFO 派生的字段留空
             logger.LogWarning(exception, "Redis INFO command failed");
             return new RedisInfo(server.IsConnected, endpoint, null, DistributedCacheExtension.InstanceName, null, null, null, null, null, pingMs, SafeMessage(exception));
         }
