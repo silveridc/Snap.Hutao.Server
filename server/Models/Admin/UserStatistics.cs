@@ -19,6 +19,15 @@ public sealed class UserStatistics
     public int SpiralAbyssRecordCount { get; set; }
 
     public int RoleCombatRecordCount { get; set; }
+
+    /// <summary>今日新注册（服务器本地时区的自然日）。</summary>
+    public int NewUsersToday { get; set; }
+
+    /// <summary>近 7 天新注册。</summary>
+    public int NewUsersLast7Days { get; set; }
+
+    /// <summary>近 30 天新注册。</summary>
+    public int NewUsersLast30Days { get; set; }
 }
 
 public sealed class UserListItem

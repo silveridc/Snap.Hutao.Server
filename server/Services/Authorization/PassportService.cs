@@ -32,7 +32,7 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
             return new(false, "This email address is already registered", ServerKeys.ServerPassportServiceEmailHasRegistered);
         }
 
-        HutaoUser newUser = new() { UserName = passport.UserName };
+        HutaoUser newUser = new() { UserName = passport.UserName, CreatedAt = timeProvider.GetUnixTimeSeconds() };
         IdentityResult result = await userManager.CreateAsync(newUser, passport.Password).ConfigureAwait(false);
 
         if (!result.Succeeded)

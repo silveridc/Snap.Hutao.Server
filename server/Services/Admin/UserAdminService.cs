@@ -17,6 +17,9 @@ public sealed class UserAdminService(AppDbContext appDbContext, IDistributedCach
         }
 
         long now = timeProvider.GetUnixTimeSeconds();
+        DateTimeOffset localNow = timeProvider.GetLocalNow();
+        long dayStart = new DateTimeOffset(localNow.Date, localNow.Offset).ToUnixTimeSeconds();
+
         UserStatistics statistics = new()
         {
             TotalUsers = await appDbContext.Users.CountAsync().ConfigureAwait(false),
@@ -28,6 +31,9 @@ public sealed class UserAdminService(AppDbContext appDbContext, IDistributedCach
             GachaItemCount = await appDbContext.GachaItems.LongCountAsync().ConfigureAwait(false),
             SpiralAbyssRecordCount = await appDbContext.Records.CountAsync().ConfigureAwait(false),
             RoleCombatRecordCount = await appDbContext.RoleCombatRecords.CountAsync().ConfigureAwait(false),
+            NewUsersToday = await appDbContext.Users.CountAsync(u => u.CreatedAt >= dayStart).ConfigureAwait(false),
+            NewUsersLast7Days = await appDbContext.Users.CountAsync(u => u.CreatedAt >= now - 604800).ConfigureAwait(false),
+            NewUsersLast30Days = await appDbContext.Users.CountAsync(u => u.CreatedAt >= now - 2592000).ConfigureAwait(false),
         };
 
         cache.Set(StatisticsCacheKey, statistics, StatisticsCacheDuration);

@@ -527,6 +527,9 @@ namespace server.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
 
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
