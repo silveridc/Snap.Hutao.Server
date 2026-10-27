@@ -34,6 +34,10 @@
       "s3Sign": {
         "title": "Update Package S3 Presigned URLs",
         "description": "When a mirror URL matches this host name, /Patch/hutao issues a time-limited presigned URL on the fly before delivery, so the bucket can stay private. Leave empty to disable."
+      },
+      "todayWallpaper": {
+        "title": "Today's Wallpaper",
+        "description": "Served when a client picks the Today wallpaper background; leave the URL empty to fall back to Bing's daily wallpaper. Changes take effect immediately."
       }
     },
     "fields": {
@@ -152,6 +156,22 @@
       "s3ExpiresHours": {
         "label": "Expires (hours)",
         "hint": "1-168, 24 recommended"
+      },
+      "todayWallpaperUrl": {
+        "label": "Wallpaper URL",
+        "hint": "Absolute HTTPS URL; the client's Today wallpaper prefers it"
+      },
+      "todayWallpaperSourceUrl": {
+        "label": "Source page",
+        "hint": "Page the image comes from; leave empty to reuse the wallpaper URL"
+      },
+      "todayWallpaperAuthor": {
+        "label": "Author",
+        "hint": "Shown as the background description in the client; defaults to Snap Hutao"
+      },
+      "todayWallpaperUploader": {
+        "label": "Uploader",
+        "hint": "Defaults to Snap Hutao"
       }
     },
     "form": {

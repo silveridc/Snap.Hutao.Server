@@ -36,6 +36,12 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
         public const string PatchS3SecretAccessKey = "Patch.S3.SecretAccessKey";
         public const string PatchS3ExpiresHours = "Patch.S3.ExpiresHours";
 
+        // 今日壁纸：/Wallpaper/today 优先返回这里人工上架的一张，Url 留空时回退到 Bing 每日壁纸。
+        public const string WallpaperTodayUrl = "Wallpaper.Today.Url";
+        public const string WallpaperTodaySourceUrl = "Wallpaper.Today.SourceUrl";
+        public const string WallpaperTodayAuthor = "Wallpaper.Today.Author";
+        public const string WallpaperTodayUploader = "Wallpaper.Today.Uploader";
+
         // SSO（外部 OIDC 身份源）。任何键未在后台配置时回退到 appsettings/环境变量里的 App:Oidc，
         // 后台改动经 UpdateAsync 即时生效，无需重启。
         public const string OidcEnabled = "Oidc.Enabled";

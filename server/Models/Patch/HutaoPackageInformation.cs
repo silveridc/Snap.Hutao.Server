@@ -35,4 +35,10 @@ public sealed class HutaoPackageInformation
 
     [JsonPropertyName("mirrors")]
     public List<HutaoPackageMirror> Mirrors { get; set; } = [];
+
+    /// <summary>
+    /// 更新说明（Markdown/纯文本），更新器窗口直接展示；未填写时为 null。
+    /// </summary>
+    [JsonPropertyName("releaseNotes")]
+    public string? ReleaseNotes { get; set; }
 }

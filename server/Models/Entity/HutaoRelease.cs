@@ -41,6 +41,7 @@ public sealed class HutaoRelease
             Validation = Validation,
             MinimumVersion = MinimumVersion,
             Mirrors = JsonSerializer.Deserialize<List<server.Models.Patch.HutaoPackageMirror>>(MirrorsJson) ?? [],
+            ReleaseNotes = ReleaseNotes,
         };
     }
 }

@@ -38,6 +38,16 @@ const CONFIG_SECTIONS = computed(() => [
     ],
   },
   {
+    title: t('pages.settings.sections.todayWallpaper.title'),
+    description: t('pages.settings.sections.todayWallpaper.description'),
+    fields: [
+      { key: 'Wallpaper.Today.Url', label: t('pages.settings.fields.todayWallpaperUrl.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperUrl.hint') },
+      { key: 'Wallpaper.Today.SourceUrl', label: t('pages.settings.fields.todayWallpaperSourceUrl.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperSourceUrl.hint') },
+      { key: 'Wallpaper.Today.Author', label: t('pages.settings.fields.todayWallpaperAuthor.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperAuthor.hint') },
+      { key: 'Wallpaper.Today.Uploader', label: t('pages.settings.fields.todayWallpaperUploader.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperUploader.hint') },
+    ],
+  },
+  {
     title: t('pages.settings.sections.pizzaHelper.title'),
     description: t('pages.settings.sections.pizzaHelper.description'),
     fields: [

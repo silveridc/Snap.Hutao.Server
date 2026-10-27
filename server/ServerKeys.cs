@@ -118,6 +118,11 @@ public static class ServerKeys
     public const string ServerAdminRedeemUpdateSucceed = "ServerAdminRedeemUpdateSucceed";
     public const string ServerAdminReleaseActivateSucceed = "ServerAdminReleaseActivateSucceed";
     public const string ServerAdminReleaseAlreadyPublished = "ServerAdminReleaseAlreadyPublished";
+    public const string ServerAdminReleaseBucketListSucceed = "ServerAdminReleaseBucketListSucceed";
+    public const string ServerAdminReleaseBucketNotConfigured = "ServerAdminReleaseBucketNotConfigured";
+    public const string ServerAdminReleaseBucketObjectNotFound = "ServerAdminReleaseBucketObjectNotFound";
+    public const string ServerAdminReleaseBucketObjectRequired = "ServerAdminReleaseBucketObjectRequired";
+    public const string ServerAdminReleaseBucketUnavailable = "ServerAdminReleaseBucketUnavailable";
     public const string ServerAdminReleaseCurrentSucceed = "ServerAdminReleaseCurrentSucceed";
     public const string ServerAdminReleaseDuplicateMirrorName = "ServerAdminReleaseDuplicateMirrorName";
     public const string ServerAdminReleaseInvalidChecksum = "ServerAdminReleaseInvalidChecksum";

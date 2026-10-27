@@ -208,6 +208,17 @@ export function activateRelease(payload) {
   return http.post('/api/Service/Release/Activate', payload)
 }
 
+// 列出补丁存储桶中的对象（从存储桶发布用）
+export function getReleaseBucketObjects(prefix = '') {
+  return http.get('/api/Service/Release/Bucket/Objects', { params: { prefix } })
+}
+
+// 从存储桶发布 (payload: { Key, Version, MirrorName, MinimumVersion, ReleaseNotes })
+// 服务端要读完整个对象算 SHA-256，几百 MiB 的安装包会超过默认 20 秒超时
+export function publishReleaseFromBucket(payload) {
+  return http.post('/api/Service/Release/Bucket/Publish', payload, { timeout: 0 })
+}
+
 // ===== 系统配置 =====
 
 // 获取所有动态配置

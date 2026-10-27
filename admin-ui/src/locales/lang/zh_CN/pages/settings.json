@@ -34,6 +34,10 @@
       "s3Sign": {
         "title": "更新包 S3 直链签名",
         "description": "镜像地址匹配该主机名时，/Patch/hutao 下发前现场签发限时访问 URL，桶可保持私有。留空不启用。"
+      },
+      "todayWallpaper": {
+        "title": "今日壁纸",
+        "description": "客户端选「今日壁纸」背景时返回这张图；URL 留空回退到 Bing 每日壁纸，保存后立即生效。"
       }
     },
     "fields": {
@@ -152,6 +156,22 @@
       "s3ExpiresHours": {
         "label": "有效期（小时）",
         "hint": "1-168，建议 24"
+      },
+      "todayWallpaperUrl": {
+        "label": "壁纸直链",
+        "hint": "HTTPS 绝对地址；客户端的「今日壁纸」优先使用它"
+      },
+      "todayWallpaperSourceUrl": {
+        "label": "来源页",
+        "hint": "图片来源页，留空用壁纸直链"
+      },
+      "todayWallpaperAuthor": {
+        "label": "作者",
+        "hint": "显示在客户端背景图描述里，留空为 Snap Hutao"
+      },
+      "todayWallpaperUploader": {
+        "label": "上传者",
+        "hint": "留空为 Snap Hutao"
       }
     },
     "form": {

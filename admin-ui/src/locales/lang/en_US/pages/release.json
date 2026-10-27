@@ -44,6 +44,27 @@
     "actions": {
       "activate": "Activate"
     },
+    "bucket": {
+      "title": "Publish from Bucket",
+      "tip": "Upload the installer to the patch bucket first, then pick the object here: the server reads it to compute the SHA-256, parses the version from the file name, and builds the Direct mirror URL.",
+      "prefix": "Object prefix",
+      "prefixPlaceholder": "e.g. patch/, empty to list everything",
+      "refreshObjects": "Refresh Objects",
+      "object": "Installer object",
+      "objectPlaceholder": "Select an object in the bucket",
+      "objectEmpty": "No objects under this prefix, or the bucket is not configured",
+      "objectSize": "Size",
+      "versionAutoHint": "Empty to parse from the object file name, e.g. Snap.Hutao.1.17.2.0.msix",
+      "mirrorName": "Mirror name",
+      "mirrorNameHint": "Empty to use the bucket host name",
+      "submit": "Verify and Publish",
+      "publishing": "Reading the object and computing the SHA-256; a large installer takes a while…",
+      "truncated": "More than 200 objects; only the first 200 are shown, narrow the prefix",
+      "objectRequired": "Select the installer object to publish first",
+      "publishSuccess": "Published from the bucket",
+      "publishFail": "Failed to publish from the bucket",
+      "listFail": "Failed to load the bucket objects"
+    },
     "dialog": {
       "activateHeader": "Activate Historical Version",
       "activateConfirmBody": "Set version {version} as the currently active version? The current active version will be replaced."

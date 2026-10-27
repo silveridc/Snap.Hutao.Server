@@ -28,6 +28,7 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
     private readonly BanService _banService = serviceProvider.GetRequiredService<BanService>();
     private readonly AdminQueryService _adminQueryService = serviceProvider.GetRequiredService<AdminQueryService>();
     private readonly ReleaseService _releaseService = serviceProvider.GetRequiredService<ReleaseService>();
+    private readonly ReleaseBucketService _releaseBucketService = serviceProvider.GetRequiredService<ReleaseBucketService>();
     private readonly SystemConfigService _systemConfigService = serviceProvider.GetRequiredService<SystemConfigService>();
     private readonly AccessionService _accessionService = serviceProvider.GetRequiredService<AccessionService>();
     private readonly IRankService _rankService = serviceProvider.GetRequiredService<IRankService>();
@@ -643,6 +644,38 @@ public class ServiceController(IServiceProvider serviceProvider) : ControllerBas
         return activated
             ? Success("Release activated", ServerKeys.ServerAdminReleaseActivateSucceed)
             : Fail("Release does not exist", ReturnCode.NotFound, ServerKeys.ServerAdminReleaseNotFound);
+    }
+
+    /// <summary>
+    /// 列出补丁存储桶中的对象，供后台按对象发布时选择。
+    /// </summary>
+    [HttpGet("Release/Bucket/Objects")]
+    public async Task<IActionResult> ReleaseBucketObjectsAsync([FromQuery] string? prefix, CancellationToken cancellationToken)
+    {
+        (ReleaseBucketListResult? result, string message, string? localizationKey) = await _releaseBucketService
+            .ListAsync(prefix, cancellationToken)
+            .ConfigureAwait(false);
+
+        return localizationKey is null
+            ? Success("Bucket objects retrieved successfully", result!, ServerKeys.ServerAdminReleaseBucketListSucceed)
+            : Fail(message, ReturnCode.InvalidUploadData, localizationKey);
+    }
+
+    /// <summary>
+    /// 从补丁存储桶发布版本：服务端读取对象计算 SHA-256，并据此生成下载镜像。
+    /// </summary>
+    [HttpPost("Release/Bucket/Publish")]
+    public async Task<IActionResult> ReleaseBucketPublishAsync([FromBody] HutaoReleasePublishFromBucketRequest request, CancellationToken cancellationToken)
+    {
+        (bool success, string message, string? localizationKey, HutaoReleaseItem? release) = await _releaseBucketService
+            .PublishAsync(request, this.GetUserIdOrZero(), cancellationToken)
+            .ConfigureAwait(false);
+
+        return success
+            ? Success<HutaoReleaseItem>(message, release!, localizationKey!)
+            : localizationKey is null
+                ? Fail(message, ReturnCode.InvalidUploadData)
+                : Fail(message, ReturnCode.InvalidUploadData, localizationKey);
     }
 
     /// <summary>

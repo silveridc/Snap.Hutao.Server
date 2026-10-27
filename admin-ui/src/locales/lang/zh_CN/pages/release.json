@@ -44,6 +44,27 @@
     "actions": {
       "activate": "激活"
     },
+    "bucket": {
+      "title": "从存储桶发布",
+      "tip": "对象先传到补丁存储桶，这里选一个安装包即可：服务端会读取对象计算 SHA-256、按文件名解析版本号，并生成 Direct 镜像地址。",
+      "prefix": "对象前缀",
+      "prefixPlaceholder": "如 patch/，留空列出全部",
+      "refreshObjects": "刷新对象",
+      "object": "安装包对象",
+      "objectPlaceholder": "选择存储桶中的对象",
+      "objectEmpty": "该前缀下没有对象，或存储桶未配置",
+      "objectSize": "大小",
+      "versionAutoHint": "留空时从对象文件名解析，如 Snap.Hutao.1.17.2.0.msix",
+      "mirrorName": "镜像名称",
+      "mirrorNameHint": "留空用存储桶主机名",
+      "submit": "校验并发布",
+      "publishing": "正在读取对象并计算 SHA-256，大文件需要一会儿…",
+      "truncated": "对象超过 200 个，仅显示前 200 个，请缩小前缀范围",
+      "objectRequired": "请先选择要发布的安装包对象",
+      "publishSuccess": "已从存储桶发布",
+      "publishFail": "从存储桶发布失败",
+      "listFail": "获取存储桶对象失败"
+    },
     "dialog": {
       "activateHeader": "激活历史版本",
       "activateConfirmBody": "确定将版本 {version} 设为当前激活版本？当前激活版本将被替换。"

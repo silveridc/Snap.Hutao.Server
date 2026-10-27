@@ -132,6 +132,9 @@ public static class ServiceEndpoints
         // 成功与「重复发布被拒」两个分支由 ReleasePublish_ThenActivate_MakesTheVersionCurrent 断言
         new("POST", "/api/Service/Release/Publish", TestData.ReleasePublishJson(PublishVersion), null),
         new("POST", "/api/Service/Release/Activate", JsonSerializer.Serialize(new HutaoReleaseActivateRequest { Id = UnknownId }), ReturnCodes.NotFound),
+        // 从存储桶发布：S3 未配置时稳定落在「未配置」分支；哈希与下发断言见 ReleasePublishFromBucket_* 用例
+        new("GET", "/api/Service/Release/Bucket/Objects", null, ReturnCodes.InvalidUploadData),
+        new("POST", "/api/Service/Release/Bucket/Publish", JsonSerializer.Serialize(new HutaoReleasePublishFromBucketRequest { Key = "patch/Snap.Hutao.1.0.0.0.msix" }), ReturnCodes.InvalidUploadData),
 
         new("GET", "/api/Service/Config/Get", null, ReturnCodes.Success),
         new("POST", "/api/Service/Config/Update", JsonSerializer.Serialize(new Dictionary<string, string?> { [ConfigUpdateKey] = "1" }), ReturnCodes.Success),

@@ -4,10 +4,12 @@ using Microsoft.Extensions.Caching.Distributed;
 using server.Models.Admin;
 using server.Models.Context;
 using server.Models.Entity;
+using server.Models.Patch;
 using server.Options;
 using server.Services.PublicAPI;
 using server.Tests.Infrastructure;
 using System.Net;
+using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -825,6 +827,150 @@ public sealed class ServiceTests
         TestResponse parsed = await SendAsync("POST", "/api/Service/Release/Publish", body, maintainer.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
+    }
+
+    private const string BucketHost = "patch.test.s3.local";
+
+    private async Task SetBucketConfigAsync(TestUser maintainer, bool enabled)
+    {
+        Dictionary<string, string?> settings = new()
+        {
+            ["Patch.S3.Host"] = enabled ? BucketHost : string.Empty,
+            ["Patch.S3.Region"] = enabled ? "cn-test-1" : string.Empty,
+            ["Patch.S3.AccessKeyId"] = enabled ? "test-access-key" : string.Empty,
+            ["Patch.S3.SecretAccessKey"] = enabled ? "test-secret-key" : string.Empty,
+        };
+
+        TestResponse updated = await SendAsync("POST", "/api/Service/Config/Update", JsonSerializer.Serialize(settings), maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, updated.Retcode);
+    }
+
+    /// <summary>
+    /// 从存储桶发布的完整链路：列对象 → 服务端流式算 SHA-256 → 版本号取自对象键 → 组装 Direct 镜像 →
+    /// /patch/hutao 原样下发校验值与更新说明。桶本身由 StubHttpMessageHandler 冒充，不依赖外网。
+    /// </summary>
+    [Fact]
+    public async Task ReleasePublishFromBucket_HashesObjectAndServesItOnPatch()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+        string version = $"1.96.{Random.Shared.Next(1000, 9999)}.0";
+        string key = $"patch/Snap.Hutao.{version}.msix";
+        byte[] payload = Encoding.UTF8.GetBytes($"msix payload for {version}");
+        string sha256 = Convert.ToHexString(SHA256.HashData(payload)).ToLowerInvariant();
+
+        factory.StubHttp.Map(
+            request => request.RequestUri?.Host == BucketHost && request.RequestUri.Query.Contains("list-type=2", StringComparison.Ordinal),
+            _ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent($"""
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+                      <Name>patch</Name>
+                      <Prefix>patch/</Prefix>
+                      <IsTruncated>false</IsTruncated>
+                      <Contents>
+                        <Key>{key}</Key>
+                        <LastModified>2026-10-28T00:00:00.000Z</LastModified>
+                        <Size>{payload.Length}</Size>
+                      </Contents>
+                    </ListBucketResult>
+                    """, Encoding.UTF8, "application/xml"),
+            });
+        factory.StubHttp.Map(
+            request => request.RequestUri?.Host == BucketHost && request.RequestUri.AbsolutePath.EndsWith($"/{key}", StringComparison.Ordinal),
+            _ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent(payload),
+            });
+
+        await SetBucketConfigAsync(maintainer, enabled: true);
+        try
+        {
+            TestResponse listed = await SendAsync("GET", "/api/Service/Release/Bucket/Objects?prefix=patch/", null, maintainer.AccessToken);
+            Assert.Equal(ReturnCodes.Success, listed.Retcode);
+
+            ReleaseBucketListResult? list = listed.DeserializeData<ReleaseBucketListResult>();
+            Assert.NotNull(list);
+            Assert.Equal(BucketHost, list!.Host);
+            ReleaseBucketObjectItem item = Assert.Single(list.Objects);
+            Assert.Equal(key, item.Key);
+            Assert.Equal(payload.Length, item.Size);
+
+            TestResponse published = await SendAsync(
+                "POST",
+                "/api/Service/Release/Bucket/Publish",
+                JsonSerializer.Serialize(new HutaoReleasePublishFromBucketRequest
+                {
+                    Key = key,
+                    ReleaseNotes = "从存储桶发布",
+                }),
+                maintainer.AccessToken);
+            Assert.Equal(ReturnCodes.Success, published.Retcode);
+
+            HutaoReleaseItem? release = published.DeserializeData<HutaoReleaseItem>();
+            Assert.NotNull(release);
+            Assert.Equal(version, release!.Version);
+            Assert.Equal(sha256, release.Validation);
+
+            HutaoPackageMirror mirror = Assert.Single(release.Mirrors);
+            Assert.Equal($"https://{BucketHost}/{key}", mirror.Url);
+            Assert.Equal(BucketHost, mirror.MirrorName);
+            Assert.Equal(HutaoPackageMirrorType.Direct, mirror.MirrorType);
+
+            using HttpResponseMessage patch = await client.GetWithTokenAsync("/patch/hutao", token: null);
+            TestResponse patchParsed = await patch.ReadTestResponseAsync();
+            Assert.Equal(ReturnCodes.Success, patchParsed.Retcode);
+            Assert.Equal(sha256, patchParsed.Data.GetProperty("validation").GetString());
+            Assert.Equal("从存储桶发布", patchParsed.Data.GetProperty("releaseNotes").GetString());
+        }
+        finally
+        {
+            await SetBucketConfigAsync(maintainer, enabled: false);
+        }
+    }
+
+    [Fact]
+    public async Task ReleasePublishFromBucket_WithMissingObject_IsRejected()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+        string key = $"patch/Snap.Hutao.1.95.{Random.Shared.Next(1000, 9999)}.0.msix";
+
+        factory.StubHttp.Map(
+            request => request.RequestUri?.Host == BucketHost && request.RequestUri.AbsolutePath.EndsWith($"/{key}", StringComparison.Ordinal),
+            _ => new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        await SetBucketConfigAsync(maintainer, enabled: true);
+        try
+        {
+            TestResponse published = await SendAsync(
+                "POST",
+                "/api/Service/Release/Bucket/Publish",
+                JsonSerializer.Serialize(new HutaoReleasePublishFromBucketRequest { Key = key }),
+                maintainer.AccessToken);
+
+            Assert.Equal(ReturnCodes.InvalidUploadData, published.Retcode);
+            Assert.Equal(ServerKeys.ServerAdminReleaseBucketObjectNotFound, published.L10nKey);
+        }
+        finally
+        {
+            await SetBucketConfigAsync(maintainer, enabled: false);
+        }
+    }
+
+    [Fact]
+    public async Task ReleasePublishFromBucket_WithoutConfiguration_IsRejected()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+        await SetBucketConfigAsync(maintainer, enabled: false);
+
+        TestResponse published = await SendAsync(
+            "POST",
+            "/api/Service/Release/Bucket/Publish",
+            JsonSerializer.Serialize(new HutaoReleasePublishFromBucketRequest { Key = "patch/Snap.Hutao.1.94.0.0.msix" }),
+            maintainer.AccessToken);
+
+        Assert.Equal(ReturnCodes.InvalidUploadData, published.Retcode);
+        Assert.Equal(ServerKeys.ServerAdminReleaseBucketNotConfigured, published.L10nKey);
     }
 
     [Fact]

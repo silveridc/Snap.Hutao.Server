@@ -5,6 +5,7 @@ using server.Models.GachaLog;
 using server.Models.Legacy;
 using server.Models.Metadata;
 using server.Models.Passport;
+using server.Models.PublicAPI;
 using server.Services.GachaLog;
 using server.Tests.Infrastructure;
 using System.Net;
@@ -487,6 +488,58 @@ public sealed class ClientFlowTests
         TestResponse loopback = await SendAsync("GET", "/api/PublicApi/ip");
         Assert.Equal(ReturnCodes.Success, loopback.Retcode);
         Assert.False(loopback.Data.TryGetProperty("country", out _), "查不到属地时不该有 country 字段");
+    }
+
+    /// <summary>
+    /// 今日壁纸：后台配了直链就下发人工上架的条目（来源页留空复用直链、作者留空用默认值），
+    /// 清空配置后回退到 Bing 每日壁纸。
+    /// </summary>
+    [Fact]
+    public async Task TodayWallpaper_WithCuratedSource_ServesItAndFallsBackWhenCleared()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+        const string url = "https://img.example.com/hutao-today.png";
+
+        TestResponse updated = await SendAsync(
+            "POST",
+            "/api/Service/Config/Update",
+            new Dictionary<string, string?>
+            {
+                ["Wallpaper.Today.Url"] = url,
+                ["Wallpaper.Today.Author"] = "Hutao",
+            },
+            maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, updated.Retcode);
+
+        try
+        {
+            TestResponse curated = await SendAsync("GET", "/api/Wallpaper/today");
+            Assert.Equal(ReturnCodes.Success, curated.Retcode);
+
+            WallPaperResponse? response = curated.DeserializeData<WallPaperResponse>();
+            Assert.NotNull(response);
+            Assert.Equal(url, response!.Url);
+            Assert.Equal(url, response.SourceUrl);
+            Assert.Equal("Hutao", response.Author);
+            Assert.Equal("Snap Hutao", response.Uploader);
+        }
+        finally
+        {
+            TestResponse cleared = await SendAsync(
+                "POST",
+                "/api/Service/Config/Update",
+                new Dictionary<string, string?>
+                {
+                    ["Wallpaper.Today.Url"] = string.Empty,
+                    ["Wallpaper.Today.Author"] = string.Empty,
+                },
+                maintainer.AccessToken);
+            Assert.Equal(ReturnCodes.Success, cleared.Retcode);
+        }
+
+        TestResponse fallback = await SendAsync("GET", "/api/Wallpaper/today");
+        Assert.Equal(ReturnCodes.Success, fallback.Retcode);
+        Assert.Contains("bing.com", fallback.DeserializeData<WallPaperResponse>()!.Url, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>HutaoLogSingleItem.DeviceId 与 client_versions.DeviceId 都限长 32。</summary>
