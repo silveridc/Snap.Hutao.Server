@@ -20,6 +20,10 @@ public sealed class AdminAuditLog
 
     public string? Detail { get; set; }
 
+    /// <summary>操作来源 IP。取 RemoteIpAddress，已由 ForwardedHeaders 还原成真实客户端地址；属地不入库，读的时候按它现查。</summary>
+    [StringLength(64)]
+    public string? Ip { get; set; }
+
     public bool Success { get; set; }
 
     public long Timestamp { get; set; }

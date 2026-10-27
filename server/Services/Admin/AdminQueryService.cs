@@ -2,11 +2,12 @@ using server.Models.Admin;
 using server.Models.Entity;
 using server.Models.Entity.GachaLog;
 using server.Models.Entity.Redeem;
+using server.Services.PublicAPI;
 
 namespace server.Services.Admin;
 
 // Scoped
-public sealed class AdminQueryService(AppDbContext appDbContext)
+public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService ipRegionService)
 {
     /// <summary>某张兑换码的使用者清单，按使用时间倒序。</summary>
     public Task<List<RedeemCodeUsageItem>> GetRedeemCodeUsesAsync(uint id)
@@ -191,11 +192,11 @@ public sealed class AdminQueryService(AppDbContext appDbContext)
         IQueryable<AdminAuditLog> baseQuery = appDbContext.AdminAuditLogs.AsNoTracking();
         long total = await baseQuery.LongCountAsync().ConfigureAwait(false);
 
-        List<AuditLogItem> items = await baseQuery
+        List<AuditLogRow> rows = await baseQuery
             .OrderByDescending(a => a.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(a => new AuditLogItem
+            .Select(a => new AuditLogRow
             {
                 Id = a.Id,
                 AdminUserId = a.AdminUserId,
@@ -205,13 +206,62 @@ public sealed class AdminQueryService(AppDbContext appDbContext)
                 AdminUserName = a.AdminAccountName ?? appDbContext.Users.Where(u => u.Id == a.AdminUserId).Select(u => u.UserName).FirstOrDefault(),
                 Action = a.Action,
                 Detail = a.Detail,
+                Ip = a.Ip,
                 Success = a.Success,
                 Timestamp = a.Timestamp,
             })
             .ToListAsync()
             .ConfigureAwait(false);
 
+        // 属地不落库，读的时候按 IP 现查（IpRegionService 带 Redis 缓存），同一个 IP 只查一次
+        string[] ips = [.. rows.Select(row => row.Ip).OfType<string>().Distinct()];
+        Task<string?[]?>[] lookups = [.. ips.Select(ip => ipRegionService.GetRegionAsync(ip))];
+        await Task.WhenAll(lookups).ConfigureAwait(false);
+        Dictionary<string, string?[]?> regions = new();
+        for (int i = 0; i < ips.Length; i++)
+        {
+            regions[ips[i]] = lookups[i].Result;
+        }
+
+        List<AuditLogItem> items =
+        [
+            .. rows.Select(row => new AuditLogItem
+            {
+                Id = row.Id,
+                AdminUserId = row.AdminUserId,
+                AdminAccountId = row.AdminAccountId,
+                AdminUserName = row.AdminUserName,
+                Action = row.Action,
+                Detail = row.Detail,
+                Ip = row.Ip,
+                IpRegion = row.Ip is null ? null : regions[row.Ip],
+                Success = row.Success,
+                Timestamp = row.Timestamp,
+            }),
+        ];
+
         return new PagedResult<AuditLogItem> { Total = total, Page = page, PageSize = pageSize, Items = items };
+    }
+
+    private sealed class AuditLogRow
+    {
+        public long Id { get; init; }
+
+        public int AdminUserId { get; init; }
+
+        public int? AdminAccountId { get; init; }
+
+        public string? AdminUserName { get; init; }
+
+        public string Action { get; init; } = default!;
+
+        public string? Detail { get; init; }
+
+        public string? Ip { get; init; }
+
+        public bool Success { get; init; }
+
+        public long Timestamp { get; init; }
     }
 
     public async Task<UserDetail?> GetUserDetailAsync(int userId)

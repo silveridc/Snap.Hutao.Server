@@ -33,10 +33,14 @@ public sealed class ClientFlowTests
     /// </summary>
     private static string NewUid() => $"2{Interlocked.Increment(ref uidCounter):D8}";
 
-    private async Task<TestResponse> SendAsync(string method, string url, object? body = null, string? token = null)
+    private async Task<TestResponse> SendAsync(string method, string url, object? body = null, string? token = null, string? realIp = null)
     {
         using HttpRequestMessage request = new(new HttpMethod(method), url);
         request.WithToken(token);
+        if (realIp is not null)
+        {
+            request.WithRealIp(realIp);
+        }
         request.WithDevice();
         request.WithClientVersion();
 
@@ -462,6 +466,27 @@ public sealed class ClientFlowTests
         ClientVersionCount? row = statistics.Versions.SingleOrDefault(item => item.Version == "9.9.9.9");
         Assert.NotNull(row);
         Assert.Equal(2, row.DeviceCount);
+    }
+
+    /// <summary>
+    /// 启动器的 IP 属地接口：ip 取 ForwardedHeaders 还原出来的真实地址，四段属地由 service 现查（带 Redis 缓存）。
+    /// </summary>
+    [Fact]
+    public async Task PublicIp_ReturnsTheFourRegionSegments()
+    {
+        TestResponse parsed = await SendAsync("GET", "/api/PublicApi/ip", realIp: "223.5.5.5");
+        Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+        JsonElement data = parsed.Data;
+        Assert.Equal("223.5.5.5", data.GetProperty("ip").GetString());
+        Assert.Equal(
+            ("中国", "浙江省", "杭州市", "阿里"),
+            (data.GetProperty("country").GetString(), data.GetProperty("province").GetString(), data.GetProperty("city").GetString(), data.GetProperty("isp").GetString()));
+
+        // 不带真实地址时是回环，内置库里查不到；响应外壳省略 null 字段而不是报错
+        TestResponse loopback = await SendAsync("GET", "/api/PublicApi/ip");
+        Assert.Equal(ReturnCodes.Success, loopback.Retcode);
+        Assert.False(loopback.Data.TryGetProperty("country", out _), "查不到属地时不该有 country 字段");
     }
 
     /// <summary>HutaoLogSingleItem.DeviceId 与 client_versions.DeviceId 都限长 32。</summary>

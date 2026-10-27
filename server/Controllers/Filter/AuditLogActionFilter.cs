@@ -35,6 +35,7 @@ public sealed partial class AuditLogActionFilter(IServiceScopeFactory scopeFacto
                 AdminAccountName = await GetAdminAccountNameAsync(scope.ServiceProvider, accountId).ConfigureAwait(false),
                 Action = context.HttpContext.Request.Path.Value ?? string.Empty,
                 Detail = Redact(SerializeArgs(context.ActionArguments)),
+                Ip = context.HttpContext.GetClientIp(),
                 Success = executed.Exception is null,
                 Timestamp = timeProvider.GetUnixTimeSeconds(),
             };

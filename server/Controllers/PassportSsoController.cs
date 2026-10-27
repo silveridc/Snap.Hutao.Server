@@ -100,7 +100,7 @@ public sealed class PassportSsoController(
     public async Task<IActionResult> ExchangeAsync([FromBody] PassportSsoExchangeRequest request, CancellationToken cancellationToken)
     {
         (HutaoUser? user, AdminAccount? account) = await adminSsoService
-            .TakeClientTicketAsync(request.Ticket ?? string.Empty, cancellationToken)
+            .TakeClientTicketAsync(request.Ticket ?? string.Empty, HttpContext.GetClientIp(), cancellationToken)
             .ConfigureAwait(false);
 
         if (user is null || account is null)

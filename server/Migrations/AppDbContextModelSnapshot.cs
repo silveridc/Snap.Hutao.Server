@@ -280,6 +280,10 @@ namespace server.Migrations
                     b.Property<string>("Detail")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Ip")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
                     b.Property<bool>("Success")
                         .HasColumnType("tinyint(1)");
 

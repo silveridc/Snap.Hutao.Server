@@ -10,12 +10,21 @@ const rows = ref<any[]>([]);
 const pagination = reactive({ current: 1, pageSize: 20, total: 0 });
 
 const columns = computed(() => [
-  { colKey: 'Timestamp', title: t('pages.audit.list.colTime'), width: 180 },
-  { colKey: 'admin', title: t('pages.audit.list.colOperator'), width: 200, ellipsis: true },
-  { colKey: 'Action', title: t('pages.audit.list.colAction'), width: 260, ellipsis: true },
+  { colKey: 'Timestamp', title: t('pages.audit.list.colTime'), width: 170 },
+  { colKey: 'admin', title: t('pages.audit.list.colOperator'), width: 190, ellipsis: true },
+  { colKey: 'Ip', title: t('pages.audit.list.colIp'), width: 140 },
+  { colKey: 'IpRegion', title: t('pages.audit.list.colIpRegion'), width: 170, ellipsis: true },
+  { colKey: 'Action', title: t('pages.audit.list.colAction'), width: 230, ellipsis: true },
   { colKey: 'Success', title: t('pages.audit.list.colResult'), width: 80 },
-  { colKey: 'Detail', title: t('pages.audit.list.colDetail'), ellipsis: true, minWidth: 240 },
+  { colKey: 'Detail', title: t('pages.audit.list.colDetail'), ellipsis: true, minWidth: 200 },
 ]);
+
+// 属地是 IP2Region 的四段数组（国家/省份/城市/运营商），查不到的段是 "0"，去重后拼成可读文本
+function fmtRegion(region?: string[] | null) {
+  if (!region?.length) return '—';
+  const parts = region.map((part) => (part ?? '').trim()).filter((part) => part && part !== '0');
+  return parts.length ? [...new Set(parts)].join(' ') : '—';
+}
 
 function fmt(sec?: number) {
   if (!sec || sec <= 0) return '—';
@@ -64,6 +73,10 @@ onMounted(load);
       >
         <template #Timestamp="{ row }">{{ fmt(row.Timestamp) }}</template>
         <template #admin="{ row }">{{ row.AdminUserName || '—' }} (#{{ row.AdminUserId }})</template>
+        <template #Ip="{ row }">
+          <span class="mono">{{ row.Ip || '—' }}</span>
+        </template>
+        <template #IpRegion="{ row }">{{ fmtRegion(row.IpRegion) }}</template>
         <template #Success="{ row }">
           <t-tag v-if="row.Success" theme="success" variant="light">{{ $t('pages.audit.list.success') }}</t-tag>
           <t-tag v-else theme="danger" variant="light">{{ $t('pages.audit.list.failure') }}</t-tag>
@@ -80,14 +93,6 @@ onMounted(load);
 </template>
 
 <style lang="less" scoped>
-.hutao-card {
-  margin-bottom: 16px;
-}
-.tip {
-  margin-bottom: 16px;
-  color: var(--td-text-color-secondary);
-  font-size: 13px;
-}
 .detail-cell {
   font-family: var(--td-font-family-medium, monospace);
   font-size: 12px;

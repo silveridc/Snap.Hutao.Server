@@ -93,7 +93,9 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     [HttpPost("Exchange")]
     public async Task<IActionResult> ExchangeAsync([FromBody] AdminSsoExchangeRequest request, CancellationToken cancellationToken)
     {
-        AdminSsoTokenResponse? token = await adminSsoService.RedeemTicketAsync(request.Ticket ?? string.Empty, cancellationToken).ConfigureAwait(false);
+        AdminSsoTokenResponse? token = await adminSsoService
+            .RedeemTicketAsync(request.Ticket ?? string.Empty, HttpContext.GetClientIp(), cancellationToken)
+            .ConfigureAwait(false);
 
         if (token is null)
         {

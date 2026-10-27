@@ -18,6 +18,7 @@ using server.Models.Entity;
 using server.Models.Entity.Passport;
 using server.Models.Passport;
 using server.Models.Response;
+using server.Services.PublicAPI;
 using server.Options;
 using server.Services.Admin;
 using server.Services.Authorization;
@@ -212,7 +213,7 @@ public sealed class SsoTests : IDisposable
     private async Task<int> SignInAsync(AdminSsoService service, string subject, CancellationToken token)
     {
         AdminSsoCallbackResult callback = await CompleteLoginAsync(service, subject, token);
-        AdminSsoTokenResponse? redeemed = await service.RedeemTicketAsync(callback.Ticket!, token);
+        AdminSsoTokenResponse? redeemed = await service.RedeemTicketAsync(callback.Ticket!, cancellationToken: token);
         Assert.NotNull(redeemed);
 
         JwtSecurityToken decoded = new JwtSecurityTokenHandler().ReadJwtToken(redeemed!.AccessToken);
@@ -246,7 +247,7 @@ public sealed class SsoTests : IDisposable
         Assert.Equal(AdminSsoCallbackStatus.Success, callback.Status);
         Assert.NotNull(callback.Ticket);
 
-        AdminSsoTokenResponse? redeemed = await service.RedeemTicketAsync(callback.Ticket!, token);
+        AdminSsoTokenResponse? redeemed = await service.RedeemTicketAsync(callback.Ticket!, cancellationToken: token);
         Assert.NotNull(redeemed);
         JwtSecurityToken decoded = new JwtSecurityTokenHandler().ReadJwtToken(redeemed!.AccessToken);
         string? accountId = decoded.Claims.SingleOrDefault(c => c.Type == AdminClaimTypes.AccountId)?.Value;
@@ -254,7 +255,7 @@ public sealed class SsoTests : IDisposable
         Assert.False(decoded.Claims.Any(c => c.Type == PassportClaimTypes.UserId), "后台令牌不应携带主站用户身份");
 
         // 一次性票据用第二次必须失败
-        Assert.Null(await service.RedeemTicketAsync(callback.Ticket!, token));
+        Assert.Null(await service.RedeemTicketAsync(callback.Ticket!, cancellationToken: token));
 
         // 账号确实落库并可被后续请求命中
         int parsedId = int.Parse(accountId!);
@@ -628,7 +629,7 @@ public sealed class SsoTests : IDisposable
 
         string unboundTicket = (await CompleteClientLoginAsync(service, subject, token)).Ticket!;
         Assert.Equal(ReturnCode.Success, (await service.UnbindAsync(accountId, token)).Code);
-        (HutaoUser? unboundUser, AdminAccount? unboundAccount) = await service.TakeClientTicketAsync(unboundTicket, token);
+        (HutaoUser? unboundUser, AdminAccount? unboundAccount) = await service.TakeClientTicketAsync(unboundTicket, cancellationToken: token);
         Assert.Null(unboundUser);
         Assert.Null(unboundAccount);
 
@@ -636,7 +637,7 @@ public sealed class SsoTests : IDisposable
         string disabledTicket = (await CompleteClientLoginAsync(service, subject, token)).Ticket!;
         Assert.Equal(ReturnCode.Success, (await service.AddAsync($"spare-{Guid.NewGuid():N}", "Spare", null, token)).Code);
         Assert.Equal(ReturnCode.Success, (await service.SetEnabledAsync(accountId, enabled: false, currentAccountId: 0, token)).Code);
-        Assert.Null((await service.TakeClientTicketAsync(disabledTicket, token)).User);
+        Assert.Null((await service.TakeClientTicketAsync(disabledTicket, cancellationToken: token)).User);
     }
 
     /// <summary>

@@ -108,6 +108,12 @@ public sealed class AuditLogItem
 
     public string? Detail { get; set; }
 
+    /// <summary>操作来源 IP。</summary>
+    public string? Ip { get; set; }
+
+    /// <summary>IP 属地，IP2Region 的四段：国家/省份/城市/运营商，缺段为 "0"；按 IP 现查，查不到为 null。</summary>
+    public string?[]? IpRegion { get; set; }
+
     public bool Success { get; set; }
 
     public long Timestamp { get; set; }

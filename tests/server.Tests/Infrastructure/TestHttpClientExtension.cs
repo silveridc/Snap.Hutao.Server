@@ -8,6 +8,9 @@ public static class TestHttpClientExtension
     public const string DeviceNameHeader = "x-hutao-device-name";
     public const string DeviceOsHeader = "x-hutao-device-os";
 
+    /// <summary>与 appsettings.json 的 <c>App:RealIp:Header</c> 一致，被 ForwardedHeaders 还原成 RemoteIpAddress。</summary>
+    public const string RealIpHeader = "X-Real-IP";
+
     /// <summary>附加 Bearer 令牌。</summary>
     public static HttpRequestMessage WithToken(this HttpRequestMessage request, string? accessToken)
     {
@@ -32,6 +35,13 @@ public static class TestHttpClientExtension
     public static HttpRequestMessage WithClientVersion(this HttpRequestMessage request, string version = "1.17.1.0")
     {
         request.Headers.TryAddWithoutValidation("User-Agent", $"Snap Hutao/{version}");
+        return request;
+    }
+
+    /// <summary>伪装成从公网来的请求，让服务端按真实客户端 IP 记审计、解析属地。</summary>
+    public static HttpRequestMessage WithRealIp(this HttpRequestMessage request, string ip)
+    {
+        request.Headers.TryAddWithoutValidation(RealIpHeader, ip);
         return request;
     }
 

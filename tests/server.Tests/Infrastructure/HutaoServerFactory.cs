@@ -196,7 +196,9 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         builder.UseSetting("ConnectionStrings:MetadataMysql8", connectionString);
         builder.UseSetting("App:RedisAddress", $"127.0.0.1:{RedisPort}");
         builder.UseSetting("App:Socket:Status", "false");
-        builder.UseSetting("App:RealIp:Status", "false");
+        // 打开真实来源 IP：ForwardedHeaders 会把 X-Real-IP 还原成 RemoteIpAddress，
+        // 审计日志记录的 IP 与属地解析共用这条链路，关掉就没法在测试里带上公网地址
+        builder.UseSetting("App:RealIp:Status", "true");
         builder.UseSetting("App:RSAPrivateKey", rsaKeyPath);
         builder.UseSetting("App:Smtp:Server", "127.0.0.1");
         builder.UseSetting("App:Smtp:UserName", "noreply@example.com");

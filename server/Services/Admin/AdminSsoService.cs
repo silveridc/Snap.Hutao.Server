@@ -133,9 +133,10 @@ public sealed class AdminSsoService(
     /// 所以回调与换取之间被停用或解绑的账号换不出令牌。
     /// </summary>
     /// <param name="ticket">回调阶段签发的票据。</param>
+    /// <param name="clientIp">换取票据的客户端 IP，仅用于审计。</param>
     /// <param name="cancellationToken">取消令牌。</param>
     /// <returns>主站账号与对应的后台账号；票据无效或身份已不可用时为 null。</returns>
-    public async Task<(HutaoUser? User, AdminAccount? Account)> TakeClientTicketAsync(string ticket, CancellationToken cancellationToken = default)
+    public async Task<(HutaoUser? User, AdminAccount? Account)> TakeClientTicketAsync(string ticket, string? clientIp = null, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(ticket))
         {
@@ -175,6 +176,7 @@ public sealed class AdminSsoService(
             AdminAccountName = account.UserName,
             Action = "/Passport/Sso/Login",
             Detail = user.UserName,
+            Ip = clientIp,
             Success = true,
             Timestamp = timeProvider.GetUnixTimeSeconds(),
         });
@@ -338,9 +340,10 @@ public sealed class AdminSsoService(
     /// 用一次性票据换取后台令牌。票据无论成功与否都只能使用一次。
     /// </summary>
     /// <param name="ticket">回调阶段签发的票据。</param>
+    /// <param name="clientIp">换取票据的客户端 IP，仅用于审计。</param>
     /// <param name="cancellationToken">取消令牌。</param>
     /// <returns>后台令牌；票据无效或账号已不可用时为 null。</returns>
-    public async Task<AdminSsoTokenResponse?> RedeemTicketAsync(string ticket, CancellationToken cancellationToken = default)
+    public async Task<AdminSsoTokenResponse?> RedeemTicketAsync(string ticket, string? clientIp = null, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(ticket))
         {
@@ -371,6 +374,7 @@ public sealed class AdminSsoService(
             AdminAccountName = account.UserName,
             Action = "/Admin/Sso/Login",
             Detail = null,
+            Ip = clientIp,
             Success = true,
             Timestamp = now.ToUnixTimeSeconds(),
         });

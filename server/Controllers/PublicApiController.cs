@@ -14,11 +14,14 @@ public class PublicApiController(IpRegionService ipRegionService) : ControllerBa
     /// <returns>IP and region data.</returns>
     [HttpGet("ip")]
     [ProducesResponseType(typeof(IpResponse), 200)]
-    public IActionResult GetIp()
+    public async Task<IActionResult> GetIpAsync()
     {
-        IPAddress clientIp = HttpContext.Connection.RemoteIpAddress!;
-        string?[] region = ipRegionService.GetRegion(clientIp);
-        IpResponse? data = new(clientIp.ToString(), region[0]!, region[1]!, region[2]!, region[3]!);
+        string? clientIp = HttpContext.GetClientIp();
+        string?[]? region = await ipRegionService.GetRegionAsync(clientIp).ConfigureAwait(false);
+
+        // 查不到时仍是四段 null，接口输出形状与以前一致
+        string?[] segments = region ?? new string?[4];
+        IpResponse data = new(clientIp ?? "unknown", segments[0]!, segments[1]!, segments[2]!, segments[3]!);
         return Success<IpResponse>("Success", data);
     }
 }
