@@ -24,7 +24,8 @@
       "workingSet": "Working Set",
       "privateMemory": "Private Memory",
       "managedHeap": "Managed Heap",
-      "threads": "Threads"
+      "threads": "Threads",
+      "heapShare": "of private memory"
     },
     "redis": {
       "title": "Redis",
@@ -39,7 +40,8 @@
       "keys": "Keys",
       "uptimeDays": "Uptime (days)",
       "ping": "Ping",
-      "instanceName": "Instance Prefix"
+      "instanceName": "Instance Prefix",
+      "infoUnavailable": "INFO is disabled on the server, some metrics are unavailable"
     },
     "database": {
       "title": "Database Connections",
@@ -98,6 +100,13 @@
       "loadFail": "Failed to load system overview",
       "refreshed": "Refreshed",
       "refreshFail": "Failed to refresh"
+    },
+    "growth": {
+      "title": "User Growth",
+      "total": "Total Users",
+      "today": "New Today",
+      "last7": "Last 7 Days",
+      "last30": "Last 30 Days"
     }
   }
 }

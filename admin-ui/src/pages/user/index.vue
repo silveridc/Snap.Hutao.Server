@@ -411,17 +411,19 @@ onMounted(() => {
 </template>
 
 <style lang="less" scoped>
-.hutao-card {
-  margin-bottom: 16px;
-}
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  // 9 个统计项正好排成 3×3，不留半行空位
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   min-height: 40px;
 }
 .stat-tile {
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px 16px;
   border: 1px solid var(--td-component-stroke);
   border-radius: var(--td-radius-medium);
   background: var(--td-bg-color-container);
@@ -429,12 +431,14 @@ onMounted(() => {
 .stat-value {
   font-size: 24px;
   font-weight: 600;
+  line-height: 1.2;
   color: var(--td-text-color-primary);
+  font-variant-numeric: tabular-nums;
 }
 .stat-label {
-  margin-top: 4px;
   color: var(--td-text-color-secondary);
   font-size: 13px;
+  line-height: 18px;
 }
 .search-bar {
   margin-bottom: 16px;

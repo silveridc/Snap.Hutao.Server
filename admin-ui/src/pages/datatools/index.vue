@@ -177,14 +177,6 @@ onMounted(() => {
 </template>
 
 <style lang="less" scoped>
-.hutao-card {
-  margin-bottom: 16px;
-}
-.tip {
-  margin-bottom: 16px;
-  color: var(--td-text-color-secondary);
-  font-size: 13px;
-}
 .bar {
   margin-bottom: 16px;
 }

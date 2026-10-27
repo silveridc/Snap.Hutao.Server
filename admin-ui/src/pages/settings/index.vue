@@ -179,10 +179,10 @@ onMounted(load);
         <template #subtitle>
           <span class="section-desc">{{ section.description }}</span>
         </template>
-        <div class="field-grid">
-          <div v-for="field in section.fields" :key="field.key" class="field">
+        <div class="field-grid" :class="{ 'field-grid-switch': section.fields.every((item) => item.type === 'switch') }">
+          <div v-for="field in section.fields" :key="field.key" class="field" :class="{ 'field-inline': field.type === 'switch' }">
             <div class="field-label">{{ field.label }}</div>
-            <div class="field-control">
+            <div class="field-control" :class="{ 'field-switch': field.type === 'switch' }">
               <t-switch v-if="field.type === 'switch'" v-model="form[field.key]" />
               <template v-else>
                 <t-input
@@ -221,19 +221,49 @@ onMounted(load);
 </template>
 
 <style lang="less" scoped>
-.hutao-card {
-  margin-bottom: 16px;
-}
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 32px;
+  align-items: start;
+}
+// 全开关的分组：三项排一行，标签在左、开关在右，避免第三个开关独占一行留空
+.field-grid-switch {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 24px;
 }
 .field {
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+}
+// 开关字段：标签与开关同一行两端对齐，提示另起一行挂在下方
+.field-inline {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'label control'
+    'hint  hint';
+  align-items: center;
+  gap: 2px 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--td-component-stroke);
+  border-radius: var(--td-radius-medium);
+}
+
+.field-inline .field-label {
+  grid-area: label;
+}
+
+.field-inline .field-control {
+  grid-area: control;
+  min-height: unset;
+}
+
+.field-inline .field-hint {
+  grid-area: hint;
+  margin-top: 2px;
 }
 .field-label {
   color: var(--td-text-color-primary);
@@ -247,6 +277,12 @@ onMounted(load);
   gap: 8px;
   min-height: 32px;
 }
+// 开关型字段没有输入框，把它们压成固定高度，避免与输入框行错位
+// 只把开关所在单元格撑到与输入框同高；开关自身的尺寸交给 TDesign，改了会把胶囊压成圆
+.field-switch {
+  min-height: 32px;
+}
+
 .field-input {
   flex: 1;
   min-width: 0;
@@ -279,10 +315,6 @@ onMounted(load);
   color: var(--td-text-color-primary);
   font-size: 15px;
   font-weight: 600;
-}
-.tip {
-  color: var(--td-text-color-secondary);
-  font-size: 12px;
 }
 .section-desc {
   color: var(--td-text-color-placeholder);

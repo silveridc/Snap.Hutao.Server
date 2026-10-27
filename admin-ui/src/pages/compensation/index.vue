@@ -119,11 +119,6 @@ function onSubmit() {
 </template>
 
 <style lang="less" scoped>
-.tip {
-  margin-bottom: 16px;
-  color: var(--td-text-color-secondary);
-  font-size: 13px;
-}
 .result {
   margin-top: 12px;
 }

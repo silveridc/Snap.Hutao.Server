@@ -1,2 +1,110 @@
 @import './font-family.less';
 @import './reset.less';
+
+// 页面骨架：卡片之间的间距、卡片内边距、标题与正文的对齐都在这里统一定义，
+// 各页面不要再各自写一份 .hutao-card，否则间距会逐个页面漂移。
+.hutao-page {
+  > * {
+    min-width: 0;
+  }
+}
+
+.hutao-card {
+  // 卡片可能被 t-loading 包一层，光靠父级 gap 排不出间距，所以间距落在卡片自己身上。
+  // 并排布局（t-row > t-col > t-card）里由行来负责间距，卡片自身不再叠加，否则同排卡片底边会被撑得不齐。
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  :deep(.t-card__header) {
+    padding-bottom: 12px;
+  }
+
+  :deep(.t-card__header-wrapper) {
+    align-items: center;
+  }
+}
+
+// TDesign 默认给 t-row 加 align-top，子项不会被拉伸，同排卡片就会一高一矮
+.t-row {
+  margin-bottom: 16px;
+  align-items: stretch !important;
+
+  > .t-col {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// 带 gutter 的行靠负外边距对齐列，嵌在卡片正文/表单里时会撑出横向滚动，统一收掉。
+// TDesign 用 .t-row--start 之类的高优先级规则给负 margin，所以要 !important。
+.t-card__body .t-row,
+.t-form .t-row,
+.t-form-item .t-row {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+.t-row .t-col > .hutao-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+// 卡片被拉高后让正文区吃掉剩余高度，同排卡片的边框才会在下沿齐平
+.t-row .t-col > .hutao-card > :deep(.t-card__body) {
+  flex: 1;
+}
+
+// 行是页面最后一块时不再叠底距，交给 .hutao-card:last-child 的归零规则
+.hutao-page > .t-row:last-child {
+  margin-bottom: 0;
+}
+
+// 卡片内的横排信息行：标签左对齐、值右对齐，行高与分隔线统一
+.info-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--td-component-stroke);
+  font-size: 13px;
+  line-height: 20px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.info-label {
+  flex: none;
+  color: var(--td-text-color-secondary);
+}
+
+.info-value {
+  font-weight: 500;
+  text-align: right;
+  word-break: break-all;
+}
+
+// 页面内的操作栏（搜索框、按钮组）统一底距，避免有的页面 12px 有的 16px
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.mono {
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+}

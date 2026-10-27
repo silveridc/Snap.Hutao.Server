@@ -79,16 +79,8 @@ onMounted(load);
 </template>
 
 <style lang="less" scoped>
-.tip {
-  margin-bottom: 16px;
-  color: var(--td-text-color-secondary);
-  font-size: 13px;
-}
 .summary {
   margin-bottom: 16px;
-}
-.mono {
-  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
 }
 .share-bar {
   width: 100%;

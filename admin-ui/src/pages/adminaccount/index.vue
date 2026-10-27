@@ -286,14 +286,6 @@ function confirmRemove(row: AdminAccountRow) {
 onMounted(load);
 </script>
 <style lang="less" scoped>
-.hutao-card {
-  margin-bottom: 16px;
-}
-
-.tip {
-  margin: 0 0 12px;
-  color: var(--td-text-color-secondary);
-}
 
 .unbound {
   color: var(--td-text-color-placeholder);
