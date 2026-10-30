@@ -1,4 +1,4 @@
-{
+﻿{
   "login": {
     "brand": "Hutao Cloud",
     "subtitle": "Admin Console",
@@ -20,7 +20,8 @@
     },
     "messages": {
       "loginSuccess": "Signed in successfully",
-      "loginFail": "Sign in failed"
+      "loginFail": "Sign in failed",
+      "captchaFail": "Human verification failed, please refresh and retry"
     }
   }
 }

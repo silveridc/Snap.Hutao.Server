@@ -1,7 +1,9 @@
-﻿namespace server.Controllers;
+﻿using server.Filter;
+
+namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/distribution")]
 [ApiExplorerSettings(GroupName = "Distribution")]
 public class DistributionController(DistributionService distributionService) : ControllerBase
 {
@@ -11,7 +13,7 @@ public class DistributionController(DistributionService distributionService) : C
     /// <returns>下载令牌。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateCdnPermission))]
-    [HttpGet("GetDownloadToken")]
+    [HttpGet("download-token")]
     public async Task<IActionResult> GetDownloadToken()
     {
         string? token = await distributionService.GetDownloadTokenAsync();
@@ -30,8 +32,8 @@ public class DistributionController(DistributionService distributionService) : C
     /// <returns>加速镜像信息。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateCdnPermission))]
-    [HttpGet("GetAcceleratedMirror")]
-    public async Task<IActionResult> GetAcceleratedMirror([FromQuery(Name = "Filename")] string filename)
+    [HttpGet("accelerated-mirror")]
+    public async Task<IActionResult> GetAcceleratedMirror([FromQuery(Name = "filename")] string filename)
     {
         HutaoPackageMirror? mirror = await distributionService.GetAcceleratedMirrorAsync(filename);
         if (mirror is null)

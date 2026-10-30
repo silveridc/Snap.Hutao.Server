@@ -1,5 +1,7 @@
+﻿using server.Models.Admin;
 using server.Services.Admin;
 using server.Tests.Infrastructure;
+using System.Net;
 using System.Net.Http;
 
 namespace server.Tests;
@@ -58,6 +60,78 @@ public sealed class S3PresignTests
     }
 
     [Fact]
+    public async Task PublishFromBucket_WithPrecomputedHash_SkipsDownloadingTheObject()
+    {
+        SystemConfigService config = factory.GetService<SystemConfigService>();
+        TestUser maintainer = await factory.Users.MaintainerAsync();
+        string key = $"patch/precomputed-{Guid.NewGuid():N}.msix";
+        string version = $"1.94.{Random.Shared.Next(1000, 9999)}.0";
+        string validation = new('b', 64);
+
+        factory.StubHttp.Map(
+            request => request.Method == HttpMethod.Head && request.RequestUri!.AbsoluteUri.Contains(key, StringComparison.Ordinal),
+            _ =>
+            {
+                HttpResponseMessage response = new(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent([]),
+                };
+                response.Content.Headers.ContentLength = 123456789;
+                return response;
+            });
+
+        await config.UpdateAsync(new Dictionary<string, string?>
+        {
+            [Keys.PatchS3Host] = "bucket.test",
+            [Keys.PatchS3Region] = "us-east-1",
+            [Keys.PatchS3AccessKeyId] = "AKIAIOSFODNN7EXAMPLE",
+            [Keys.PatchS3SecretAccessKey] = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        }, 0);
+
+        try
+        {
+            using HttpRequestMessage publish = new(HttpMethod.Post, "/api/admin/releases/from-bucket");
+            publish.WithToken(maintainer.AccessToken);
+            publish.Content = JsonContent.Create(new HutaoReleasePublishFromBucketRequest
+            {
+                Key = key,
+                Version = version,
+                Validation = validation,
+            });
+
+            using HttpResponseMessage response = await client.SendAsync(publish, TestContext.Current.CancellationToken);
+            TestResponse parsed = await response.ReadTestResponseAsync();
+            Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+            HutaoReleaseItem? release = parsed.DeserializeData<HutaoReleaseItem>();
+            Assert.NotNull(release);
+            Assert.Equal(validation, release!.Validation);
+
+            // 指定哈希后只发 HEAD，不下载对象
+            Assert.Contains(factory.StubHttp.Requests, r => r.Method == "HEAD" && r.Url.Contains(key, StringComparison.Ordinal));
+            Assert.DoesNotContain(factory.StubHttp.Requests, r => r.Method == "GET" && r.Url.Contains(key, StringComparison.Ordinal));
+
+            using HttpRequestMessage deactivate = new(HttpMethod.Delete, $"/api/admin/releases/{release.Id}/activation");
+            deactivate.WithToken(maintainer.AccessToken);
+            using HttpResponseMessage deactivated = await client.SendAsync(deactivate, TestContext.Current.CancellationToken);
+            Assert.True(deactivated.IsSuccessStatusCode);
+        }
+        finally
+        {
+            foreach (string configKey in new[]
+            {
+                Keys.PatchS3Host,
+                Keys.PatchS3Region,
+                Keys.PatchS3AccessKeyId,
+                Keys.PatchS3SecretAccessKey,
+            })
+            {
+                await config.DeleteAsync(configKey);
+            }
+        }
+    }
+
+    [Fact]
     public async Task PatchMirrors_ArePresignedOnlyWhenConfiguredAndHostMatches()
     {
         SystemConfigService config = factory.GetService<SystemConfigService>();
@@ -65,7 +139,7 @@ public sealed class S3PresignTests
         string version = $"1.96.{Random.Shared.Next(1000, 9999)}.0";
 
         // 发布两个镜像：一个主机名匹配 S3 配置，一个不匹配
-        using HttpRequestMessage publish = new(HttpMethod.Post, "/api/Service/Release/Publish");
+        using HttpRequestMessage publish = new(HttpMethod.Post, "/api/admin/releases");
         publish.WithToken(maintainer.AccessToken);
         publish.Content = new StringContent(
             $$"""
@@ -80,11 +154,11 @@ public sealed class S3PresignTests
         {
             await config.UpdateAsync(new Dictionary<string, string?>
             {
-                [SystemConfigService.Keys.PatchS3Host] = "my-bucket.s3.us-east-1.amazonaws.com",
-                [SystemConfigService.Keys.PatchS3Region] = "us-east-1",
-                [SystemConfigService.Keys.PatchS3AccessKeyId] = "AKIAIOSFODNN7EXAMPLE",
-                [SystemConfigService.Keys.PatchS3SecretAccessKey] = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-                [SystemConfigService.Keys.PatchS3ExpiresHours] = "24",
+                [Keys.PatchS3Host] = "my-bucket.s3.us-east-1.amazonaws.com",
+                [Keys.PatchS3Region] = "us-east-1",
+                [Keys.PatchS3AccessKeyId] = "AKIAIOSFODNN7EXAMPLE",
+                [Keys.PatchS3SecretAccessKey] = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+                [Keys.PatchS3ExpiresHours] = "24",
             }, 0);
 
             using HttpResponseMessage signed = await client.GetAsync("/patch/hutao", TestContext.Current.CancellationToken);
@@ -98,11 +172,11 @@ public sealed class S3PresignTests
         {
             foreach (string key in new[]
             {
-                SystemConfigService.Keys.PatchS3Host,
-                SystemConfigService.Keys.PatchS3Region,
-                SystemConfigService.Keys.PatchS3AccessKeyId,
-                SystemConfigService.Keys.PatchS3SecretAccessKey,
-                SystemConfigService.Keys.PatchS3ExpiresHours,
+                Keys.PatchS3Host,
+                Keys.PatchS3Region,
+                Keys.PatchS3AccessKeyId,
+                Keys.PatchS3SecretAccessKey,
+                Keys.PatchS3ExpiresHours,
             })
             {
                 await config.DeleteAsync(key);
@@ -111,7 +185,7 @@ public sealed class S3PresignTests
 
         // 撤销配置后：同一下发不再带签名（下一版本发布前该 release 仍是 active，用 Release/Activate 复位不需要——
         // 直接验证未配置时 SignS3Mirrors 短路即可：发布一个同主机的新版本，URL 原样）
-        using HttpRequestMessage republish = new(HttpMethod.Post, "/api/Service/Release/Publish");
+        using HttpRequestMessage republish = new(HttpMethod.Post, "/api/admin/releases");
         string plainVersion = $"1.95.{Random.Shared.Next(1000, 9999)}.0";
         republish.WithToken(maintainer.AccessToken);
         republish.Content = new StringContent(

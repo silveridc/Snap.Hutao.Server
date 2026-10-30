@@ -100,6 +100,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<RefreshToken> RefreshTokens { get; set; } = default!;
 
     public DbSet<OAuthBindIdentity> OAuthBindIdentities { get; set; } = default!;
+
+    public DbSet<UserLoginLog> UserLoginLogs { get; set; } = default!;
     #endregion
 
     /// <inheritdoc/>

@@ -1,4 +1,4 @@
-{
+﻿{
   "login": {
     "brand": "胡桃云",
     "subtitle": "管理后台",
@@ -20,7 +20,8 @@
     },
     "messages": {
       "loginSuccess": "登录成功",
-      "loginFail": "登录失败"
+      "loginFail": "登录失败",
+      "captchaFail": "人机验证失败，请刷新页面重试"
     }
   }
 }

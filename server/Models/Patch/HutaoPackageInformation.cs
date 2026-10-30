@@ -33,6 +33,18 @@ public sealed class HutaoPackageInformation
     [JsonPropertyName("islandInjectionDisabled")]
     public bool? IslandInjectionDisabled { get; set; }
 
+    /// <summary>
+    /// 熔断原因：客户端在功能被禁用时展示给用户；未填写时省略，客户端使用默认提示。
+    /// </summary>
+    [JsonPropertyName("fpsUnlockDisabledReason")]
+    public string? FpsUnlockDisabledReason { get; set; }
+
+    /// <summary>
+    /// 熔断原因：语义同 <see cref="FpsUnlockDisabledReason"/>。
+    /// </summary>
+    [JsonPropertyName("islandInjectionDisabledReason")]
+    public string? IslandInjectionDisabledReason { get; set; }
+
     [JsonPropertyName("mirrors")]
     public List<HutaoPackageMirror> Mirrors { get; set; } = [];
 

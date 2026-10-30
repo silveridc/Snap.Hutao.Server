@@ -1,4 +1,4 @@
-// API 冒烟测试。凭据从环境变量读取，不落盘。
+﻿// API 冒烟测试。凭据从环境变量读取，不落盘。
 //   BASE=https://snap-api.sliveridc1.cn EMAIL=... PASSWORD=... node scripts/api-smoke.mjs
 const BASE = process.env.BASE || 'https://snap-api.sliveridc1.cn'
 const EMAIL = process.env.EMAIL
@@ -40,8 +40,8 @@ async function tryLogin(label, url, withDeviceHeaders) {
 }
 
 console.log('--- v2 WITHOUT device headers ---')
-await tryLogin('v2/Login  (no headers)', `${BASE}/Passport/v2/Login`, false)
+await tryLogin('v2/Login  (no headers)', `${BASE}/passport/v2/sessions`, false)
 console.log('--- v2 WITH device headers ---')
-await tryLogin('v2/Login  (headers)   ', `${BASE}/Passport/v2/Login`, true)
+await tryLogin('v2/Login  (headers)   ', `${BASE}/passport/v2/sessions`, true)
 console.log('--- legacy WITHOUT device headers ---')
 await tryLogin('Passport/Login (legacy)', `${BASE}/Passport/Login`, false)

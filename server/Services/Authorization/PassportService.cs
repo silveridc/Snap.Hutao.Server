@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using server.Extension;
 using server.Models.Passport;
 
 namespace server.Services.Authorization;

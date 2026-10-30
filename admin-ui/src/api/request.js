@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 import { i18n } from '@/locales'
 import { getAccessToken, getRefreshToken, setTokens, clearTokens, emitAuthExpired } from '@/utils/token'
 import { getDeviceHeaders } from '@/utils/device'
@@ -46,7 +46,7 @@ async function refreshTokens() {
       try {
         const encrypted = await rsaEncrypt(refreshToken)
         const { data: envelope } = await bare.post(
-          '/api/Passport/v2/RefreshToken',
+          '/api/passport/v2/sessions/refresh',
           { RefreshToken: encrypted },
           { headers: getDeviceHeaders() },
         )

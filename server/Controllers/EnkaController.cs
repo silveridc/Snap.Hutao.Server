@@ -1,7 +1,7 @@
-namespace server.Controllers;
+﻿namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/enka")]
 [ApiExplorerSettings(IgnoreApi = true)]
 public sealed class EnkaController(IHttpClientFactory httpClientFactory, IDistributedCache cache) : ControllerBase
 {

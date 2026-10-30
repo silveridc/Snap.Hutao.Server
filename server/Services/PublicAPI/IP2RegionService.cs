@@ -22,10 +22,10 @@ public class IpRegionService([FromKeyedServices("IPv4DB")] ISearcher searcher, [
             return Task.FromResult<string?[]?>(null);
         }
 
-        return cache.GetOrCreateAsync<string?[]?>($"{_cacheKeyPrefix}{ip}", _cacheDuration, () => Task.FromResult(Lookup(address)));
+        return cache.GetOrCreateAsync<string?[]?>($"{_cacheKeyPrefix}{ip}", _cacheDuration, () => Task.FromResult(_Lookup(address)));
     }
 
-    private string?[]? Lookup(IPAddress ip)
+    private string?[]? _Lookup(IPAddress ip)
     {
         string?[] region = ip switch
         {

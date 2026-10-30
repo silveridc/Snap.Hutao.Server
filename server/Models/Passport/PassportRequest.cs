@@ -46,4 +46,9 @@ public sealed class PassportRequest
     /// 指示请求用于注销账号。
     /// </summary>
     public bool IsCancelRegistration { get; set; }
+
+    /// <summary>
+    /// reCAPTCHA v3 客户端令牌，启用验证码时登录必须携带。
+    /// </summary>
+    public string? CaptchaToken { get; set; }
 }

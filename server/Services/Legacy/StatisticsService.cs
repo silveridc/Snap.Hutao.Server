@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using server.Core;
-using server.Extension;
 using server.Models.Entity.SpiralAbyss;
 
 namespace server.Services.Legacy;

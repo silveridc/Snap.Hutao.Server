@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using server.Extension;
 using server.Models.Entity.GachaLog;
 using server.Models.Metadata;
 using server.Services.Legacy.Primitive;

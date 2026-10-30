@@ -13,6 +13,7 @@ public static class ServerKeys
     public const string ServerPassportLoginRequired = "ServerPassportLoginRequired";
     public const string ServerPassportLoginSucceed = "ServerPassportLoginSucceed";
     public const string ServerPassportPasswordTooShort = "ServerPassportPasswordTooShort";
+    public const string ServerPassportReCaptchaFailed = "ServerPassportReCaptchaFailed";
     public const string ServerPassportRefreshTokenEmpty = "ServerPassportRefreshTokenEmpty";
     public const string ServerPassportRefreshTokenInvalid = "ServerPassportRefreshTokenInvalid";
     public const string ServerPassportResetPasswordSucceed = "ServerPassportResetPasswordSucceed";
@@ -106,6 +107,7 @@ public static class ServerKeys
     public const string ServerAdminLicenseApproveSucceed = "ServerAdminLicenseApproveSucceed";
     public const string ServerAdminLicenseApproveUserNotFound = "ServerAdminLicenseApproveUserNotFound";
     public const string ServerAdminLicenseListSucceed = "ServerAdminLicenseListSucceed";
+    public const string ServerAdminLoginLogListSucceed = "ServerAdminLoginLogListSucceed";
     public const string ServerAdminOperationSucceed = "ServerAdminOperationSucceed";
     public const string ServerAdminPasswordTooShort = "ServerAdminPasswordTooShort";
     public const string ServerAdminRankKeyRequired = "ServerAdminRankKeyRequired";
@@ -124,6 +126,7 @@ public static class ServerKeys
     public const string ServerAdminReleaseBucketObjectRequired = "ServerAdminReleaseBucketObjectRequired";
     public const string ServerAdminReleaseBucketUnavailable = "ServerAdminReleaseBucketUnavailable";
     public const string ServerAdminReleaseCurrentSucceed = "ServerAdminReleaseCurrentSucceed";
+    public const string ServerAdminReleaseDeactivateSucceed = "ServerAdminReleaseDeactivateSucceed";
     public const string ServerAdminReleaseDuplicateMirrorName = "ServerAdminReleaseDuplicateMirrorName";
     public const string ServerAdminReleaseInvalidChecksum = "ServerAdminReleaseInvalidChecksum";
     public const string ServerAdminReleaseInvalidMirrorName = "ServerAdminReleaseInvalidMirrorName";
@@ -147,6 +150,8 @@ public static class ServerKeys
     public const string ServerAdminUserNameNotFound = "ServerAdminUserNameNotFound";
     public const string ServerAdminUserNotFound = "ServerAdminUserNotFound";
     public const string ServerAdminUserStatisticsSucceed = "ServerAdminUserStatisticsSucceed";
+    public const string ServerAdminWallpaperPoolInvalid = "ServerAdminWallpaperPoolInvalid";
+    public const string ServerAdminWallpaperPoolSaveSucceed = "ServerAdminWallpaperPoolSaveSucceed";
     public const string ServerAdminWriteRequiresSso = "ServerAdminWriteRequiresSso";
     public const string ServerAnnouncementGetSucceed = "ServerAnnouncementGetSucceed";
     public const string ServerAnnouncementUploadSucceed = "ServerAnnouncementUploadSucceed";

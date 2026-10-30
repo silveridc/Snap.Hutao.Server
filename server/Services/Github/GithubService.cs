@@ -1,5 +1,4 @@
 ﻿using System.Web;
-using server.Extension;
 using server.Models.Github;
 
 namespace server.Services.Github;

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using server.Models.Context;
@@ -73,7 +73,7 @@ public sealed class UserAdminTests
         TestUser victim = await users.CreateUniqueAsync("nostamp");
         await SetStampAsync(factory, victim.Id, null);
 
-        using HttpRequestMessage request = new(HttpMethod.Post, "/api/Service/User/ResetPassword");
+        using HttpRequestMessage request = new(HttpMethod.Put, $"/api/admin/users/{victim.Id}/password");
         request.Headers.Authorization = new("Bearer", maintainer.AccessToken);
         request.Content = JsonContent.Create(new { UserId = victim.Id, NewPassword });
 

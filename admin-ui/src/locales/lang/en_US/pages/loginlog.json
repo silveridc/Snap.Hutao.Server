@@ -1,0 +1,32 @@
+{
+  "loginlog": {
+    "title": "Login Log",
+    "tip": "Successful and failed password / SSO logins from clients; the region is resolved from the IP on read",
+    "filters": {
+      "keywordPlaceholder": "Filter by email or IP",
+      "all": "All",
+      "success": "Success",
+      "failure": "Failed",
+      "search": "Search",
+      "reset": "Reset"
+    },
+    "columns": {
+      "time": "Time",
+      "user": "User",
+      "method": "Method",
+      "result": "Result",
+      "ip": "IP",
+      "region": "Region",
+      "device": "Device",
+      "reason": "Failure Reason"
+    },
+    "methods": {
+      "password": "Password",
+      "sso": "SSO"
+    },
+    "messages": {
+      "loadFail": "Failed to load the login log"
+    },
+    "empty": "No login records"
+  }
+}

@@ -1,4 +1,4 @@
-{
+﻿{
   "server": {
     "ServerAdminAccountAddSucceed": "Admin account added successfully",
     "ServerAdminAccountAlreadyExists": "An admin account for this identity already exists",
@@ -56,6 +56,7 @@
     "ServerAdminLicenseApproveSucceed": "Approved successfully",
     "ServerAdminLicenseApproveUserNotFound": "Approval failed: account does not exist",
     "ServerAdminLicenseListSucceed": "License application list acquired successfully",
+    "ServerAdminLoginLogListSucceed": "Login log acquired successfully",
     "ServerAdminOperationSucceed": "Operation succeeded",
     "ServerAdminPasswordTooShort": "New password must be at least 8 characters",
     "ServerAdminRankKeyRequired": "Leaderboard key is required",
@@ -74,6 +75,7 @@
     "ServerAdminReleaseBucketObjectRequired": "Select the installer object to publish",
     "ServerAdminReleaseBucketUnavailable": "The patch storage bucket is unavailable; check the endpoint and credentials",
     "ServerAdminReleaseCurrentSucceed": "Current release retrieved successfully",
+    "ServerAdminReleaseDeactivateSucceed": "Release deactivated",
     "ServerAdminReleaseDuplicateMirrorName": "Mirror names must be unique",
     "ServerAdminReleaseInvalidChecksum": "SHA-256 checksum must contain 64 hexadecimal characters",
     "ServerAdminReleaseInvalidMirrorName": "Mirror name must not be empty or exceed 100 characters",
@@ -97,6 +99,8 @@
     "ServerAdminUserNameNotFound": "User name does not exist",
     "ServerAdminUserNotFound": "User does not exist",
     "ServerAdminUserStatisticsSucceed": "User statistics acquired successfully",
+    "ServerAdminWallpaperPoolInvalid": "Invalid wallpaper pool: every URL must be an absolute HTTPS URL and the pool is limited to 50 entries",
+    "ServerAdminWallpaperPoolSaveSucceed": "Wallpaper pool saved",
     "ServerAdminWriteRequiresSso": "Only SSO admin accounts can modify data",
     "ServerAnnouncementGetSucceed": "Announcements acquired successfully",
     "ServerAnnouncementUploadSucceed": "Announcement uploaded successfully",
@@ -131,6 +135,7 @@
     "ServerPassportLoginRequired": "Please login or register Snap Hutao account first",
     "ServerPassportLoginSucceed": "Login successfully",
     "ServerPassportPasswordTooShort": "Password is not allowed to be shorter than 8 characters",
+    "ServerPassportReCaptchaFailed": "Human verification failed, please try again",
     "ServerPassportRefreshTokenEmpty": "Refresh token cannot be empty",
     "ServerPassportRefreshTokenInvalid": "The refresh token is invalid or has expired",
     "ServerPassportRegisterSucceed": "Register successfully",

@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>申请开源许可证</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+    <!-- reCAPTCHA v3 API (已换用国内可直连的 recaptcha.net 域名，并拼接了你的 Site Key) -->
+    <script src="https://www.recaptcha.net/recaptcha/api.js?render=6LdxDQcuAAAAANQPL53pUG81HWQ5dk8ebR1ErGEX"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body class="py-5">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+
+                <!-- 提示反馈区域 -->
+                <div id="alertBox" class="alert d-none" role="alert"></div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title text-center font-weight-bold mb-4">申请开源许可证</h4>
+
+                        <form id="licenseForm" novalidate>
+                            <!-- 用户名/账号 -->
+                            <div class="form-group">
+                                <label for="username">用户名 / 账号 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="username" placeholder="请输入绑定的账户名" required>
+                                <div class="invalid-feedback">请输入有效的账号。</div>
+                            </div>
+
+                            <!-- 开源项目名称 -->
+                            <div class="form-group">
+                                <label for="projectName">项目名称 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="projectName" placeholder="例如：MyAwesomeProject" required>
+                                <div class="invalid-feedback">请输入开源项目名称。</div>
+                            </div>
+
+                            <!-- 项目仓库 URL -->
+                            <div class="form-group">
+                                <label for="repositoryUrl">开源仓库地址 <span class="text-danger">*</span></label>
+                                <input type="url" class="form-control" id="repositoryUrl" placeholder="https://github.com/org/repo" required>
+                                <div class="invalid-feedback">请输入合法的仓库 URL 地址。</div>
+                            </div>
+
+                            <!-- 申请理由 / 备注 -->
+                            <div class="form-group">
+                                <label for="reason">申请说明</label>
+                                <textarea class="form-control" id="reason" rows="3" placeholder="简要描述项目的开源许可证诉求..."></textarea>
+                            </div>
+
+                            <!-- v3 无需手动勾选框，右下角会自动展示 reCAPTCHA 徽章 -->
+                            <!-- 提交按钮 -->
+                            <button type="submit" id="btnSubmit" class="btn btn-primary btn-block btn-lg mt-4">
+                                <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                <span id="btnText">提交申请</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery 3 & Bootstrap 4 Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const RECAPTCHA_SITE_KEY = '6LdxDQcuAAAAANQPL53pUG81HWQ5dk8ebR1ErGEX';
+
+            const $form = $('#licenseForm');
+            const $alertBox = $('#alertBox');
+            const $btnSubmit = $('#btnSubmit');
+            const $spinner = $('#spinner');
+            const $btnText = $('#btnText');
+
+            function showAlert(type, message) {
+                $alertBox
+                    .removeClass('d-none alert-success alert-danger alert-warning')
+                    .addClass('alert-' + type)
+                    .text(message)
+                    .fadeIn();
+            }
+
+            function setLoading(loading) {
+                if (loading) {
+                    $btnSubmit.prop('disabled', true);
+                    $spinner.removeClass('d-none');
+                    $btnText.text('正在提交...');
+                } else {
+                    $btnSubmit.prop('disabled', false);
+                    $spinner.addClass('d-none');
+                    $btnText.text('提交申请');
+                }
+            }
+
+            $form.on('submit', function (e) {
+                e.preventDefault();
+                $alertBox.addClass('d-none');
+
+                // 1. 表单基础字段校验
+                if (!this.checkValidity()) {
+                    e.stopPropagation();
+                    $form.addClass('was-validated');
+                    return;
+                }
+                $form.addClass('was-validated');
+
+                setLoading(true);
+
+                // 2. 调度 reCAPTCHA v3 生成 Token
+                grecaptcha.ready(function () {
+                    grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit_application' })
+                        .then(function (token) {
+                            // 组装提交给 C# 控制器的数据
+                            const payload = {
+                                UserName: $('#username').val().trim(),
+                                ProjectName: $('#projectName').val().trim(),
+                                RepositoryUrl: $('#repositoryUrl').val().trim(),
+                                Reason: $('#reason').val().trim(),
+                                ReCaptchaToken: token // 传给 LicenseApplication 对应的 Token 字段
+                            };
+
+                            // 3. 发送 Ajax 请求到接口
+                            return $.ajax({
+                                url: '/api/Accession/ApplyOpenSourceLicense',
+                                type: 'POST',
+                                contentType: 'application/json; charset=utf-8',
+                                data: JSON.stringify(payload),
+                                dataType: 'json'
+                            });
+                        })
+                        .done(function (res) {
+                            const successMsg = res.message || res.msg || '申请已提交，请等待审核。';
+                            showAlert('success', successMsg);
+                            $form[0].reset();
+                            $form.removeClass('was-validated');
+                        })
+                        .fail(function (xhr) {
+                            let errorMsg = '网络或系统异常，请稍后重试。';
+                            if (xhr.responseJSON) {
+                                errorMsg = xhr.responseJSON.message || xhr.responseJSON.msg || errorMsg;
+                            }
+                            showAlert('danger', errorMsg);
+                        })
+                        .always(function () {
+                            setLoading(false);
+                        });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,4 +1,3 @@
-using server.Extension;
 using StackExchange.Redis;
 
 namespace server.Services.Cache;

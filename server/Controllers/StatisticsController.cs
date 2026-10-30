@@ -4,7 +4,7 @@ using server.Models.Legacy;
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/statistics")]
 [ApiExplorerSettings(GroupName = "SpiralAbyss")]
 public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatisticsService) : ControllerBase
 {
@@ -13,7 +13,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
     /// </summary>
     /// <param name="last">是否获取上一期数据。</param>
     /// <returns>深渊统计总览数据。</returns>
-    [HttpGet("Overview")]
+    [HttpGet("overview")]
     public IActionResult Overview([FromQuery(Name = "Last")] bool last = false)
     {
         return GetStatistics<Overview>(LegacyStatistics.Overview, last);
@@ -24,7 +24,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
     /// </summary>
     /// <param name="last">是否获取上一期数据。</param>
     /// <returns>角色登场率数据。</returns>
-    [HttpGet("Avatar/AttendanceRate")]
+    [HttpGet("avatars/attendance-rate")]
     public IActionResult AttendanceRate([FromQuery(Name = "Last")] bool last = false)
     {
         return GetStatistics<List<AvatarAppearanceRank>>(LegacyStatistics.AvatarAppearanceRank, last);
@@ -35,7 +35,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
     /// </summary>
     /// <param name="last">是否获取上一期数据。</param>
     /// <returns>角色使用率数据。</returns>
-    [HttpGet("Avatar/UtilizationRate")]
+    [HttpGet("avatars/utilization-rate")]
     public IActionResult UtilizationRate([FromQuery(Name = "Last")] bool last = false)
     {
         return GetStatistics<List<AvatarUsageRank>>(LegacyStatistics.AvatarUsageRank, last);
@@ -46,7 +46,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
     /// </summary>
     /// <param name="last">是否获取上一期数据。</param>
     /// <returns>角色持有率数据。</returns>
-    [HttpGet("Avatar/HoldingRate")]
+    [HttpGet("avatars/holding-rate")]
     public IActionResult HoldingRate([FromQuery(Name = "Last")] bool last = false)
     {
         return GetStatistics<List<AvatarConstellationInfo>>(LegacyStatistics.AvatarConstellationInfo, last);
@@ -57,7 +57,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
     /// </summary>
     /// <param name="last">是否获取上一期数据。</param>
     /// <returns>角色搭配数据。</returns>
-    [HttpGet("Avatar/AvatarCollocation")]
+    [HttpGet("avatars/collocations")]
     public IActionResult AvatarCollocation([FromQuery(Name = "Last")] bool last = false)
     {
         return GetStatistics<List<AvatarCollocation>>(LegacyStatistics.AvatarCollocation, last);
@@ -68,7 +68,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
     /// </summary>
     /// <param name="last">是否获取上一期数据。</param>
     /// <returns>武器搭配数据。</returns>
-    [HttpGet("Weapon/WeaponCollocation")]
+    [HttpGet("weapons/collocations")]
     public IActionResult WeaponCollocation([FromQuery(Name = "Last")] bool last = false)
     {
         return GetStatistics<List<WeaponCollocation>>(LegacyStatistics.WeaponCollocation, last);
@@ -79,7 +79,7 @@ public class StatisticsController(SpiralAbyssStatisticsService spiralAbyssStatis
     /// </summary>
     /// <param name="last">是否获取上一期数据。</param>
     /// <returns>队伍组合数据。</returns>
-    [HttpGet("Team/Combination")]
+    [HttpGet("teams/combinations")]
     public IActionResult Combination([FromQuery(Name = "Last")] bool last = false)
     {
         return GetStatistics<List<TeamAppearance>>(LegacyStatistics.TeamAppearance, last);

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using server.Models.Passport;
 using server.Tests.Infrastructure;
 using System.Net;
@@ -32,7 +32,7 @@ public sealed class WebhookTests
             ["Afdian2.SkuCdnService"] = CdnSku,
         });
 
-        using HttpRequestMessage request = new(HttpMethod.Post, "/api/Service/Config/Update")
+        using HttpRequestMessage request = new(HttpMethod.Patch, "/api/admin/settings")
         {
             Content = new StringContent(body, Encoding.UTF8, "application/json"),
         };
@@ -74,7 +74,7 @@ public sealed class WebhookTests
 
     private async Task<UserInfo> UserInfoAsync(TestUser user)
     {
-        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/Passport/v2/UserInfo", user.AccessToken);
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/passport/v2/me", user.AccessToken);
         TestResponse parsed = await response.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         return parsed.DeserializeData<UserInfo>()!;

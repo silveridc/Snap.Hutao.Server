@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <t-form
     ref="form"
     class="item-container login-password"
@@ -51,9 +51,11 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { getCaptchaSettings } from '@/api/passport';
 import { getSsoChallenge, getSsoStatus } from '@/api/sso';
 import { t } from '@/locales';
 import { useUserStore } from '@/store';
+import { getReCaptchaToken } from '@/utils/recaptcha';
 
 const userStore = useUserStore();
 
@@ -72,6 +74,7 @@ const formData = ref({ ...INITIAL_DATA });
 const showPsw = ref(false);
 const loading = ref(false);
 const sso = ref<{ enabled: boolean; displayName: string }>({ enabled: false, displayName: '' });
+const captcha = ref<{ enabled: boolean; siteKey: string }>({ enabled: false, siteKey: '' });
 const ssoLoading = ref(false);
 
 const router = useRouter();
@@ -84,6 +87,13 @@ onMounted(async () => {
     sso.value = { enabled: Boolean(res.data?.Enabled), displayName: res.data?.DisplayName || '' };
   } catch {
     sso.value = { enabled: false, displayName: '' };
+  }
+
+  try {
+    const settings: any = await getCaptchaSettings();
+    captcha.value = { enabled: Boolean(settings?.Enabled), siteKey: settings?.SiteKey || '' };
+  } catch {
+    captcha.value = { enabled: false, siteKey: '' };
   }
 });
 
@@ -105,7 +115,17 @@ const onSubmit = async (ctx: SubmitContext) => {
   }
   loading.value = true;
   try {
-    await userStore.login({ email: formData.value.email, password: formData.value.password });
+    let captchaToken: string | undefined;
+    if (captcha.value.enabled && captcha.value.siteKey) {
+      try {
+        captchaToken = await getReCaptchaToken(captcha.value.siteKey, 'login');
+      } catch {
+        MessagePlugin.error(t('pages.login.messages.captchaFail'));
+        return;
+      }
+    }
+
+    await userStore.login({ email: formData.value.email, password: formData.value.password, captchaToken });
     MessagePlugin.success(t('pages.login.messages.loginSuccess'));
     const redirect = route.query.redirect as string;
     router.push(redirect || '/dashboard');

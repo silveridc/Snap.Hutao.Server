@@ -1,5 +1,4 @@
-using System.Globalization;
-using System.Net;
+﻿using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -105,10 +104,35 @@ public sealed partial class ReleaseBucketService(
             return (false, "Version must contain four numeric components, such as 1.17.2.0", ServerKeys.ServerAdminReleaseInvalidVersion, null);
         }
 
-        (string? sha256, long length, string message, string? errorKey) = await TryHashAsync(key, cancellationToken).ConfigureAwait(false);
-        if (sha256 is null)
+        string? sha256;
+        long length;
+        if (!string.IsNullOrWhiteSpace(request.Validation))
         {
-            return (false, message, errorKey, null);
+            string supplied = request.Validation.Trim();
+            if (!Sha256Pattern().IsMatch(supplied))
+            {
+                return (false, "SHA-256 checksum must contain 64 hexadecimal characters", ServerKeys.ServerAdminReleaseInvalidChecksum, null);
+            }
+
+            (bool exists, long objectLength, string message, string? errorKey) = await TryHeadAsync(key, cancellationToken).ConfigureAwait(false);
+            if (!exists)
+            {
+                return (false, message, errorKey, null);
+            }
+
+            sha256 = supplied.ToLowerInvariant();
+            length = objectLength;
+        }
+        else
+        {
+            (string? hashed, long hashedLength, string message, string? errorKey) = await TryHashAsync(key, cancellationToken).ConfigureAwait(false);
+            if (hashed is null)
+            {
+                return (false, message, errorKey, null);
+            }
+
+            sha256 = hashed;
+            length = hashedLength;
         }
 
         HutaoReleasePublishRequest publish = new()
@@ -196,9 +220,9 @@ public sealed partial class ReleaseBucketService(
     {
         return S3Presigner.PresignGet(
             url,
-            systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3Region, string.Empty).Trim(),
-            systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3AccessKeyId, string.Empty).Trim(),
-            systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3SecretAccessKey, string.Empty),
+            systemConfig.GetOrDefault(Keys.PatchS3Region, string.Empty).Trim(),
+            systemConfig.GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty).Trim(),
+            systemConfig.GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty),
             _presignSeconds);
     }
 
@@ -233,4 +257,25 @@ public sealed partial class ReleaseBucketService(
 
     [GeneratedRegex(@"\d+\.\d+\.\d+\.\d+", RegexOptions.CultureInvariant)]
     private static partial Regex VersionPattern();
+
+    private async Task<(bool Exists, long Length, string Message, string? LocalizationKey)> TryHeadAsync(string key, CancellationToken cancellationToken)
+    {
+        using HttpClient client = httpClientFactory.CreateClient();
+        using HttpResponseMessage response = await client
+            .SendAsync(new HttpRequestMessage(HttpMethod.Head, Sign(BuildObjectUrl(key))), cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogWarning("Bucket object {Key} HEAD failed: HTTP {Status}", key, (int)response.StatusCode);
+            return response.StatusCode is HttpStatusCode.NotFound
+                ? (false, 0, "Object does not exist in the storage bucket", ServerKeys.ServerAdminReleaseBucketObjectNotFound)
+                : (false, 0, "Patch storage bucket is unavailable", ServerKeys.ServerAdminReleaseBucketUnavailable);
+        }
+
+        return (true, response.Content.Headers.ContentLength ?? 0, string.Empty, null);
+    }
+
+    [GeneratedRegex("^[0-9a-fA-F]{64}$", RegexOptions.CultureInvariant)]
+    private static partial Regex Sha256Pattern();
 }

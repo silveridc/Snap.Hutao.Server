@@ -3,8 +3,8 @@
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-[ApiExplorerSettings(IgnoreApi = true)]
+[Route("api/license-applications")]
+[ApiExplorerSettings(GroupName = "PublicApi")]
 public sealed class AccessionController(AccessionService accessionService) : ControllerBase
 {
     /// <summary>
@@ -12,7 +12,7 @@ public sealed class AccessionController(AccessionService accessionService) : Con
     /// </summary>
     /// <param name="info">许可证申请信息。</param>
     /// <returns>申请处理结果。</returns>
-    [HttpPost("ApplyOpenSourceLicense")]
+    [HttpPost]
     public async Task<IActionResult> ApplyOpenSourceLicenseAsync([FromBody] LicenseApplication info)
     {
         return await accessionService.ProcessApplicationAsync(info).ConfigureAwait(false) switch

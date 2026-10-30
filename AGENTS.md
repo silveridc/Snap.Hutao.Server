@@ -1,4 +1,4 @@
-## Repository layout
+﻿## Repository layout
 
 This is the self-hosted **Snap Hutao server**. The git root (`D:\projects\hutao\server`) nests two projects:
 
@@ -30,11 +30,13 @@ Tests (~15s). `dotnet test` does **not** work on SDK 10.0.4xx: xunit.v3 ships Mi
 
 ## Architecture
 
-**Two EF Core DbContexts.** `AppDbContext` is the primary DB and owns all migrations — always pass `--context AppDbContext`. `MetadataDbContext` has no migrations. Both use Pomelo MySQL and are pooled. `MetadataDbContext` currently covers only `yae_achievement_metadata` (feeding `/api/client/AchievementFieldId_{version}.json`), `known_items` and `gacha_events`; the metadata-to-DB feature (`metadata_document` / `metadata_object` / i18n / translation / projection + its `/metadata/*` controller, admin panel page and import tool) was deliberately removed — clients keep reading metadata from the original path, and the code is recoverable from git history if that work resumes.
+**Two EF Core DbContexts.** `AppDbContext` is the primary DB and owns all migrations — always pass `--context AppDbContext`. `MetadataDbContext` has no migrations. Both use Pomelo MySQL and are pooled. `MetadataDbContext` currently covers only `yae_achievement_metadata` (feeding `/api/client/features/AchievementFieldId_{version}`), `known_items` and `gacha_events`; the metadata-to-DB feature (`metadata_document` / `metadata_object` / i18n / translation / projection + its `/metadata/*` controller, admin panel page and import tool) was deliberately removed — clients keep reading metadata from the original path, and the code is recoverable from git history if that work resumes.
 
 **Migrations are generated offline.** The production MySQL is not reachable from the dev/build environment, so `DesignTimeAppDbContextFactory` pins `MySqlServerVersion(8,0,32)` instead of `ServerVersion.AutoDetect` (runtime `Program.cs` still AutoDetects the real server). Migrations **auto-apply only in RELEASE builds** at startup (`Program.MigrateDatabase`, `[Conditional("RELEASE")]`) — there is no manual `database update` step. After generating a migration, open the `Up()`/`Down()` and confirm it contains only the intended schema ops before deploying.
 
 **Response envelope.** API responses use `Models/Response/Response.cs` with a `retcode` (`ReturnCode` enum), `message` (English), and optional `data`/`l10nKey`. Use `Response.Success(...)` / `Response.Fail(code, msg, key)` / `Response<T>.Success(...)` — static messages must pass an `l10nKey` from `server/ServerKeys.cs`; messages with runtime interpolation stay English without a key. The frontend axios client (`admin-ui/src/api/request.js`) unwraps this envelope, auto-refreshes tokens on `514002`, treats non-envelope bodies as pass-through third-party data, and rewrites `message` through `l10nKey` (namespace `pages.server.*`).
+
+**Routing conventions (2026-10-30).** Internal APIs are REST-shaped: `/api/<resource>` for launcher/public resources and `/api/admin/<resource>` for admin-only ones; use the verb that matches the operation (GET read, POST create/action, PUT/PATCH update, DELETE remove) and keep verbs, `Get`, `Update`, `List` and `SetEnabled` out of path segments. Route parameters carry ids (`/users/{userId}`, `/bans/{uid}`); list filters stay in the query. Only external contracts are exempt: `/patch/hutao` (forced updates) and the third-party callbacks `/api/OAuth/Callback/GitHub`, `/Admin/Sso/Callback`, `/Passport/Sso/Callback`, `/api/Webhook/Incoming/Afdian`. The launcher and admin-ui are updated in the same change; do not add legacy route aliases.
 
 **Auth.** JWT bearer (`Program.cs`) plus ASP.NET Identity (`HutaoUser`). Get the current user with the `GetUserId()` / `TryGetUserId()` extensions (`Controllers/UserAuthorizationExtension.cs`), which read the `PassportClaimTypes.UserId` claim. Login is via OAuth (GitHub) with AES-encrypted state, plus passport/password flows.
 
@@ -50,6 +52,7 @@ Tests (~15s). `dotnet test` does **not** work on SDK 10.0.4xx: xunit.v3 ships Mi
 - `Nullable` is enabled. `SuppressImplicitRequiredAttributeForNonNullableReferenceTypes` is on, so non-nullable reference types are **not** treated as `[Required]`.
 - JSON uses original property names (no camelCase policy), ignores nulls when writing, and is case-insensitive on read.
 - Code comments remain Chinese; API response messages are English + `l10nKey` (see Response envelope above). Client-side translations live in the launcher's `SH.resx`/`SH.en.resx` and in `admin-ui/src/locales/lang/<locale>/pages/server.json` — after adding/changing keys in `ServerKeys.cs`, update the launcher resx and rerun `node scripts/extract-server-l10n.mjs` (from `admin-ui/`) to regenerate the admin panel's copy from the launcher resx.
+- **DI lifetime markers are a bare keyword.** A class annotated with its lifetime gets exactly `// Singleton`, `// Scoped` or `// Transient` on the line above the type — no `：` explanation, no parenthetical rationale. If the "why" matters (e.g. it depends on a scoped service), write it next to the registration in `Program.cs` or in the commit message, not on the marker.
 - Frontend uses TDesign Vue Next components (keep the official TDesign starter look). Two API layers coexist: the starter's TS client (`@/utils/request`) and a purpose-built JS axios client (`@/api/request.js` + `@/api/service.js`) for the backend envelope — new backend calls go through the latter. Page UI strings are i18n'd via per-page locale fragments (`src/locales/lang/<locale>/pages/<page>.json`, use `$t` in templates / `t` from `@/locales` in scripts).
 
 ## Code style (StyleCop)

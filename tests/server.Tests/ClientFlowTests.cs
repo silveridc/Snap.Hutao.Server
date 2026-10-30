@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using server.Models.Admin;
 using server.Models.Entity;
 using server.Models.GachaLog;
@@ -61,7 +61,7 @@ public sealed class ClientFlowTests
 
     private async Task<UserInfo> UserInfoAsync(TestUser user)
     {
-        TestResponse parsed = await SendAsync("GET", "/api/Passport/v2/UserInfo", token: user.AccessToken);
+        TestResponse parsed = await SendAsync("GET", "/api/passport/v2/me", token: user.AccessToken);
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         return parsed.DeserializeData<UserInfo>()!;
     }
@@ -72,16 +72,16 @@ public sealed class ClientFlowTests
         string uid = NewUid();
 
         // 未绑定账号的首次上传：成功但不发放祈愿服务时长
-        TestResponse uploaded = await SendAsync("POST", "/api/Record/Upload", TestData.SimpleRecord(uid));
+        TestResponse uploaded = await SendAsync("POST", "/api/records/abyss", TestData.SimpleRecord(uid));
         Assert.Equal(ReturnCodes.Success, uploaded.Retcode);
         Assert.Equal(ServerKeys.ServerRecordUploadSuccessButNoPassport, uploaded.L10nKey);
 
-        TestResponse check = await SendAsync("GET", $"/api/Record/Check?Uid={uid}");
+        TestResponse check = await SendAsync("GET", $"/api/records/abyss/{uid}/status");
         Assert.Equal(ReturnCodes.Success, check.Retcode);
         Assert.True(check.Data.GetBoolean());
 
         // 排行表在上传事务里同步写入，伤害数据应能原样读回
-        TestResponse rank = await SendAsync("GET", $"/api/Record/Rank?Uid={uid}");
+        TestResponse rank = await SendAsync("GET", $"/api/records/abyss/{uid}/rank");
         Assert.Equal(ReturnCodes.Success, rank.Retcode);
         Rank? rankData = rank.DeserializeData<Rank>();
         Assert.NotNull(rankData);
@@ -91,7 +91,7 @@ public sealed class ClientFlowTests
         Assert.Equal(65432, rankData.TakeDamage.Value);
 
         // 同一期重复上传仍然成功，但换成「本期非首次」的消息
-        TestResponse again = await SendAsync("POST", "/api/Record/Upload", TestData.SimpleRecord(uid));
+        TestResponse again = await SendAsync("POST", "/api/records/abyss", TestData.SimpleRecord(uid));
         Assert.Equal(ReturnCodes.Success, again.Retcode);
         Assert.Equal(ServerKeys.ServerRecordUploadSuccessButNotFirstTimeAtCurrentSchedule, again.L10nKey);
     }
@@ -102,7 +102,7 @@ public sealed class ClientFlowTests
         TestUser owner = await users.CreateUniqueAsync("abyss-owner");
         string uid = NewUid();
 
-        TestResponse uploaded = await SendAsync("POST", "/api/Record/Upload", TestData.SimpleRecord(uid, reservedUserName: owner.UserName));
+        TestResponse uploaded = await SendAsync("POST", "/api/records/abyss", TestData.SimpleRecord(uid, reservedUserName: owner.UserName));
         Assert.Equal(ReturnCodes.Success, uploaded.Retcode);
         Assert.Equal(ServerKeys.ServerRecordUploadSuccessAndGachaLogServiceTimeExtended, uploaded.L10nKey);
 
@@ -113,7 +113,7 @@ public sealed class ClientFlowTests
             $"祈愿服务有效期未按 3 天发放：{expireAt:o}");
 
         // 上传时也能带排名数据，?returningRank=true 直接返回排行
-        TestResponse withRank = await SendAsync("POST", "/api/Record/Upload?returningRank=true", TestData.SimpleRecord(NewUid(), reservedUserName: owner.UserName));
+        TestResponse withRank = await SendAsync("POST", "/api/records/abyss?returningRank=true", TestData.SimpleRecord(NewUid(), reservedUserName: owner.UserName));
         Assert.Equal(ReturnCodes.Success, withRank.Retcode);
         Assert.NotNull(withRank.DeserializeData<Rank>());
     }
@@ -123,13 +123,13 @@ public sealed class ClientFlowTests
     {
         string uid = NewUid();
 
-        TestResponse uploaded = await SendAsync("POST", "/api/Record/Upload", TestData.SimpleRecord(uid, reservedUserName: $"ghost-{Guid.NewGuid():N}@example.com"));
+        TestResponse uploaded = await SendAsync("POST", "/api/records/abyss", TestData.SimpleRecord(uid, reservedUserName: $"ghost-{Guid.NewGuid():N}@example.com"));
 
         // 账号不存在只影响时长发放，数据本身照常入库
         Assert.Equal(ReturnCodes.Success, uploaded.Retcode);
         Assert.Equal(ServerKeys.ServerRecordUploadSuccessButNoSuchUser, uploaded.L10nKey);
 
-        Assert.True((await SendAsync("GET", $"/api/Record/Check?Uid={uid}")).Data.GetBoolean());
+        Assert.True((await SendAsync("GET", $"/api/records/abyss/{uid}/status")).Data.GetBoolean());
     }
 
     [Fact]
@@ -138,13 +138,13 @@ public sealed class ClientFlowTests
         TestUser maintainer = await users.MaintainerAsync();
         string uid = NewUid();
 
-        Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", $"/api/Service/Ban/Add?uid={uid}&reason=clientflow", token: maintainer.AccessToken)).Retcode);
+        Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", $"/api/admin/bans?uid={uid}&reason=clientflow", token: maintainer.AccessToken)).Retcode);
 
-        TestResponse uploaded = await SendAsync("POST", "/api/Record/Upload", TestData.SimpleRecord(uid));
+        TestResponse uploaded = await SendAsync("POST", "/api/records/abyss", TestData.SimpleRecord(uid));
         Assert.Equal(ReturnCodes.BannedUid, uploaded.Retcode);
         Assert.Equal(ServerKeys.ServerRecordBannedUid, uploaded.L10nKey);
 
-        await SendAsync("POST", $"/api/Service/Ban/Remove?uid={uid}", token: maintainer.AccessToken);
+        await SendAsync("DELETE", $"/api/admin/bans/{uid}", token: maintainer.AccessToken);
     }
 
     [Fact]
@@ -152,16 +152,16 @@ public sealed class ClientFlowTests
     {
         string uid = NewUid();
 
-        TestResponse uploaded = await SendAsync("POST", "/api/Record/Upload", TestData.OutdatedSpiralAbyssRecordJson(uid));
+        TestResponse uploaded = await SendAsync("POST", "/api/records/abyss", TestData.OutdatedSpiralAbyssRecordJson(uid));
 
         Assert.Equal(ReturnCodes.NotCurrentSchedule, uploaded.Retcode);
-        Assert.False((await SendAsync("GET", $"/api/Record/Check?Uid={uid}")).Data.GetBoolean());
+        Assert.False((await SendAsync("GET", $"/api/records/abyss/{uid}/status")).Data.GetBoolean());
     }
 
     [Fact]
     public async Task SpiralAbyssUpload_WithEmptyBody_IsRejected()
     {
-        TestResponse uploaded = await SendAsync("POST", "/api/Record/Upload", new { });
+        TestResponse uploaded = await SendAsync("POST", "/api/records/abyss", new { });
 
         Assert.Equal(ReturnCodes.InvalidUploadData, uploaded.Retcode);
     }
@@ -171,7 +171,7 @@ public sealed class ClientFlowTests
     [InlineData("10000000a")]
     public async Task RecordCheck_WithMalformedUid_IsRejected(string uid)
     {
-        TestResponse parsed = await SendAsync("GET", $"/api/Record/Check?Uid={uid}");
+        TestResponse parsed = await SendAsync("GET", $"/api/records/abyss/{uid}/status");
 
         Assert.Equal(ReturnCodes.InvalidQueryString, parsed.Retcode);
     }
@@ -181,10 +181,10 @@ public sealed class ClientFlowTests
     {
         string uid = NewUid();
 
-        Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", "/api/RoleCombat/Upload", TestData.RoleCombatRecord(uid))).Retcode);
+        Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", "/api/records/role-combat", TestData.RoleCombatRecord(uid))).Retcode);
 
         // 每个 Uid 只保留最新一条，重复上传不会累积
-        TestResponse again = await SendAsync("POST", "/api/RoleCombat/Upload", TestData.RoleCombatRecord(uid));
+        TestResponse again = await SendAsync("POST", "/api/records/role-combat", TestData.RoleCombatRecord(uid));
         Assert.Equal(ReturnCodes.Success, again.Retcode);
 
         int records = await factory.WithDbContextAsync(context =>
@@ -198,7 +198,7 @@ public sealed class ClientFlowTests
         server.Models.RoleCombat.SimpleRoleCombatRecord record = TestData.RoleCombatRecord(NewUid());
         record.ScheduleId -= 1;
 
-        TestResponse uploaded = await SendAsync("POST", "/api/RoleCombat/Upload", record);
+        TestResponse uploaded = await SendAsync("POST", "/api/records/role-combat", record);
 
         Assert.Equal(ReturnCodes.NotCurrentSchedule, uploaded.Retcode);
     }
@@ -210,34 +210,34 @@ public sealed class ClientFlowTests
         string uid = NewUid();
         UidAndItems items = TestData.GachaItems(uid, count: 4);
 
-        TestResponse uploaded = await SendAsync("POST", "/api/GachaLog/Upload", items, owner.AccessToken);
+        TestResponse uploaded = await SendAsync("POST", "/api/gacha-logs", items, owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, uploaded.Retcode);
         Assert.Equal((int)GachaLogSaveResultKind.Ok, uploaded.Data.GetProperty("Kind").GetInt32());
         Assert.Equal(items.Items.Count, uploaded.Data.GetProperty("SaveCount").GetInt32());
 
-        TestResponse entries = await SendAsync("GET", "/api/GachaLog/Entries", token: owner.AccessToken);
+        TestResponse entries = await SendAsync("GET", "/api/gacha-logs/entries", token: owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, entries.Retcode);
         Assert.NotNull(entries.DeserializeData<List<GachaEntry>>()?.SingleOrDefault(entry => entry.Uid == uid && entry.ItemCount == items.Items.Count));
 
         long newestId = items.Items.Max(item => item.Id);
-        TestResponse endIds = await SendAsync("GET", $"/api/GachaLog/EndIds?Uid={uid}", token: owner.AccessToken);
+        TestResponse endIds = await SendAsync("GET", $"/api/gacha-logs/end-ids?Uid={uid}", token: owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, endIds.Retcode);
         Assert.Equal(newestId, endIds.DeserializeData<Dictionary<string, long>>()![$"{(int)GachaConfigType.ActivityAvatar:D}"]);
 
         // Retrieve 取严格早于 EndIds 的记录，用最新 Id 能取回全部四条
-        TestResponse retrieved = await SendAsync("POST", "/api/GachaLog/Retrieve", new { Uid = uid, EndIds = new Dictionary<string, long> { [$"{(int)GachaConfigType.ActivityAvatar}"] = newestId + 1 } }, owner.AccessToken);
+        TestResponse retrieved = await SendAsync("POST", "/api/gacha-logs/retrievals", new { Uid = uid, EndIds = new Dictionary<string, long> { [$"{(int)GachaConfigType.ActivityAvatar}"] = newestId + 1 } }, owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, retrieved.Retcode);
         Assert.Equal(items.Items.Count, retrieved.DeserializeData<List<SimpleGachaItem>>()?.Count);
 
-        TestResponse limited = await SendAsync("GET", $"/api/GachaLog/LimitedRetrieve?uid={uid}&configType={(int)GachaConfigType.ActivityAvatar}&endId={newestId + 1}&count=2", token: owner.AccessToken);
+        TestResponse limited = await SendAsync("GET", $"/api/gacha-logs/limited-retrievals?uid={uid}&configType={(int)GachaConfigType.ActivityAvatar}&endId={newestId + 1}&count=2", token: owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, limited.Retcode);
         Assert.Equal(2, limited.DeserializeData<List<SimpleGachaItem>>()?.Count);
 
-        TestResponse deleted = await SendAsync("GET", $"/api/GachaLog/Delete?Uid={uid}", token: owner.AccessToken);
+        TestResponse deleted = await SendAsync("DELETE", $"/api/gacha-logs/{uid}", token: owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, deleted.Retcode);
         Assert.Equal(items.Items.Count, deleted.Data.GetInt32());
 
-        TestResponse afterDelete = await SendAsync("GET", "/api/GachaLog/Entries", token: owner.AccessToken);
+        TestResponse afterDelete = await SendAsync("GET", "/api/gacha-logs/entries", token: owner.AccessToken);
         Assert.DoesNotContain(afterDelete.DeserializeData<List<GachaEntry>>()!, entry => entry.Uid == uid);
     }
 
@@ -249,10 +249,10 @@ public sealed class ClientFlowTests
         List<string> uids = [.. Enumerable.Range(0, 5).Select(_ => NewUid())];
         foreach (string uid in uids)
         {
-            Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", "/api/GachaLog/Upload", TestData.GachaItems(uid, count: 1), owner.AccessToken)).Retcode);
+            Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", "/api/gacha-logs", TestData.GachaItems(uid, count: 1), owner.AccessToken)).Retcode);
         }
 
-        TestResponse sixth = await SendAsync("POST", "/api/GachaLog/Upload", TestData.GachaItems(NewUid(), count: 1), owner.AccessToken);
+        TestResponse sixth = await SendAsync("POST", "/api/gacha-logs", TestData.GachaItems(NewUid(), count: 1), owner.AccessToken);
 
         Assert.Equal(ReturnCodes.TooManyGachaLogUids, sixth.Retcode);
         Assert.Equal(ServerKeys.ServerGachaLogServiceInsufficientRecordSlot, sixth.L10nKey);
@@ -265,18 +265,18 @@ public sealed class ClientFlowTests
         UidAndItems items = TestData.GachaItems(NewUid(), count: 2);
         items.Items[0].Id = 0;
 
-        TestResponse uploaded = await SendAsync("POST", "/api/GachaLog/Upload", items, owner.AccessToken);
+        TestResponse uploaded = await SendAsync("POST", "/api/gacha-logs", items, owner.AccessToken);
 
         Assert.Equal(ReturnCodes.InvalidGachaLogItems, uploaded.Retcode);
 
         // 整批拒绝，一条也不会入库
-        TestResponse entries = await SendAsync("GET", "/api/GachaLog/Entries", token: owner.AccessToken);
+        TestResponse entries = await SendAsync("GET", "/api/gacha-logs/entries", token: owner.AccessToken);
         Assert.DoesNotContain(entries.DeserializeData<List<GachaEntry>>()!, entry => entry.Uid == items.Uid);
     }
 
     [Theory]
-    [InlineData("/api/GachaLog/Entries")]
-    [InlineData("/api/GachaLog/EndIds?Uid=100000999")]
+    [InlineData("/api/gacha-logs/entries")]
+    [InlineData("/api/gacha-logs/end-ids?uid=100000999")]
     public async Task GachaLogEndpoints_WithoutActiveService_AreRejected(string url)
     {
         TestUser plain = await users.PlainAsync();
@@ -295,10 +295,10 @@ public sealed class ClientFlowTests
         // 分布统计由外部生成器写入 GachaStatistics 表，测试库里没有数据时走「计算中」分支
         foreach (string url in new[]
         {
-            "/api/GachaLog/Statistics/Distribution/AvatarEvent",
-            "/api/GachaLog/Statistics/Distribution/WeaponEvent",
-            "/api/GachaLog/Statistics/Distribution/Chronicled",
-            "/api/GachaLog/Statistics/Distribution/Standard",
+            "/api/gacha-logs/statistics/distributions/avatar-event",
+            "/api/gacha-logs/statistics/distributions/weapon-event",
+            "/api/gacha-logs/statistics/distributions/chronicled",
+            "/api/gacha-logs/statistics/distributions/standard",
         })
         {
             TestResponse parsed = await SendAsync("GET", url, token: owner.AccessToken);
@@ -321,7 +321,7 @@ public sealed class ClientFlowTests
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         });
 
-        TestResponse parsed = await SendAsync("GET", "/api/GachaLog/Statistics/CurrentEventStatistics");
+        TestResponse parsed = await SendAsync("GET", "/api/gacha-logs/statistics/current-event");
 
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         Assert.Equal(ServerKeys.ServerGachaLogStatisticsSucceed, parsed.L10nKey);
@@ -333,11 +333,11 @@ public sealed class ClientFlowTests
     {
         TestUser owner = await users.CdnAsync();
 
-        TestResponse token = await SendAsync("GET", "/api/Distribution/GetDownloadToken", token: owner.AccessToken);
+        TestResponse token = await SendAsync("GET", "/api/distribution/download-token", token: owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, token.Retcode);
         Assert.Equal("stub-download-token", token.Data.GetString());
 
-        TestResponse mirror = await SendAsync("GET", "/api/Distribution/GetAcceleratedMirror?Filename=hutao.zip", token: owner.AccessToken);
+        TestResponse mirror = await SendAsync("GET", "/api/distribution/accelerated-mirror?Filename=hutao.zip", token: owner.AccessToken);
         Assert.Equal(ReturnCodes.Success, mirror.Retcode);
         // HutaoPackageMirror 用 snake_case 的 JsonPropertyName，出站也是这个拼写
         Assert.Equal("https://hutao-cdn.test/files/hutao.zip", mirror.Data.GetProperty("url").GetString());
@@ -348,7 +348,7 @@ public sealed class ClientFlowTests
     {
         TestUser plain = await users.PlainAsync();
 
-        TestResponse parsed = await SendAsync("GET", "/api/Distribution/GetDownloadToken", token: plain.AccessToken);
+        TestResponse parsed = await SendAsync("GET", "/api/distribution/download-token", token: plain.AccessToken);
 
         Assert.Equal(ReturnCodes.GachaLogServiceNotAllowed, parsed.Retcode);
         Assert.Equal(ServerKeys.ServerCdnServiceInsufficientTime, parsed.L10nKey);
@@ -361,14 +361,14 @@ public sealed class ClientFlowTests
         string deviceId = $"cf-{Guid.NewGuid():N}".Substring(0, 32);
         string info = $"{{\"exception\":\"{Guid.NewGuid():N}\"}}";
 
-        TestResponse first = await SendAsync("POST", "/api/HutaoLog/Upload", new { Id = deviceId, Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(), Info = info });
+        TestResponse first = await SendAsync("POST", "/api/telemetry-logs", new { Id = deviceId, Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(), Info = info });
         Assert.Equal(ReturnCodes.Success, first.Retcode);
         Assert.Equal(ServerKeys.ServerHutaoLogUploadSucceed, first.L10nKey);
 
         // 相同 Info 视为同一条日志，只累加次数
-        Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", "/api/HutaoLog/Upload", new { Id = deviceId, Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(), Info = info })).Retcode);
+        Assert.Equal(ReturnCodes.Success, (await SendAsync("POST", "/api/telemetry-logs", new { Id = deviceId, Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(), Info = info })).Retcode);
 
-        TestResponse query = await SendAsync("GET", $"/api/HutaoLog/ByDeviceId?id={deviceId}");
+        TestResponse query = await SendAsync("GET", $"/api/telemetry-logs/{deviceId}");
         Assert.Equal(ReturnCodes.Success, query.Retcode);
 
         List<server.Models.Entity.Telemetry.HutaoLog> logs = query.DeserializeData<List<server.Models.Entity.Telemetry.HutaoLog>>()!;
@@ -380,7 +380,7 @@ public sealed class ClientFlowTests
     [Fact]
     public async Task HutaoLogUpload_WithoutDeviceId_IsRejected()
     {
-        TestResponse parsed = await SendAsync("POST", "/api/HutaoLog/Upload", new { Id = (string?)null, Time = 0, Info = "{}" });
+        TestResponse parsed = await SendAsync("POST", "/api/telemetry-logs", new { Id = (string?)null, Time = 0, Info = "{}" });
 
         Assert.Equal(ReturnCodes.InvalidUploadData, parsed.Retcode);
     }
@@ -393,20 +393,21 @@ public sealed class ClientFlowTests
         // 只放行这次请求的 token，其余请求仍走工厂里默认的失败桩
         string token = $"test-token-{Guid.NewGuid():N}";
         factory.StubHttp.MapJson(
-            $"response={token}",
-            """{"success":true,"score":0.9,"action":"ApplyOpenSourceLicense"}""");
+            "recaptcha/api/siteverify",
+            """{"success":true,"score":0.9,"action":"ApplyOpenSourceLicense"}""",
+            bodyFragment: $"response={token}");
 
-        TestResponse applied = await SendAsync("POST", "/api/Accession/ApplyOpenSourceLicense", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
+        TestResponse applied = await SendAsync("POST", "/api/license-applications", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
         Assert.Equal(ReturnCodes.Success, applied.Retcode);
         Assert.Equal(ServerKeys.ServerLicenseApplySucceed, applied.L10nKey);
 
-        TestResponse twice = await SendAsync("POST", "/api/Accession/ApplyOpenSourceLicense", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
+        TestResponse twice = await SendAsync("POST", "/api/license-applications", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
         Assert.Equal(ReturnCodes.AlreadyAppliedForLicense, twice.Retcode);
 
         // reCAPTCHA 通过但账号不存在
         string ghostToken = $"test-token-{Guid.NewGuid():N}";
-        factory.StubHttp.MapJson($"response={ghostToken}", """{"success":true,"score":0.9,"action":"ApplyOpenSourceLicense"}""");
-        TestResponse ghost = await SendAsync("POST", "/api/Accession/ApplyOpenSourceLicense", new { UserName = $"ghost-{Guid.NewGuid():N}@example.com", ProjectUrl = "https://github.com/example/repo", Token = ghostToken });
+        factory.StubHttp.MapJson("recaptcha/api/siteverify", """{"success":true,"score":0.9,"action":"ApplyOpenSourceLicense"}""", bodyFragment: $"response={ghostToken}");
+        TestResponse ghost = await SendAsync("POST", "/api/license-applications", new { UserName = $"ghost-{Guid.NewGuid():N}@example.com", ProjectUrl = "https://github.com/example/repo", Token = ghostToken });
         Assert.Equal(ReturnCodes.UserNameNotExists, ghost.Retcode);
     }
 
@@ -415,7 +416,7 @@ public sealed class ClientFlowTests
     {
         string deviceId = NewDeviceId();
 
-        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.17.1.0");
+        await SendAsClientAsync("/api/records/abyss/100000000/status", deviceId, "1.17.1.0");
 
         ClientVersion? tracked = await TrackRowAsync(deviceId);
         Assert.NotNull(tracked);
@@ -423,7 +424,7 @@ public sealed class ClientFlowTests
         Assert.Equal(tracked.FirstSeenAt, tracked.LastSeenAt);
 
         // 同一设备升级客户端：仍然只有一行，版本被就地刷新
-        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.18.0.0");
+        await SendAsClientAsync("/api/records/abyss/100000000/status", deviceId, "1.18.0.0");
 
         ClientVersion? upgraded = await TrackRowAsync(deviceId);
         Assert.NotNull(upgraded);
@@ -436,11 +437,11 @@ public sealed class ClientFlowTests
     {
         string deviceId = NewDeviceId();
 
-        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.17.1.0");
+        await SendAsClientAsync("/api/records/abyss/100000000/status", deviceId, "1.17.1.0");
         ClientVersion? first = await TrackRowAsync(deviceId);
         Assert.NotNull(first);
 
-        await SendAsClientAsync("/api/Record/Check?Uid=100000000", deviceId, "1.17.1.0");
+        await SendAsClientAsync("/api/records/abyss/100000000/status", deviceId, "1.17.1.0");
 
         ClientVersion? second = await TrackRowAsync(deviceId);
         Assert.NotNull(second);
@@ -453,10 +454,10 @@ public sealed class ClientFlowTests
     {
         TestUser maintainer = await users.MaintainerAsync();
 
-        await SendAsClientAsync("/api/Record/Check?Uid=100000000", NewDeviceId(), "9.9.9.9");
-        await SendAsClientAsync("/api/Record/Check?Uid=100000000", NewDeviceId(), "9.9.9.9");
+        await SendAsClientAsync("/api/records/abyss/100000000/status", NewDeviceId(), "9.9.9.9");
+        await SendAsClientAsync("/api/records/abyss/100000000/status", NewDeviceId(), "9.9.9.9");
 
-        TestResponse parsed = await SendAsync("GET", "/api/Service/ClientVersion/List", token: maintainer.AccessToken);
+        TestResponse parsed = await SendAsync("GET", "/api/admin/client-versions", token: maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         Assert.Equal(ServerKeys.ServerAdminClientVersionListSucceed, parsed.L10nKey);
 
@@ -475,7 +476,7 @@ public sealed class ClientFlowTests
     [Fact]
     public async Task PublicIp_ReturnsTheFourRegionSegments()
     {
-        TestResponse parsed = await SendAsync("GET", "/api/PublicApi/ip", realIp: "223.5.5.5");
+        TestResponse parsed = await SendAsync("GET", "/api/public/ip", realIp: "223.5.5.5");
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
 
         JsonElement data = parsed.Data;
@@ -485,24 +486,71 @@ public sealed class ClientFlowTests
             (data.GetProperty("country").GetString(), data.GetProperty("province").GetString(), data.GetProperty("city").GetString(), data.GetProperty("isp").GetString()));
 
         // 不带真实地址时是回环，内置库里查不到；响应外壳省略 null 字段而不是报错
-        TestResponse loopback = await SendAsync("GET", "/api/PublicApi/ip");
+        TestResponse loopback = await SendAsync("GET", "/api/public/ip");
         Assert.Equal(ReturnCodes.Success, loopback.Retcode);
         Assert.False(loopback.Data.TryGetProperty("country", out _), "查不到属地时不该有 country 字段");
     }
 
     /// <summary>
-    /// 今日壁纸：后台配了直链就下发人工上架的条目（来源页留空复用直链、作者留空用默认值），
-    /// 清空配置后回退到 Bing 每日壁纸。
+    /// 今日壁纸：从壁纸池里按天稳定随机取一张（同一天重复请求结果一致），来源页/作者/上传者留空时用默认值；
+    /// 保存空池后回退到 Bing 每日壁纸。
     /// </summary>
     [Fact]
-    public async Task TodayWallpaper_WithCuratedSource_ServesItAndFallsBackWhenCleared()
+    public async Task TodayWallpaper_PicksFromThePoolStablyAndFallsBackWhenEmpty()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+        WallpaperPoolItem[] pool =
+        [
+            new() { Url = "https://img.example.com/today-a.png" },
+            new() { Url = "https://img.example.com/today-b.png", SourceUrl = "https://example.com/source", Author = "Hutao", Uploader = "Silveridc" },
+        ];
+
+        TestResponse saved = await SendAsync("PUT", "/api/admin/wallpaper-pool", pool, maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, saved.Retcode);
+
+        try
+        {
+            TestResponse first = await SendAsync("GET", "/api/wallpapers/today");
+            TestResponse second = await SendAsync("GET", "/api/wallpapers/today");
+            Assert.Equal(ReturnCodes.Success, first.Retcode);
+
+            WallPaperResponse? response = first.DeserializeData<WallPaperResponse>();
+            Assert.NotNull(response);
+            Assert.Contains(response!.Url, pool.Select(item => item.Url));
+            Assert.Equal(response.Url, second.DeserializeData<WallPaperResponse>()!.Url);
+
+            WallpaperPoolItem chosen = pool.Single(item => item.Url == response.Url);
+            Assert.Equal(chosen.SourceUrl ?? chosen.Url, response.SourceUrl);
+            Assert.Equal(chosen.Author ?? "Snap Hutao", response.Author);
+            Assert.Equal(chosen.Uploader ?? "Snap Hutao", response.Uploader);
+
+            TestResponse emptied = await SendAsync("PUT", "/api/admin/wallpaper-pool", Array.Empty<WallpaperPoolItem>(), maintainer.AccessToken);
+            Assert.Equal(ReturnCodes.Success, emptied.Retcode);
+
+            TestResponse fallback = await SendAsync("GET", "/api/wallpapers/today");
+            Assert.Equal(ReturnCodes.Success, fallback.Retcode);
+            Assert.Contains("bing.com", fallback.DeserializeData<WallPaperResponse>()!.Url, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            await ResetConfigAsync(maintainer, "Wallpaper.Today.Pool");
+        }
+    }
+
+    /// <summary>
+    /// 壁纸池创建前，旧版单张配置仍然生效；后台页面会把它作为池里的一条记录展示。
+    /// </summary>
+    [Fact]
+    public async Task TodayWallpaper_LegacySingleEntry_IsStillServedWithoutAPool()
     {
         TestUser maintainer = await users.MaintainerAsync();
         const string url = "https://img.example.com/hutao-today.png";
 
+        await ResetConfigAsync(maintainer, "Wallpaper.Today.Pool");
+
         TestResponse updated = await SendAsync(
-            "POST",
-            "/api/Service/Config/Update",
+            "PATCH",
+            "/api/admin/settings",
             new Dictionary<string, string?>
             {
                 ["Wallpaper.Today.Url"] = url,
@@ -513,10 +561,10 @@ public sealed class ClientFlowTests
 
         try
         {
-            TestResponse curated = await SendAsync("GET", "/api/Wallpaper/today");
-            Assert.Equal(ReturnCodes.Success, curated.Retcode);
+            TestResponse legacy = await SendAsync("GET", "/api/wallpapers/today");
+            Assert.Equal(ReturnCodes.Success, legacy.Retcode);
 
-            WallPaperResponse? response = curated.DeserializeData<WallPaperResponse>();
+            WallPaperResponse? response = legacy.DeserializeData<WallPaperResponse>();
             Assert.NotNull(response);
             Assert.Equal(url, response!.Url);
             Assert.Equal(url, response.SourceUrl);
@@ -526,8 +574,8 @@ public sealed class ClientFlowTests
         finally
         {
             TestResponse cleared = await SendAsync(
-                "POST",
-                "/api/Service/Config/Update",
+                "PATCH",
+                "/api/admin/settings",
                 new Dictionary<string, string?>
                 {
                     ["Wallpaper.Today.Url"] = string.Empty,
@@ -536,10 +584,11 @@ public sealed class ClientFlowTests
                 maintainer.AccessToken);
             Assert.Equal(ReturnCodes.Success, cleared.Retcode);
         }
+    }
 
-        TestResponse fallback = await SendAsync("GET", "/api/Wallpaper/today");
-        Assert.Equal(ReturnCodes.Success, fallback.Retcode);
-        Assert.Contains("bing.com", fallback.DeserializeData<WallPaperResponse>()!.Url, StringComparison.OrdinalIgnoreCase);
+    private async Task ResetConfigAsync(TestUser user, string key)
+    {
+        await SendAsync("DELETE", $"/api/admin/settings/{Uri.EscapeDataString(key)}", null, user.AccessToken);
     }
 
     /// <summary>HutaoLogSingleItem.DeviceId 与 client_versions.DeviceId 都限长 32。</summary>

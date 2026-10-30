@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using server.Controllers;
-using server.Controllers.Filter;
 using server.Models.Admin;
 using server.Models.Context;
 using server.Models.Entity;
@@ -26,6 +25,7 @@ using server.Tests.Infrastructure;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Security.Cryptography;
+using server.Filter;
 
 namespace server.Tests;
 
@@ -502,7 +502,7 @@ public sealed class SsoTests : IDisposable
         AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Assert.Contains(
             await db.AdminAuditLogs.AsNoTracking().Where(log => log.AdminAccountId == accountId).ToListAsync(token),
-            log => log.Action == "/Passport/Sso/Login" && log.Detail == bound.UserName);
+            log => log.Action == "/api/passport/sso/sessions" && log.Detail == bound.UserName);
     }
 
     /// <summary>回跳只落到启动器拦截的哨兵地址：成功带 ticket，失败带 error 与回显的主体标识。</summary>
@@ -725,6 +725,7 @@ public sealed class SsoTests : IDisposable
         return new PassportSsoController(
             service,
             scope.ServiceProvider.GetRequiredService<PassportService>(),
+            scope.ServiceProvider.GetRequiredService<UserLoginLogService>(),
             NullLogger<PassportSsoController>.Instance)
         {
             ControllerContext = new ControllerContext { HttpContext = httpContext },

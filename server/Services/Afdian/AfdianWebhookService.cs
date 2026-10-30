@@ -1,12 +1,11 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
-using server.Extension;
 using server.Models.Afdian;
 using server.Services.Admin;
 
 namespace server.Services.Afdian;
 
-// Scoped（依赖 Scoped 的 RedeemService，注册成 Singleton 会无法解析）
+// Scoped
 public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
 {
     private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();

@@ -1,5 +1,4 @@
-﻿using server.Extension;
-using server.Models.Entity.Telemetry;
+﻿using server.Models.Entity.Telemetry;
 using server.Models.Upload;
 
 namespace server.Services.Telemetry;

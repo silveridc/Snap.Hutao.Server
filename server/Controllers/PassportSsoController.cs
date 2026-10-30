@@ -6,11 +6,12 @@ using server.Services.Admin;
 namespace server.Controllers;
 
 [ApiController]
-[Route("Passport/Sso")]
+[Route("api/passport/sso")]
 [ApiExplorerSettings(GroupName = "Passport")]
 public sealed class PassportSsoController(
     AdminSsoService adminSsoService,
     PassportService passportService,
+    UserLoginLogService userLoginLogService,
     ILogger<PassportSsoController> logger) : ControllerBase
 {
     /// <summary>
@@ -23,7 +24,7 @@ public sealed class PassportSsoController(
     /// 查询服务器是否支持启动器单点登录。
     /// </summary>
     /// <returns>支持状态与身份源显示名。</returns>
-    [HttpGet("Status")]
+    [HttpGet("status")]
     public IActionResult GetStatus()
     {
         return Success<PassportSsoStatus>("Single sign-on status acquired successfully", new PassportSsoStatus
@@ -38,7 +39,7 @@ public sealed class PassportSsoController(
     /// </summary>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>302 到身份源。</returns>
-    [HttpGet("Challenge")]
+    [HttpGet("challenge")]
     public async Task<IActionResult> ChallengeAsync(CancellationToken cancellationToken)
     {
         if (!adminSsoService.IsClientLoginEnabled)
@@ -66,7 +67,7 @@ public sealed class PassportSsoController(
     /// <param name="error">身份源直接返回的错误名。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>302 回跳到启动器拦截的地址。</returns>
-    [HttpGet("Callback")]
+    [HttpGet("~/Passport/Sso/Callback")]
     public async Task<IActionResult> CallbackAsync([FromQuery] string? code, [FromQuery] string? state, [FromQuery] string? error, CancellationToken cancellationToken)
     {
         PassportSsoCallbackResult result = await adminSsoService.HandleClientCallbackAsync(code, state, error, cancellationToken).ConfigureAwait(false);
@@ -96,7 +97,7 @@ public sealed class PassportSsoController(
     /// <param name="request">包含票据的请求体。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>主站令牌与登录邮箱。</returns>
-    [HttpPost("Exchange")]
+    [HttpPost("sessions")]
     public async Task<IActionResult> ExchangeAsync([FromBody] PassportSsoExchangeRequest request, CancellationToken cancellationToken)
     {
         (HutaoUser? user, AdminAccount? account) = await adminSsoService
@@ -105,10 +106,19 @@ public sealed class PassportSsoController(
 
         if (user is null || account is null)
         {
+            await userLoginLogService
+                .RecordAsync(HttpContext, null, "sso", null, false, ServerKeys.ServerPassportSsoTicketInvalid)
+                .ConfigureAwait(false);
+
             return Fail("The login ticket is invalid or has expired", ReturnCode.SsoTicketInvalid, ServerKeys.ServerPassportSsoTicketInvalid);
         }
 
-        TokenResponse token = await passportService.CreateTokenResponseAsync(user, this.GetDeviceInfo()).ConfigureAwait(false);
+        DeviceInfo deviceInfo = this.GetDeviceInfo();
+        TokenResponse token = await passportService.CreateTokenResponseAsync(user, deviceInfo).ConfigureAwait(false);
+
+        await userLoginLogService
+            .RecordAsync(HttpContext, deviceInfo, "sso", user.UserName ?? account.UserName, true, null, user.Id)
+            .ConfigureAwait(false);
 
         return Success<PassportSsoLoginResult>(
             "Login succeeded",

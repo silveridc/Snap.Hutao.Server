@@ -1,11 +1,12 @@
-﻿using server.Models.Entity.GachaLog;
+﻿using server.Filter;
+using server.Models.Entity.GachaLog;
 using server.Models.GachaLog;
 using server.Models.Metadata;
 
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/gacha-logs")]
 [ApiExplorerSettings(GroupName = "GachaLog")]
 public class GachaLogController(GachaLogService gachaLogService) : ControllerBase
 {
@@ -13,7 +14,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// 获取当前祈愿活动的统计概览。
     /// </summary>
     /// <returns>祈愿活动统计数据。</returns>
-    [HttpGet("Statistics/CurrentEventStatistics")]
+    [HttpGet("statistics/current-event")]
     public IActionResult CurrentEventStatistics()
     {
         return GetGachaLogStatistics<GachaEventStatistics>(GachaStatistics.GachaEventStatistics);
@@ -25,7 +26,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>角色活动祈愿分布数据。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("Statistics/Distribution/AvatarEvent")]
+    [HttpGet("statistics/distributions/avatar-event")]
     public IActionResult AvatarEventDistribution()
     {
         return GetGachaLogStatistics<GachaDistribution>(GachaStatistics.AvaterEventGachaDistribution);
@@ -37,7 +38,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>武器活动祈愿分布数据。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("Statistics/Distribution/WeaponEvent")]
+    [HttpGet("statistics/distributions/weapon-event")]
     public IActionResult WeaponEventDistribution()
     {
         return GetGachaLogStatistics<GachaDistribution>(GachaStatistics.WeaponEventGachaDistribution);
@@ -49,7 +50,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>集录祈愿分布数据。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("Statistics/Distribution/Chronicled")]
+    [HttpGet("statistics/distributions/chronicled")]
     public IActionResult ChronicledDistribution()
     {
         return GetGachaLogStatistics<GachaDistribution>(GachaStatistics.ChronicledGachaDistribution);
@@ -61,7 +62,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>常驻祈愿分布数据。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("Statistics/Distribution/Standard")]
+    [HttpGet("statistics/distributions/standard")]
     public IActionResult StandardDistribution()
     {
         return GetGachaLogStatistics<GachaDistribution>(GachaStatistics.StandardGachaDistribution);
@@ -73,7 +74,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>祈愿记录 Entry 列表。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("Entries")]
+    [HttpGet("entries")]
     public async Task<IActionResult> GetGachaEntriesAsync()
     {
         List<GachaEntry> entries = await gachaLogService.GetGachaEntriesForUserAsync(this.GetUserId()).ConfigureAwait(false);
@@ -87,7 +88,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>最新的 EndIds。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("EndIds")]
+    [HttpGet("end-ids")]
     public async Task<IActionResult> GetEndIdsAsync([FromQuery(Name = "Uid")] string uid)
     {
         EndIds endIds = await gachaLogService.GetNewestEndIdsAsync(this.GetUserId(), uid).ConfigureAwait(false);
@@ -101,7 +102,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>祈愿记录列表。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpPost("Retrieve")]
+    [HttpPost("retrievals")]
     public async Task<IActionResult> RetrieveAsync([FromBody] UidAndEndIds uidAndEndIds)
     {
         int userId = this.GetUserId();
@@ -119,7 +120,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>祈愿记录列表。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("LimitedRetrieve")]
+    [HttpGet("limited-retrievals")]
     public async Task<IActionResult> LimitedRetrieveAsync([FromQuery(Name = "uid")] string uid, [FromQuery(Name = "configType")] int configType, [FromQuery(Name = "endId")] long endId = long.MaxValue, [FromQuery(Name = "count")] int count = 20)
     {
         int userId = this.GetUserId();
@@ -134,7 +135,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>上传保存结果。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpPost("Upload")]
+    [HttpPost]
     public async Task<IActionResult> UploadAsync([FromBody] UidAndItems uidAndItems)
     {
         int userId = this.GetUserId();
@@ -157,8 +158,8 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     /// <returns>删除的记录条数。</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
-    [HttpGet("Delete")]
-    public async Task<IActionResult> DeleteAsync([FromQuery(Name = "Uid")] string uid)
+    [HttpDelete("{uid}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] string uid)
     {
         int count = await gachaLogService.DeleteGachaItemsAsync(this.GetUserId(), uid).ConfigureAwait(false);
         return Success<int>($"Deleted {count} records", count);

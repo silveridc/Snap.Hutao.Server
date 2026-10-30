@@ -1,4 +1,4 @@
-{
+﻿{
   "release": {
     "current": {
       "title": "Currently Active Version",
@@ -6,7 +6,10 @@
       "publisher": "Publisher",
       "publishedAt": "Published At",
       "mirrors": "Mirrors",
-      "releaseNotes": "Release Notes"
+      "releaseNotes": "Release Notes",
+      "copyHash": "Copy full checksum",
+      "copiedHash": "SHA-256 copied",
+      "copyFail": "Copy failed; select the text and copy manually"
     },
     "form": {
       "title": "Publish New Version",
@@ -42,7 +45,8 @@
       "current": "Current"
     },
     "actions": {
-      "activate": "Activate"
+      "activate": "Activate",
+      "deactivate": "Unpublish"
     },
     "bucket": {
       "title": "Publish from Bucket",
@@ -57,6 +61,11 @@
       "versionAutoHint": "Empty to parse from the object file name, e.g. Snap.Hutao.1.17.2.0.msix",
       "mirrorName": "Mirror name",
       "mirrorNameHint": "Empty to use the bucket host name",
+      "validation": "SHA-256 (optional)",
+      "validationHint": "Paste a precomputed checksum to skip downloading the installer: the server only HEADs the object. Leave empty to hash the object.",
+      "validationPlaceholder": "64 hex characters; empty to let the server compute it",
+      "validationInvalid": "SHA-256 must be 64 hexadecimal characters",
+      "publishingWithHash": "Verifying the object and publishing…",
       "submit": "Verify and Publish",
       "publishing": "Reading the object and computing the SHA-256; a large installer takes a while…",
       "truncated": "More than 200 objects; only the first 200 are shown, narrow the prefix",
@@ -67,7 +76,9 @@
     },
     "dialog": {
       "activateHeader": "Activate Historical Version",
-      "activateConfirmBody": "Set version {version} as the currently active version? The current active version will be replaced."
+      "activateConfirmBody": "Set version {version} as the currently active version? The current active version will be replaced.",
+      "deactivateHeader": "Unpublish the active release",
+      "deactivateConfirmBody": "Unpublish version {version}? Clients will no longer receive this update."
     },
     "messages": {
       "versionRequired": "Please enter the version number",
@@ -79,7 +90,9 @@
       "listFail": "Failed to load the release history",
       "alreadyActive": "This version is already the currently active one",
       "activateSuccess": "Activated successfully",
-      "activateFail": "Failed to activate"
+      "activateFail": "Failed to activate",
+      "deactivateSuccess": "Release unpublished",
+      "deactivateFail": "Failed to unpublish"
     }
   }
 }

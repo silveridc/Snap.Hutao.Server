@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -50,7 +50,7 @@ public sealed class StatisticsTests
 
         // ?Last=true 查的是上一期，正是生产 500 的触发参数
         JsonNode root = JsonNode.Parse(
-            await (await client.GetAsync("/api/Statistics/Overview?Last=true", TestContext.Current.CancellationToken)).Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
+            await (await client.GetAsync("/api/statistics/overview?Last=true", TestContext.Current.CancellationToken)).Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
         Assert.Equal(0, (int)root["retcode"]!);
         JsonNode data = root["data"]!;
         Assert.Equal(0, (double)data["TimeAverage"]!);
@@ -65,7 +65,7 @@ public sealed class StatisticsTests
             """{"ScheduleId":123,"RecordTotal":0,"SpiralAbyssTotal":0,"SpiralAbyssFullStar":0,"SpiralAbyssPassed":0,"SpiralAbyssStarTotal":0,"SpiralAbyssBattleTotal":0,"Timestamp":1791194700562,"TimeTotal":"NaN","TimeAverage":"-Infinity"}""");
 
         JsonNode root = JsonNode.Parse(
-            await (await client.GetAsync("/api/Statistics/Overview?Last=true", TestContext.Current.CancellationToken)).Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
+            await (await client.GetAsync("/api/statistics/overview?Last=true", TestContext.Current.CancellationToken)).Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
         Assert.Equal(0, (int)root["retcode"]!);
         Assert.Equal(0, (double)root["data"]!["TimeTotal"]!);
         Assert.Equal(0, (double)root["data"]!["TimeAverage"]!);
@@ -81,7 +81,7 @@ public sealed class StatisticsTests
 
         for (int i = 1; i <= 2; i++)
         {
-            using HttpResponseMessage response = await client.GetAsync("/api/Statistics/Overview?Last=true", TestContext.Current.CancellationToken);
+            using HttpResponseMessage response = await client.GetAsync("/api/statistics/overview?Last=true", TestContext.Current.CancellationToken);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;
@@ -98,7 +98,7 @@ public sealed class StatisticsTests
         await PreparePoisonRowAsync(LegacyStatistics.AvatarAppearanceRank,
             """[{"Floor":9,"Ranks":[{"Item":10000002,"Rate":"NaN"}]}]""");
 
-        using HttpResponseMessage response = await client.GetAsync("/api/Statistics/Avatar/AttendanceRate?Last=true", TestContext.Current.CancellationToken);
+        using HttpResponseMessage response = await client.GetAsync("/api/statistics/avatars/attendance-rate?Last=true", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         JsonNode root = JsonNode.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!;

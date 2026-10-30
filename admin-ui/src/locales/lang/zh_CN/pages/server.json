@@ -1,4 +1,4 @@
-{
+﻿{
   "server": {
     "ServerAdminAccountAddSucceed": "后台账号已添加",
     "ServerAdminAccountAlreadyExists": "该身份已有后台账号",
@@ -56,6 +56,7 @@
     "ServerAdminLicenseApproveSucceed": "批准成功",
     "ServerAdminLicenseApproveUserNotFound": "批准失败，账户不存在",
     "ServerAdminLicenseListSucceed": "获取许可证申请列表成功",
+    "ServerAdminLoginLogListSucceed": "获取登录日志成功",
     "ServerAdminOperationSucceed": "操作成功",
     "ServerAdminPasswordTooShort": "新密码至少 8 位",
     "ServerAdminRankKeyRequired": "缺少排行榜键",
@@ -74,6 +75,7 @@
     "ServerAdminReleaseBucketObjectRequired": "请选择要发布的安装包对象",
     "ServerAdminReleaseBucketUnavailable": "补丁存储桶不可用，请检查地址与密钥",
     "ServerAdminReleaseCurrentSucceed": "获取当前发布版本成功",
+    "ServerAdminReleaseDeactivateSucceed": "版本已下架",
     "ServerAdminReleaseDuplicateMirrorName": "镜像名称不能重复",
     "ServerAdminReleaseInvalidChecksum": "SHA-256 校验值必须是 64 位十六进制字符串",
     "ServerAdminReleaseInvalidMirrorName": "镜像名称不能为空且不能超过 100 个字符",
@@ -97,6 +99,8 @@
     "ServerAdminUserNameNotFound": "用户名不存在",
     "ServerAdminUserNotFound": "用户不存在",
     "ServerAdminUserStatisticsSucceed": "获取用户统计成功",
+    "ServerAdminWallpaperPoolInvalid": "今日壁纸池不合法：直链必须是 HTTPS 绝对地址，且最多 50 条",
+    "ServerAdminWallpaperPoolSaveSucceed": "今日壁纸池已保存",
     "ServerAdminWriteRequiresSso": "启用单点登录后，只有后台专属账号可以修改数据",
     "ServerAnnouncementGetSucceed": "获取公告成功",
     "ServerAnnouncementUploadSucceed": "上传公告成功",
@@ -131,6 +135,7 @@
     "ServerPassportLoginRequired": "请先登录或注册胡桃账号",
     "ServerPassportLoginSucceed": "登录成功",
     "ServerPassportPasswordTooShort": "密码长度不能小于 8 位",
+    "ServerPassportReCaptchaFailed": "人机验证失败，请重试",
     "ServerPassportRefreshTokenEmpty": "刷新令牌不能为空",
     "ServerPassportRefreshTokenInvalid": "刷新令牌无效或已过期",
     "ServerPassportRegisterSucceed": "注册成功",

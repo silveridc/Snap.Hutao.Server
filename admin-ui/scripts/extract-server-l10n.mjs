@@ -75,6 +75,8 @@ const adminOnly = {
   ServerAdminAccountUserUnbound: ['该后台账号未绑定主站账号', 'This admin account is not bound to a Hutao account'],
   ServerAdminCannotDemoteDefaultAdmin: ['默认管理员不能被降级', 'The default administrator cannot be demoted'],
   ServerAdminSystemOverviewSucceed: ['获取系统概览成功', 'System overview acquired successfully'],
+  ServerAdminWallpaperPoolInvalid: ['今日壁纸池不合法：直链必须是 HTTPS 绝对地址，且最多 50 条', 'Invalid wallpaper pool: every URL must be an absolute HTTPS URL and the pool is limited to 50 entries'],
+  ServerAdminWallpaperPoolSaveSucceed: ['今日壁纸池已保存', 'Wallpaper pool saved'],
 };
 for (const [key, [zhText, enText]] of Object.entries(adminOnly)) {
   zhOut.server[key] = zhText;

@@ -1,30 +1,26 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore.Storage;
-using server.Extension;
 using server.Models.Entity.RoleCombat;
 using server.Models.RoleCombat;
 
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/records/role-combat")]
 [ApiExplorerSettings(GroupName = "RoleCombat")]
-public class RoleCombatController(IServiceProvider serviceProvider, TimeProvider timeProvider)
+public class RoleCombatController(AppDbContext appDbContext, IDistributedCache cache, TimeProvider timeProvider)
 {
     private static readonly ConcurrentDictionary<string, UploadToken> UploadingUids = new();
-
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-    private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
 
     /// <summary>
     /// 上传剧演记录。
     /// </summary>
     /// <param name="record">剧演记录数据。</param>
     /// <returns>上传结果。</returns>
-    [HttpPost("Upload")]
+    [HttpPost]
     public async Task<IActionResult> Upload([FromBody] SimpleRoleCombatRecord record)
     {
-        if (_cache.HasFlag(RoleCombatService.Working))
+        if (cache.HasFlag(RoleCombatService.Working))
         {
             return Fail("Computing statistics", ReturnCode.ComputingStatistics, ServerKeys.ServerRoleCombatComputingStatistics);
         }
@@ -44,16 +40,16 @@ public class RoleCombatController(IServiceProvider serviceProvider, TimeProvider
             return Fail("A previous request for this Uid is still being processed", ReturnCode.PreviousRequestNotCompleted, ServerKeys.ServerRoleCombatPreviousRequestNotCompleted);
         }
 
-        await using (IDbContextTransaction transaction = await _appDbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
+        await using (IDbContextTransaction transaction = await appDbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
         {
-            RoleCombatRecord? exist = await _appDbContext.RoleCombatRecords.SingleOrDefaultAsync(r => r.Uid == record.Uid).ConfigureAwait(false);
+            RoleCombatRecord? exist = await appDbContext.RoleCombatRecords.SingleOrDefaultAsync(r => r.Uid == record.Uid).ConfigureAwait(false);
 
             if (exist is not null)
             {
-                await _appDbContext.RoleCombatAvatars.Where(a => a.RecordId == exist.PrimaryId).ExecuteDeleteAsync().ConfigureAwait(false);
+                await appDbContext.RoleCombatAvatars.Where(a => a.RecordId == exist.PrimaryId).ExecuteDeleteAsync().ConfigureAwait(false);
             }
 
-            await _appDbContext.RoleCombatRecords.Where(r => r.Uid == record.Uid).ExecuteDeleteAsync().ConfigureAwait(false);
+            await appDbContext.RoleCombatRecords.Where(r => r.Uid == record.Uid).ExecuteDeleteAsync().ConfigureAwait(false);
 
             RoleCombatRecord newRecord = new()
             {
@@ -61,11 +57,11 @@ public class RoleCombatController(IServiceProvider serviceProvider, TimeProvider
                 Uploader = record.Identity,
                 UploadTime = timeProvider.GetUnixTimeSeconds(),
             };
-            await _appDbContext.RoleCombatRecords.AddAndSaveAsync(newRecord).ConfigureAwait(false);
+            await appDbContext.RoleCombatRecords.AddAndSaveAsync(newRecord).ConfigureAwait(false);
 
             long recordId = newRecord.PrimaryId;
             List<RoleCombatAvatar> avatars = [.. record.BackupAvatars.Select(id => new RoleCombatAvatar() { AvatarId = id, RecordId = recordId })];
-            await _appDbContext.RoleCombatAvatars.AddRangeAndSaveAsync(avatars).ConfigureAwait(false);
+            await appDbContext.RoleCombatAvatars.AddRangeAndSaveAsync(avatars).ConfigureAwait(false);
 
             await transaction.CommitAsync().ConfigureAwait(false);
         }
@@ -82,18 +78,18 @@ public class RoleCombatController(IServiceProvider serviceProvider, TimeProvider
     /// 获取当前剧演的统计数据。
     /// </summary>
     /// <returns>剧演统计数据。</returns>
-    [HttpGet("Statistics")]
+    [HttpGet("statistics")]
     public IActionResult GetStatistics()
     {
         int scheduleId = RoleCombatScheduleId.GetForNow();
 
         string key = $"RoleCombatStatistics:{scheduleId}";
-        if (_cache.TryGetValue(key, out RoleCombatStatisticsItem? data))
+        if (cache.TryGetValue(key, out RoleCombatStatisticsItem? data))
         {
             return Success<RoleCombatStatisticsItem>("Role combat statistics acquired successfully", data!, ServerKeys.ServerRoleCombatStatisticsSucceed);
         }
 
-        RoleCombatStatistics? statistics = _appDbContext.RoleCombatStatistics
+        RoleCombatStatistics? statistics = appDbContext.RoleCombatStatistics
             .SingleOrDefault(s => s.ScheduleId == scheduleId);
 
         if (statistics is null)
@@ -102,7 +98,7 @@ public class RoleCombatController(IServiceProvider serviceProvider, TimeProvider
         }
 
         RoleCombatStatisticsItem? typedData = JsonSerializer.Deserialize<RoleCombatStatisticsItem>(statistics.Data);
-        _cache.Set(key, typedData, TimeSpan.FromDays(1));
+        cache.Set(key, typedData, TimeSpan.FromDays(1));
 
         return Success<RoleCombatStatisticsItem>("Role combat statistics acquired successfully", typedData!, ServerKeys.ServerRoleCombatStatisticsSucceed);
     }

@@ -1,10 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using server.Extension;
 using server.Models.Admin;
 using server.Models.Entity;
 using server.Models.Passport;
@@ -174,7 +173,7 @@ public sealed class AdminSsoService(
             AdminUserId = 0,
             AdminAccountId = account.Id,
             AdminAccountName = account.UserName,
-            Action = "/Passport/Sso/Login",
+            Action = "/api/passport/sso/sessions",
             Detail = user.UserName,
             Ip = clientIp,
             Success = true,
@@ -372,7 +371,7 @@ public sealed class AdminSsoService(
             AdminUserId = 0,
             AdminAccountId = account.Id,
             AdminAccountName = account.UserName,
-            Action = "/Admin/Sso/Login",
+            Action = "/api/admin/sso/sessions",
             Detail = null,
             Ip = clientIp,
             Success = true,

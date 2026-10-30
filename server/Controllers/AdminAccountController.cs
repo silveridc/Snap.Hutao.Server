@@ -1,11 +1,12 @@
-﻿using server.Models.Admin;
+﻿using server.Filter;
+using server.Models.Admin;
 using server.Services.Admin;
 
 namespace server.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/Service/AdminAccount")]
+[Route("api/admin/accounts")]
 [ServiceFilter(typeof(ValidateMaintainPermission), Order = 1)]
 [ServiceFilter(typeof(ValidateAdminWritePermission), Order = 2)]
 [ServiceFilter(typeof(AuditLogActionFilter), Order = 3)]
@@ -17,7 +18,7 @@ public sealed class AdminAccountController(AdminSsoService adminSsoService) : Co
     /// </summary>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>账号列表。</returns>
-    [HttpGet("List")]
+    [HttpGet]
     public async Task<IActionResult> ListAsync(CancellationToken cancellationToken)
     {
         int? currentAccountId = this.TryGetAdminAccountId(out int accountId) ? accountId : null;
@@ -32,7 +33,7 @@ public sealed class AdminAccountController(AdminSsoService adminSsoService) : Co
     /// <param name="request">主体标识与显示信息。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>操作结果。</returns>
-    [HttpPost("Add")]
+    [HttpPost]
     public async Task<IActionResult> AddAsync([FromBody] AdminAccountAddRequest request, CancellationToken cancellationToken)
     {
         (ReturnCode code, string message, string? localizationKey) = await adminSsoService
@@ -51,8 +52,8 @@ public sealed class AdminAccountController(AdminSsoService adminSsoService) : Co
     /// <param name="enabled">目标状态。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>操作结果。</returns>
-    [HttpPost("SetEnabled")]
-    public async Task<IActionResult> SetEnabledAsync([FromQuery] int accountId, [FromQuery] bool enabled, CancellationToken cancellationToken)
+    [HttpPatch("{accountId}")]
+    public async Task<IActionResult> SetEnabledAsync([FromRoute] int accountId, [FromQuery] bool enabled, CancellationToken cancellationToken)
     {
         int currentAccountId = this.TryGetAdminAccountId(out int id) ? id : 0;
         (ReturnCode code, string message, string? localizationKey) = await adminSsoService
@@ -70,8 +71,8 @@ public sealed class AdminAccountController(AdminSsoService adminSsoService) : Co
     /// <param name="accountId">目标账号。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>操作结果。</returns>
-    [HttpPost("Remove")]
-    public async Task<IActionResult> RemoveAsync([FromQuery] int accountId, CancellationToken cancellationToken)
+    [HttpDelete("{accountId}")]
+    public async Task<IActionResult> RemoveAsync([FromRoute] int accountId, CancellationToken cancellationToken)
     {
         int currentAccountId = this.TryGetAdminAccountId(out int id) ? id : 0;
         (ReturnCode code, string message, string? localizationKey) = await adminSsoService
@@ -91,8 +92,8 @@ public sealed class AdminAccountController(AdminSsoService adminSsoService) : Co
     /// <param name="request">主站账号的邮箱。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>操作结果。</returns>
-    [HttpPost("Bind")]
-    public async Task<IActionResult> BindAsync([FromQuery] int accountId, [FromBody] AdminAccountBindRequest request, CancellationToken cancellationToken)
+    [HttpPut("{accountId}/binding")]
+    public async Task<IActionResult> BindAsync([FromRoute] int accountId, [FromBody] AdminAccountBindRequest request, CancellationToken cancellationToken)
     {
         (ReturnCode code, string message, string? localizationKey) = await adminSsoService
             .BindAsync(accountId, request.UserName, cancellationToken)
@@ -109,8 +110,8 @@ public sealed class AdminAccountController(AdminSsoService adminSsoService) : Co
     /// <param name="accountId">目标后台账号。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>操作结果。</returns>
-    [HttpPost("Unbind")]
-    public async Task<IActionResult> UnbindAsync([FromQuery] int accountId, CancellationToken cancellationToken)
+    [HttpDelete("{accountId}/binding")]
+    public async Task<IActionResult> UnbindAsync([FromRoute] int accountId, CancellationToken cancellationToken)
     {
         (ReturnCode code, string message, string? localizationKey) = await adminSsoService
             .UnbindAsync(accountId, cancellationToken)

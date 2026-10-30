@@ -1,14 +1,13 @@
 ﻿using IP2Region.Net.Abstractions;
 using IP2Region.Net.XDB;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.OpenApi;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Quartz;
+using server.Filter;
 using server.Services.Admin;
 using server.Services.Cache;
 using server.Services.WallPaper;
@@ -165,6 +164,7 @@ public static class Program
             .AddKeyedScoped<IOAuthProvider, GithubService>(OAuthProviderKind.Github)
             .AddScoped<PassportService>()
             .AddScoped<PassportVerificationService>()
+            .AddScoped<UserLoginLogService>()
             .AddScoped<PizzaHelperRecordService>()
             .AddScoped<RecordService>()
             .AddScoped<SpiralAbyssStatisticsService>()

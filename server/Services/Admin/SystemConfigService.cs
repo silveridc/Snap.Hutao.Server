@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using server.Models.Entity;
 
 namespace server.Services.Admin;
@@ -8,54 +8,6 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 {
     private readonly ConcurrentDictionary<string, string?> _cache = new(StringComparer.OrdinalIgnoreCase);
     private volatile bool _initialized;
-
-    public static class Keys
-    {
-        public const string PizzaHelperUidSalt = "PizzaHelper.UidSalt";
-        public const string PizzaHelperApiSalt = "PizzaHelper.ApiSalt";
-        public const string PizzaHelperAvatarHoldingEndpoint = "PizzaHelper.EndPoints.AvatarHolding";
-        public const string PizzaHelperSpiralAbyssEndpoint = "PizzaHelper.EndPoints.SpiralAbyss";
-
-        public const string AfdianSkuGachaLog = "Afdian.SkuGachaLogUploadService";
-        public const string Afdian2SkuCdn = "Afdian2.SkuCdnService";
-
-        public const string SmtpDiagnosticEmail = "Smtp.DiagnosticEmailAddress";
-
-        public const string MaintenanceMode = "System.MaintenanceMode";
-        public const string RegistrationEnabled = "System.RegistrationEnabled";
-        public const string CaptchaEnabled = "System.CaptchaEnabled";
-
-        // 客户端功能熔断：后台即时开关，经 /Patch/hutao 下发；解除后客户端恢复用户本地设置。
-        public const string PatchDisableFpsUnlock = "Patch.DisableFpsUnlock";
-        public const string PatchDisableIslandInjection = "Patch.DisableIslandInjection";
-
-        // 更新包 S3 直链签名：镜像主机名匹配时 /Patch/hutao 下发前现场签发限时 URL，桶可保持私有。
-        public const string PatchS3Host = "Patch.S3.Host";
-        public const string PatchS3Region = "Patch.S3.Region";
-        public const string PatchS3AccessKeyId = "Patch.S3.AccessKeyId";
-        public const string PatchS3SecretAccessKey = "Patch.S3.SecretAccessKey";
-        public const string PatchS3ExpiresHours = "Patch.S3.ExpiresHours";
-
-        // 今日壁纸：/Wallpaper/today 优先返回这里人工上架的一张，Url 留空时回退到 Bing 每日壁纸。
-        public const string WallpaperTodayUrl = "Wallpaper.Today.Url";
-        public const string WallpaperTodaySourceUrl = "Wallpaper.Today.SourceUrl";
-        public const string WallpaperTodayAuthor = "Wallpaper.Today.Author";
-        public const string WallpaperTodayUploader = "Wallpaper.Today.Uploader";
-
-        // SSO（外部 OIDC 身份源）。任何键未在后台配置时回退到 appsettings/环境变量里的 App:Oidc，
-        // 后台改动经 UpdateAsync 即时生效，无需重启。
-        public const string OidcEnabled = "Oidc.Enabled";
-        public const string OidcAuthority = "Oidc.Authority";
-        public const string OidcClientId = "Oidc.ClientId";
-        public const string OidcClientSecret = "Oidc.ClientSecret";
-        public const string OidcRedirectUri = "Oidc.RedirectUri";
-        public const string OidcClientRedirectUri = "Oidc.ClientRedirectUri";
-        public const string OidcScope = "Oidc.Scope";
-        public const string OidcDisplayName = "Oidc.DisplayName";
-        public const string OidcBootstrapClaim = "Oidc.BootstrapClaim";
-        public const string OidcBootstrapValue = "Oidc.BootstrapValue";
-        public const string OidcRequireHttpsMetadata = "Oidc.RequireHttpsMetadata";
-    }
 
     public async Task InitializeAsync()
     {
@@ -131,16 +83,16 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 
     public bool MaintenanceMode => GetBool(Keys.MaintenanceMode, false);
 
-    /// <summary>熔断：禁用客户端解锁帧率，经 /Patch/hutao 下发。</summary>
     public bool PatchDisableFpsUnlock => GetBool(Keys.PatchDisableFpsUnlock, false);
 
-    /// <summary>熔断：禁用客户端 Island 注入，经 /Patch/hutao 下发。</summary>
     public bool PatchDisableIslandInjection => GetBool(Keys.PatchDisableIslandInjection, false);
 
-    /// <summary>S3 直链签名：要签名的主机名（如 my-bucket.s3.us-east-1.amazonaws.com）。空 = 不启用。</summary>
+    public string PatchDisableFpsUnlockReason => GetOrDefault(Keys.PatchDisableFpsUnlockReason, string.Empty).Trim();
+
+    public string PatchDisableIslandInjectionReason => GetOrDefault(Keys.PatchDisableIslandInjectionReason, string.Empty).Trim();
+
     public string PatchS3Host => GetOrDefault(Keys.PatchS3Host, string.Empty).Trim();
 
-    /// <summary>四项配置齐全才启用签名。</summary>
     public bool IsPatchS3SigningEnabled =>
         !string.IsNullOrWhiteSpace(PatchS3Host)
         && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3Region, string.Empty))
@@ -149,12 +101,8 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 
     public bool RegistrationEnabled => GetBool(Keys.RegistrationEnabled, true);
 
-    public bool CaptchaEnabled => GetBool(Keys.CaptchaEnabled, !string.IsNullOrWhiteSpace(appOptions.ReCaptchaKey));
+    public bool CaptchaEnabled => GetBool(Keys.CaptchaEnabled, !string.IsNullOrWhiteSpace(appOptions.ReCaptchaKey) && !string.IsNullOrWhiteSpace(appOptions.ReCaptchaSiteKey));
 
-    /// <summary>
-    /// SSO 当前生效配置：后台覆盖值优先，留空的键回退 App:Oidc（appsettings/环境变量）。
-    /// 每次读取现拼——管理端保存后下一次调用即生效。
-    /// </summary>
     public OidcOptions Oidc => new()
     {
         Enabled = GetBool(Keys.OidcEnabled, appOptions.Oidc.Enabled),

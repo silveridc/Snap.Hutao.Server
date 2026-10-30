@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+﻿import { defineStore } from 'pinia';
 
 import { fetchUserInfo, login as apiLogin } from '@/api/passport';
 import { exchangeSsoTicket } from '@/api/sso';
@@ -36,9 +36,9 @@ export const useUserStore = defineStore('user', {
     roles: (state) => state.userInfo?.roles,
   },
   actions: {
-    async login(userInfo: { email?: string; account?: string; password: string }) {
+    async login(userInfo: { email?: string; account?: string; password: string; captchaToken?: string }) {
       const email = (userInfo.email ?? userInfo.account ?? '').trim();
-      const token = await apiLogin(email, userInfo.password);
+      const token = await apiLogin(email, userInfo.password, userInfo.captchaToken);
       setTokens({
         accessToken: token.AccessToken,
         refreshToken: token.RefreshToken,

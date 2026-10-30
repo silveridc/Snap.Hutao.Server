@@ -10,6 +10,8 @@ public sealed class AppOptions
 
     public string ReCaptchaKey { get; set; } = default!;
 
+    public string ReCaptchaSiteKey { get; set; } = default!;
+
     public string RedisAddress { get; set; } = default!;
 
     public string RSAPrivateKey { get; set; } = default!;

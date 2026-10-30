@@ -2,7 +2,7 @@
 
 public sealed class OidcOptions
 {
-    /// <summary>总开关。关闭时 <c>/Admin/Sso/*</c> 只返回未启用，写门禁对所有身份放行。</summary>
+    /// <summary>总开关。关闭时 <c>/api/admin/sso/*</c> 只返回未启用，写门禁对所有身份放行。</summary>
     public bool Enabled { get; set; }
 
     /// <summary>身份源的 Issuer 地址，需能访问 <c>/.well-known/openid-configuration</c>。</summary>
@@ -17,7 +17,7 @@ public sealed class OidcOptions
 
     /// <summary>
     /// 启动器（客户端）单点登录的回调绝对地址，同样要在身份源里登记，与 <see cref="RedirectUri"/> 是两个不同的地址。
-    /// 留空时启动器查询 <c>/Passport/Sso/Status</c> 得到未启用，登录界面继续只显示邮箱密码登录。
+    /// 留空时启动器查询 <c>/api/passport/sso/status</c> 得到未启用，登录界面继续只显示邮箱密码登录。
     /// </summary>
     public string? ClientRedirectUri { get; set; }
 

@@ -4,24 +4,21 @@ using server.Models.Redeem;
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/redeem-codes")]
 [ApiExplorerSettings(GroupName = "Redeem")]
-public class RedeemController(IServiceProvider serviceProvider) : ControllerBase
+public class RedeemController(RedeemService redeemService, AppDbContext appDbContext) : ControllerBase
 {
-    private readonly RedeemService _redeemService = serviceProvider.GetRequiredService<RedeemService>();
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-
     /// <summary>
     /// 使用兑换码。
     /// </summary>
     /// <param name="req">兑换请求。</param>
     /// <returns>兑换结果。</returns>
-    [HttpPost("Use")]
+    [HttpPost("redemptions")]
     public async Task<IActionResult> UseRedeemCodeAsync([FromBody] RedeemUseRequest req)
     {
         if (req.Username is null)
         {
-            if (await this.GetUserAsync(_appDbContext.Users).ConfigureAwait(false) is not { } user)
+            if (await this.GetUserAsync(appDbContext.Users).ConfigureAwait(false) is not { } user)
             {
                 return Fail("Please log in or register a Snap Hutao account first", ReturnCode.NoUserIdentity, ServerKeys.ServerPassportLoginRequired);
             }
@@ -29,7 +26,7 @@ public class RedeemController(IServiceProvider serviceProvider) : ControllerBase
             req.Username = user.UserName;
         }
 
-        RedeemUseResponse response = await _redeemService.UseRedeemCodeAsync(req).ConfigureAwait(false);
+        RedeemUseResponse response = await redeemService.UseRedeemCodeAsync(req).ConfigureAwait(false);
 
         return response.Status switch
         {

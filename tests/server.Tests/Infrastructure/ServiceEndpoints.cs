@@ -1,7 +1,8 @@
-using server.Models.Admin;
+﻿using server.Models.Admin;
 using server.Models.Cache;
 using server.Models.Entity.Announcement;
 using server.Models.Entity.Redeem;
+using server.Models.PublicAPI;
 using server.Models.Redeem;
 using server.Models.Upload;
 
@@ -37,39 +38,39 @@ public static class ServiceEndpoints
 
     public static IReadOnlyList<ServiceEndpoint> Rows { get; } =
     [
-        new("GET", "/api/Service/Statistics/Run", null, ReturnCodes.Success),
+        new("POST", "/api/admin/statistics/refresh", null, ReturnCodes.Success),
 
         // 补偿接口用 days=0：只会把已过期账号的到期时间补到当前时刻，不会凭空发放时长
-        new("GET", "/api/Service/GachaLog/Compensation?days=0", null, ReturnCodes.Success),
-        new("GET", $"/api/Service/GachaLog/Designation?userName={Uri.EscapeDataString(UnknownUser)}&days=0", null, ReturnCodes.UserNameNotExists),
-        new("GET", "/api/Service/Distribution/Compensation?days=0", null, ReturnCodes.Success),
-        new("GET", $"/api/Service/Distribution/Designation?userName={Uri.EscapeDataString(UnknownUser)}&days=0", null, ReturnCodes.UserNameNotExists),
+        new("POST", "/api/admin/gacha-logs/compensations?days=0", null, ReturnCodes.Success),
+        new("POST", $"/api/admin/gacha-logs/compensations/designation?userName={Uri.EscapeDataString(UnknownUser)}&days=0", null, ReturnCodes.UserNameNotExists),
+        new("POST", "/api/admin/cdn/compensations?days=0", null, ReturnCodes.Success),
+        new("POST", $"/api/admin/cdn/compensations/designation?userName={Uri.EscapeDataString(UnknownUser)}&days=0", null, ReturnCodes.UserNameNotExists),
 
-        new("GET", "/api/Service/System/Overview", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Analytics/Gacha?days=30", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Analytics/Abyss", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Analytics/Damage?top=10", null, ReturnCodes.Success),
-        new("GET", "/api/Service/User/Statistics", null, ReturnCodes.Success),
-        new("GET", "/api/Service/ClientVersion/List", null, ReturnCodes.Success),
-        new("GET", "/api/Service/User/List?page=1&pageSize=10&keyword=example.com", null, ReturnCodes.Success),
-        new("GET", $"/api/Service/User/Detail?userId={int.MaxValue}", null, ReturnCodes.UserNameNotExists),
-        new("POST", "/api/Service/User/Privilege", JsonSerializer.Serialize(new UserPrivilegeRequest { UserId = int.MaxValue }), ReturnCodes.UserNameNotExists),
-        new("POST", "/api/Service/User/ResetPassword", JsonSerializer.Serialize(new UserResetPasswordRequest { UserId = int.MaxValue, NewPassword = "PlaceholderPassword1" }), ReturnCodes.InvalidUploadData),
+        new("GET", "/api/admin/system/overview", null, ReturnCodes.Success),
+        new("GET", "/api/admin/analytics/gacha?days=30", null, ReturnCodes.Success),
+        new("GET", "/api/admin/analytics/abyss", null, ReturnCodes.Success),
+        new("GET", "/api/admin/analytics/damage?top=10", null, ReturnCodes.Success),
+        new("GET", "/api/admin/users/statistics", null, ReturnCodes.Success),
+        new("GET", "/api/admin/client-versions", null, ReturnCodes.Success),
+        new("GET", "/api/admin/users?page=1&pageSize=10&keyword=example.com", null, ReturnCodes.Success),
+        new("GET", $"/api/admin/users/{int.MaxValue}", null, ReturnCodes.UserNameNotExists),
+        new("PATCH", $"/api/admin/users/{int.MaxValue}/privileges", JsonSerializer.Serialize(new UserPrivilegeRequest { UserId = int.MaxValue }), ReturnCodes.UserNameNotExists),
+        new("PUT", $"/api/admin/users/{int.MaxValue}/password", JsonSerializer.Serialize(new UserResetPasswordRequest { UserId = int.MaxValue, NewPassword = "PlaceholderPassword1" }), ReturnCodes.InvalidUploadData),
 
-        new("GET", "/api/Service/Ban/List?page=1&pageSize=10", null, ReturnCodes.Success),
-        new("POST", $"/api/Service/Ban/Add?uid={BanAddUid}&reason=smoke", null, ReturnCodes.Success),
-        new("POST", $"/api/Service/Ban/Remove?uid={BanRemoveUid}", null, ReturnCodes.Success),
-        new("POST", "/api/Service/Ban/BatchAdd", JsonSerializer.Serialize(new BatchUidRequest { Uids = [BanBatchUid] }), ReturnCodes.Success),
+        new("GET", "/api/admin/bans?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("POST", $"/api/admin/bans?uid={BanAddUid}&reason=smoke", null, ReturnCodes.Success),
+        new("DELETE", $"/api/admin/bans/{BanRemoveUid}", null, ReturnCodes.Success),
+        new("POST", "/api/admin/bans/batch", JsonSerializer.Serialize(new BatchUidRequest { Uids = [BanBatchUid] }), ReturnCodes.Success),
 
-        new("GET", "/api/Service/Announcement/List?page=1&pageSize=10", null, ReturnCodes.Success),
-        new("POST", "/api/Service/Announcement/Upload", JsonSerializer.Serialize(new HutaoUploadAnnouncement
+        new("GET", "/api/admin/announcements?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("POST", "/api/admin/announcements", JsonSerializer.Serialize(new HutaoUploadAnnouncement
         {
             Title = "Smoke Announcement",
             Content = "Smoke content",
             Severity = AnnouncementSeverity.Informational,
             Link = "https://example.com",
         }), ReturnCodes.Success),
-        new("POST", "/api/Service/Announcement/Update", JsonSerializer.Serialize(new AnnouncementUpdateRequest
+        new("PUT", $"/api/admin/announcements/{UnknownId}", JsonSerializer.Serialize(new AnnouncementUpdateRequest
         {
             Id = UnknownId,
             Locale = "ALL",
@@ -77,12 +78,12 @@ public static class ServiceEndpoints
             Content = "Smoke content",
             Link = "https://example.com",
         }), ReturnCodes.NotFound),
-        new("POST", $"/api/Service/Announcement/SetEnabled?id={UnknownId}&enabled=true", null, ReturnCodes.NotFound),
-        new("POST", $"/api/Service/Announcement/Delete?id={UnknownId}", null, ReturnCodes.NotFound),
+        new("PATCH", $"/api/admin/announcements/{UnknownId}?enabled=true", null, ReturnCodes.NotFound),
+        new("DELETE", $"/api/admin/announcements/{UnknownId}", null, ReturnCodes.NotFound),
 
-        new("GET", "/api/Service/Redeem/List?page=1&pageSize=10", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Redeem/Uses?id=1", null, ReturnCodes.Success),
-        new("POST", "/api/Service/Redeem/Generate", JsonSerializer.Serialize(new RedeemGenerateRequest
+        new("GET", "/api/admin/redeem-codes?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("GET", "/api/admin/redeem-codes/1/usages", null, ReturnCodes.Success),
+        new("POST", "/api/admin/redeem-codes/generation", JsonSerializer.Serialize(new RedeemGenerateRequest
         {
             Count = 1,
             Type = RedeemCodeType.TimeLimited,
@@ -92,7 +93,7 @@ public static class ServiceEndpoints
             ExpireTime = DateTimeOffset.UtcNow.AddDays(1),
             Times = 1,
         }), ReturnCodes.Success),
-        new("POST", "/api/Service/Redeem/Update", JsonSerializer.Serialize(new RedeemCodeUpdateRequest
+        new("PUT", $"/api/admin/redeem-codes/{uint.MaxValue}", JsonSerializer.Serialize(new RedeemCodeUpdateRequest
         {
             Id = uint.MaxValue,
             Type = (uint)RedeemCodeType.TimeLimited,
@@ -102,60 +103,66 @@ public static class ServiceEndpoints
             ExpireTime = DateTimeOffset.UtcNow.AddDays(1),
             TimesAllowed = 1,
         }), ReturnCodes.NotFound),
-        new("POST", $"/api/Service/Redeem/Delete?id={uint.MaxValue}", null, ReturnCodes.NotFound),
-        new("POST", "/api/Service/Redeem/BatchDelete", JsonSerializer.Serialize(new BatchIdRequest { Ids = [uint.MaxValue] }), ReturnCodes.Success),
+        new("DELETE", $"/api/admin/redeem-codes/{uint.MaxValue}", null, ReturnCodes.NotFound),
+        new("POST", "/api/admin/redeem-codes/batch-deletion", JsonSerializer.Serialize(new BatchIdRequest { Ids = [uint.MaxValue] }), ReturnCodes.Success),
 
-        new("GET", "/api/Service/License/Applications?page=1&pageSize=10", null, ReturnCodes.Success),
-        new("POST", $"/api/Service/License/Approve?userName={Uri.EscapeDataString(UnknownUser)}&code=PLACEHOLDER", null, ReturnCodes.LicenseApprovalFailed),
+        new("GET", "/api/admin/license-applications?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("POST", $"/api/admin/license-applications/approval?userName={Uri.EscapeDataString(UnknownUser)}&code=PLACEHOLDER", null, ReturnCodes.LicenseApprovalFailed),
 
-        new("GET", "/api/Service/AllowedVersion/List", null, ReturnCodes.Success),
-        new("POST", $"/api/Service/AllowedVersion/Add?header={Uri.EscapeDataString(AllowedVersionHeader)}", null, ReturnCodes.Success),
-        new("POST", $"/api/Service/AllowedVersion/Remove?header={Uri.EscapeDataString(AllowedVersionHeader)}", null, ReturnCodes.Success),
+        new("GET", "/api/admin/allowed-client-versions", null, ReturnCodes.Success),
+        new("POST", $"/api/admin/allowed-client-versions?header={Uri.EscapeDataString(AllowedVersionHeader)}", null, ReturnCodes.Success),
+        new("DELETE", $"/api/admin/allowed-client-versions?header={Uri.EscapeDataString(AllowedVersionHeader)}", null, ReturnCodes.Success),
 
-        new("GET", "/api/Service/InvalidGachaUid/List?page=1&pageSize=10", null, ReturnCodes.Success),
-        new("POST", "/api/Service/InvalidGachaUid/Remove?uid=100000001", null, ReturnCodes.Success),
+        new("GET", "/api/admin/invalid-gacha-uids?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("DELETE", "/api/admin/invalid-gacha-uids/100000001", null, ReturnCodes.Success),
 
-        new("GET", "/api/Service/Audit/List?page=1&pageSize=10", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Cache/Keys?pattern=*&limit=10", null, ReturnCodes.Success),
-        new("POST", "/api/Service/Cache/Invalidate", JsonSerializer.Serialize(new CacheInvalidationRequest
+        new("GET", "/api/admin/audit-logs?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("GET", "/api/admin/login-logs?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("GET", "/api/admin/cache/keys?pattern=*&limit=10", null, ReturnCodes.Success),
+        new("DELETE", "/api/admin/cache", JsonSerializer.Serialize(new CacheInvalidationRequest
         {
             Keys = ["HutaoTest.Placeholder"],
             Patterns = ["HutaoTest.Placeholder:*"],
         }), ReturnCodes.Success),
 
-        new("GET", "/api/Service/Rank/Keys", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Rank/Leaderboard?key=Hutao.Damage.Avatar.All&count=10", null, ReturnCodes.Success),
+        new("GET", "/api/admin/ranks", null, ReturnCodes.Success),
+        new("GET", "/api/admin/ranks/Hutao.Damage.Avatar.All?count=10", null, ReturnCodes.Success),
 
-        new("GET", "/api/Service/Release/Current", null, ReturnCodes.Success),
-        new("GET", "/api/Service/Release/List?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("GET", "/api/admin/releases/current", null, ReturnCodes.Success),
+        new("GET", "/api/admin/releases?page=1&pageSize=10", null, ReturnCodes.Success),
         // 发布有状态：同一版本号不可重复发布，且发布会立即切换当前版本，
         // 成功与「重复发布被拒」两个分支由 ReleasePublish_ThenActivate_MakesTheVersionCurrent 断言
-        new("POST", "/api/Service/Release/Publish", TestData.ReleasePublishJson(PublishVersion), null),
-        new("POST", "/api/Service/Release/Activate", JsonSerializer.Serialize(new HutaoReleaseActivateRequest { Id = UnknownId }), ReturnCodes.NotFound),
+        new("POST", "/api/admin/releases", TestData.ReleasePublishJson(PublishVersion), null),
+        new("PUT", $"/api/admin/releases/{UnknownId}/activation", JsonSerializer.Serialize(new HutaoReleaseActivateRequest { Id = UnknownId }), ReturnCodes.NotFound),
+        new("DELETE", $"/api/admin/releases/{UnknownId}/activation", null, ReturnCodes.NotFound),
         // 从存储桶发布：S3 未配置时稳定落在「未配置」分支；哈希与下发断言见 ReleasePublishFromBucket_* 用例
-        new("GET", "/api/Service/Release/Bucket/Objects", null, ReturnCodes.InvalidUploadData),
-        new("POST", "/api/Service/Release/Bucket/Publish", JsonSerializer.Serialize(new HutaoReleasePublishFromBucketRequest { Key = "patch/Snap.Hutao.1.0.0.0.msix" }), ReturnCodes.InvalidUploadData),
+        new("GET", "/api/admin/releases/bucket-objects", null, ReturnCodes.InvalidUploadData),
+        new("POST", "/api/admin/releases/from-bucket", JsonSerializer.Serialize(new HutaoReleasePublishFromBucketRequest { Key = "patch/Snap.Hutao.1.0.0.0.msix" }), ReturnCodes.InvalidUploadData),
 
-        new("GET", "/api/Service/Config/Get", null, ReturnCodes.Success),
-        new("POST", "/api/Service/Config/Update", JsonSerializer.Serialize(new Dictionary<string, string?> { [ConfigUpdateKey] = "1" }), ReturnCodes.Success),
-        new("POST", $"/api/Service/Config/Reset?key={ConfigResetKey}", null, ReturnCodes.NotFound),
+        new("GET", "/api/admin/settings", null, ReturnCodes.Success),
+        new("PATCH", "/api/admin/settings", JsonSerializer.Serialize(new Dictionary<string, string?> { [ConfigUpdateKey] = "1" }), ReturnCodes.Success),
+        new("DELETE", $"/api/admin/settings/{ConfigResetKey}", null, ReturnCodes.NotFound),
 
-        new("GET", "/api/Service/Yae/Metadata", null, ReturnCodes.Success),
+        new("GET", "/api/admin/wallpaper-pool", null, ReturnCodes.Success),
+        // 保存有状态：用 http 直链稳定落在校验失败分支，不覆盖测试库里的壁纸池
+        new("PUT", "/api/admin/wallpaper-pool", JsonSerializer.Serialize(new[] { new WallpaperPoolItem { Url = "http://insecure.example.com/wallpaper.png" } }), ReturnCodes.InvalidUploadData),
+
+        new("GET", "/api/admin/yae/metadata", null, ReturnCodes.Success),
 
         // Yae 同步有状态：成功分支会写库，且依赖外部 bucket 的桩数据，
         // 两个分支由 YaeTests 断言，这里只要求它穿过维护者权限过滤器
-        new("POST", "/api/Service/Yae/SyncMetadata", null, null),
+        new("POST", "/api/admin/yae/metadata", null, null),
 
         // 后台专属账号（SSO）：SSO 未启用的宿主里写门禁整体放行，维护者可到达业务逻辑。
         // Add 有状态（唯一 subject，重复调用会走到「已存在」分支），只要求穿过权限过滤器；
         // SetEnabled/Remove 用越界 accountId，稳定落在「账号不存在」分支。
-        new("GET", "/api/Service/AdminAccount/List", null, ReturnCodes.Success),
-        new("POST", "/api/Service/AdminAccount/Add", JsonSerializer.Serialize(new AdminAccountAddRequest { Subject = AdminAccountSubject }), null),
-        new("POST", $"/api/Service/AdminAccount/SetEnabled?accountId={int.MaxValue}&enabled=false", null, ReturnCodes.NotFound),
-        new("POST", $"/api/Service/AdminAccount/Remove?accountId={int.MaxValue}", null, ReturnCodes.NotFound),
+        new("GET", "/api/admin/accounts", null, ReturnCodes.Success),
+        new("POST", "/api/admin/accounts", JsonSerializer.Serialize(new AdminAccountAddRequest { Subject = AdminAccountSubject }), null),
+        new("PATCH", $"/api/admin/accounts/{int.MaxValue}?enabled=false", null, ReturnCodes.NotFound),
+        new("DELETE", $"/api/admin/accounts/{int.MaxValue}", null, ReturnCodes.NotFound),
         // Bind/Unbind 同样用越界 accountId 落在「账号不存在」分支，绑定的成功分支见 SsoTests
-        new("POST", $"/api/Service/AdminAccount/Bind?accountId={int.MaxValue}", JsonSerializer.Serialize(new AdminAccountBindRequest { UserName = "no-such-user@example.com" }), ReturnCodes.NotFound),
-        new("POST", $"/api/Service/AdminAccount/Unbind?accountId={int.MaxValue}", null, ReturnCodes.NotFound),
+        new("PUT", $"/api/admin/accounts/{int.MaxValue}/binding", JsonSerializer.Serialize(new AdminAccountBindRequest { UserName = "no-such-user@example.com" }), ReturnCodes.NotFound),
+        new("DELETE", $"/api/admin/accounts/{int.MaxValue}/binding", null, ReturnCodes.NotFound),
     ];
 
     /// <summary>后台账号用例使用的 subject，与真实身份源签发的好区分。</summary>

@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
 using server.Models.Admin;
 using server.Models.Entity;
@@ -28,8 +28,16 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
         // 只在熔断时下发 true（false 省略字段——客户端的非空 bool 收到 JSON null 会反序列化失败）
         if (info is not null)
         {
-            info.FpsUnlockDisabled = systemConfig.PatchDisableFpsUnlock ? true : null;
-            info.IslandInjectionDisabled = systemConfig.PatchDisableIslandInjection ? true : null;
+            bool disableFpsUnlock = systemConfig.PatchDisableFpsUnlock;
+            bool disableIslandInjection = systemConfig.PatchDisableIslandInjection;
+            info.FpsUnlockDisabled = disableFpsUnlock ? true : null;
+            info.IslandInjectionDisabled = disableIslandInjection ? true : null;
+            info.FpsUnlockDisabledReason = disableFpsUnlock && systemConfig.PatchDisableFpsUnlockReason.Length > 0
+                ? systemConfig.PatchDisableFpsUnlockReason
+                : null;
+            info.IslandInjectionDisabledReason = disableIslandInjection && systemConfig.PatchDisableIslandInjectionReason.Length > 0
+                ? systemConfig.PatchDisableIslandInjectionReason
+                : null;
             SignS3Mirrors(info);
         }
 
@@ -48,10 +56,10 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
         }
 
         string host = systemConfig.PatchS3Host;
-        int expiresHours = Math.Clamp(int.TryParse(systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3ExpiresHours, "24"), out int parsed) ? parsed : 24, 1, 168);
-        string region = systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3Region, string.Empty).Trim();
-        string accessKeyId = systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3AccessKeyId, string.Empty).Trim();
-        string secretAccessKey = systemConfig.GetOrDefault(SystemConfigService.Keys.PatchS3SecretAccessKey, string.Empty);
+        int expiresHours = Math.Clamp(int.TryParse(systemConfig.GetOrDefault(Keys.PatchS3ExpiresHours, "24"), out int parsed) ? parsed : 24, 1, 168);
+        string region = systemConfig.GetOrDefault(Keys.PatchS3Region, string.Empty).Trim();
+        string accessKeyId = systemConfig.GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty).Trim();
+        string secretAccessKey = systemConfig.GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty);
 
         foreach (server.Models.Patch.HutaoPackageMirror mirror in info.Mirrors)
         {
@@ -150,6 +158,15 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
             .ConfigureAwait(false);
         await transaction.CommitAsync().ConfigureAwait(false);
         return true;
+    }
+
+    public async Task<bool> DeactivateAsync(long id)
+    {
+        int updated = await appDbContext.HutaoReleases
+            .Where(r => r.Id == id && r.IsActive)
+            .ExecuteUpdateAsync(update => update.SetProperty(r => r.IsActive, false))
+            .ConfigureAwait(false);
+        return updated > 0;
     }
 
     private async Task<HutaoReleaseItem?> GetByIdAsync(long id)

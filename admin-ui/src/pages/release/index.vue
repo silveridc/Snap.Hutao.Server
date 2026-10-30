@@ -1,8 +1,9 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
+import { CopyIcon } from 'tdesign-icons-vue-next';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
 import { computed, onMounted, reactive, ref } from 'vue';
 
-import { activateRelease, getReleaseBucketObjects, getReleaseCurrent, getReleaseList, publishRelease, publishReleaseFromBucket } from '@/api/service';
+import { activateRelease, deactivateRelease, getReleaseBucketObjects, getReleaseCurrent, getReleaseList, publishRelease, publishReleaseFromBucket } from '@/api/service';
 import { t } from '@/locales';
 
 const MIRROR_TYPE_OPTIONS = [
@@ -92,6 +93,7 @@ const bucket = reactive({
   version: '',
   mirrorName: '',
   minimumVersion: '',
+  validation: '',
   releaseNotes: '',
 });
 const bucketLoading = ref(false);
@@ -150,6 +152,12 @@ async function submitFromBucket() {
     return;
   }
 
+  const validation = bucket.validation.trim();
+  if (validation && !/^[0-9a-fA-F]{64}$/.test(validation)) {
+    MessagePlugin.warning(t('pages.release.bucket.validationInvalid'));
+    return;
+  }
+
   bucketPublishing.value = true;
   try {
     const payload = {
@@ -157,6 +165,7 @@ async function submitFromBucket() {
       Version: bucket.version.trim() || null,
       MirrorName: bucket.mirrorName.trim() || null,
       MinimumVersion: bucket.minimumVersion.trim() || null,
+      Validation: validation || null,
       ReleaseNotes: bucket.releaseNotes.trim() || null,
     };
     const res: any = await publishReleaseFromBucket(payload);
@@ -164,6 +173,7 @@ async function submitFromBucket() {
     bucket.selected = '';
     bucket.version = '';
     bucket.minimumVersion = '';
+    bucket.validation = '';
     bucket.releaseNotes = '';
     pagination.current = 1;
     await loadList();
@@ -191,6 +201,23 @@ function fmtTime(value?: string) {
   if (!value) return '—';
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('zh-CN');
+}
+
+const HASH_PREVIEW_LENGTH = 12;
+
+function shortHash(value?: string) {
+  if (!value) return '—';
+  return value.length > HASH_PREVIEW_LENGTH ? `${value.slice(0, HASH_PREVIEW_LENGTH)}…` : value;
+}
+
+async function copyHash(value?: string) {
+  if (!value) return;
+  try {
+    await navigator.clipboard.writeText(value);
+    MessagePlugin.success(t('pages.release.current.copiedHash'));
+  } catch {
+    MessagePlugin.error(t('pages.release.current.copyFail'));
+  }
 }
 
 async function loadCurrent() {
@@ -246,6 +273,26 @@ function activateRow(row: any) {
   });
 }
 
+function deactivateRow(row: any) {
+  const dialog = DialogPlugin.confirm({
+    header: t('pages.release.dialog.deactivateHeader'),
+    body: t('pages.release.dialog.deactivateConfirmBody', { version: row.Version }),
+    theme: 'warning',
+    confirmBtn: t('pages.release.actions.deactivate'),
+    onConfirm: async () => {
+      dialog.hide();
+      try {
+        const res: any = await deactivateRelease({ Id: row.Id });
+        MessagePlugin.success(res.message || t('pages.release.messages.deactivateSuccess'));
+        await loadList();
+        await loadCurrent();
+      } catch (err) {
+        MessagePlugin.error((err as Error).message || t('pages.release.messages.deactivateFail'));
+      }
+    },
+  });
+}
+
 onMounted(() => {
   loadCurrent();
   loadList();
@@ -261,7 +308,19 @@ onMounted(() => {
         <t-descriptions-item :label="$t('pages.release.current.publisher')">{{ currentRelease.PublishedByUserName || '—' }}</t-descriptions-item>
         <t-descriptions-item :label="$t('pages.release.current.publishedAt')">{{ fmtTime(currentRelease.PublishedAt) }}</t-descriptions-item>
         <t-descriptions-item label="SHA-256">
-          <span class="mono">{{ currentRelease.Validation }}</span>
+          <span class="hash-cell">
+            <t-tooltip placement="top-left" :overlay-inner-style="{ maxWidth: '480px' }">
+              <template #content>
+                <span class="mono hash-full">{{ currentRelease.Validation }}</span>
+              </template>
+              <span class="mono hash-trigger">{{ shortHash(currentRelease.Validation) }}</span>
+            </t-tooltip>
+            <t-tooltip :content="$t('pages.release.current.copyHash')" placement="top">
+              <t-button class="hash-copy" shape="square" size="small" variant="text" @click="copyHash(currentRelease.Validation)">
+                <copy-icon />
+              </t-button>
+            </t-tooltip>
+          </span>
         </t-descriptions-item>
         <t-descriptions-item :label="$t('pages.release.current.mirrors')">{{ currentRelease.Mirrors?.length ?? 0 }}</t-descriptions-item>
         <t-descriptions-item v-if="currentRelease.MinimumVersion" :label="$t('pages.release.form.minimumVersion')">
@@ -320,6 +379,11 @@ onMounted(() => {
             </t-form-item>
           </t-col>
           <t-col :span="12">
+            <t-form-item :label="$t('pages.release.bucket.validation')" :help="$t('pages.release.bucket.validationHint')">
+              <t-input v-model="bucket.validation" :placeholder="$t('pages.release.bucket.validationPlaceholder')" clearable class="mono" />
+            </t-form-item>
+          </t-col>
+          <t-col :span="12">
             <t-form-item :label="$t('pages.release.form.releaseNotes')">
               <t-textarea v-model="bucket.releaseNotes" :placeholder="$t('pages.release.form.releaseNotesPlaceholder')" :autosize="{ minRows: 2, maxRows: 6 }" />
             </t-form-item>
@@ -329,7 +393,9 @@ onMounted(() => {
               <t-button theme="primary" :loading="bucketPublishing" @click="submitFromBucket">
                 {{ $t('pages.release.bucket.submit') }}
               </t-button>
-              <span v-if="bucketPublishing" class="bucket-hint">{{ $t('pages.release.bucket.publishing') }}</span>
+              <span v-if="bucketPublishing" class="bucket-hint">
+                {{ bucket.validation.trim() ? $t('pages.release.bucket.publishingWithHash') : $t('pages.release.bucket.publishing') }}
+              </span>
               <span v-else-if="bucket.truncated" class="bucket-hint">{{ $t('pages.release.bucket.truncated') }}</span>
             </t-form-item>
           </t-col>
@@ -411,7 +477,7 @@ onMounted(() => {
         <template #PublishedAt="{ row }">{{ fmtTime(row.PublishedAt) }}</template>
         <template #op="{ row }">
             <t-link v-if="!row.IsActive" theme="primary" hover="color" @click="activateRow(row)">{{ $t('pages.release.actions.activate') }}</t-link>
-            <span v-else class="text-disabled">{{ $t('pages.release.list.current') }}</span>
+            <t-link v-else theme="danger" hover="color" @click="deactivateRow(row)">{{ $t('pages.release.actions.deactivate') }}</t-link>
         </template>
       </t-table>
     </t-card>
@@ -421,6 +487,21 @@ onMounted(() => {
 <style lang="less" scoped>
 .hash {
   font-size: 12px;
+  color: var(--td-text-color-secondary);
+}
+.hash-cell {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.hash-trigger {
+  cursor: help;
+}
+.hash-full {
+  word-break: break-all;
+}
+.hash-copy {
+  margin-left: 2px;
   color: var(--td-text-color-secondary);
 }
 .mirror-list {

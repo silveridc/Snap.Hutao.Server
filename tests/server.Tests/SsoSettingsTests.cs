@@ -23,7 +23,7 @@ public sealed class SsoSettingsTests
     public async Task Oidc_FallsBackToAppOptions_WhenNothingOverridden()
     {
         SystemConfigService service = GetService();
-        await service.DeleteAsync(SystemConfigService.Keys.OidcAuthority);
+        await service.DeleteAsync(Keys.OidcAuthority);
 
         Assert.Equal(
             factory.Services.GetRequiredService<Options.AppOptions>().Oidc.Authority,
@@ -38,7 +38,7 @@ public sealed class SsoSettingsTests
 
         (bool saved, _) = await service.UpdateAsync(new Dictionary<string, string?>
         {
-            [SystemConfigService.Keys.OidcAuthority] = "https://override.test",
+            [Keys.OidcAuthority] = "https://override.test",
         }, 0);
         Assert.True(saved);
 
@@ -46,7 +46,7 @@ public sealed class SsoSettingsTests
         // 未覆盖的键仍然回退配置文件
         Assert.Equal(factory.Services.GetRequiredService<Options.AppOptions>().Oidc.Scope, service.Oidc.Scope);
 
-        (bool deleted, _) = await service.DeleteAsync(SystemConfigService.Keys.OidcAuthority);
+        (bool deleted, _) = await service.DeleteAsync(Keys.OidcAuthority);
         Assert.True(deleted);
         Assert.Equal(fallback, service.Oidc.Authority);
     }
@@ -61,13 +61,13 @@ public sealed class SsoSettingsTests
         {
             await service.UpdateAsync(new Dictionary<string, string?>
             {
-                [SystemConfigService.Keys.OidcEnabled] = (!configEnabled).ToString(),
+                [Keys.OidcEnabled] = (!configEnabled).ToString(),
             }, 0);
             Assert.Equal(!configEnabled, service.Oidc.Enabled);
         }
         finally
         {
-            await service.DeleteAsync(SystemConfigService.Keys.OidcEnabled);
+            await service.DeleteAsync(Keys.OidcEnabled);
         }
 
         Assert.Equal(configEnabled, service.Oidc.Enabled);

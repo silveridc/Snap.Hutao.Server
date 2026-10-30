@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using server.Models.Entity.Passport;
 using server.Services.OAuth;
 using server.Tests.Infrastructure;
@@ -56,7 +56,7 @@ public sealed class OAuthTests
 
     private async Task<TestResponse> StatusAsync(string accessToken)
     {
-        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/OAuth/Status?provider=Github", accessToken);
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/oauth/bindings/Github", accessToken);
         return await response.ReadTestResponseAsync();
     }
 
@@ -64,7 +64,7 @@ public sealed class OAuthTests
     public async Task Auth_Anonymous_RedirectsToGitHubAuthorizeWithEncryptedState()
     {
         using HttpResponseMessage response = await client.GetAsync(
-            "/api/OAuth/Auth?provider=Github&device_id=device-auth&device_name=Test%20Device&device_os=Windows&callback=https://hutao.app/cb",
+            "/api/oauth/authorizations/Github?device_id=device-auth&device_name=Test%20Device&device_os=Windows&callback=https://hutao.app/cb",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -166,7 +166,7 @@ public sealed class OAuthTests
         Assert.StartsWith($"{CallbackUri}?access_token=", location, StringComparison.Ordinal);
 
         string accessToken = QueryValue(location, "access_token");
-        using HttpResponseMessage userInfo = await client.GetWithTokenAsync("/api/Passport/v2/UserInfo", accessToken);
+        using HttpResponseMessage userInfo = await client.GetWithTokenAsync("/api/passport/v2/me", accessToken);
         TestResponse parsed = await userInfo.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
         Assert.Equal(user.UserName, parsed.Data.GetProperty("UserName").GetString());
@@ -208,7 +208,7 @@ public sealed class OAuthTests
         await BindGitHubAsync(user.Id, $"device-unbind-{Guid.NewGuid():N}");
         Assert.True((await StatusAsync(user.AccessToken)).DeserializeData<OAuthBindStatus>()!.IsBinded);
 
-        using HttpResponseMessage unbind = await client.GetWithTokenAsync("/api/OAuth/Unbind?provider=Github", user.AccessToken);
+        using HttpResponseMessage unbind = await client.DeleteWithTokenAsync("/api/oauth/bindings/Github", user.AccessToken);
         TestResponse parsed = await unbind.ReadTestResponseAsync();
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
 
@@ -219,18 +219,17 @@ public sealed class OAuthTests
     [Fact]
     public async Task Status_And_Unbind_RequireSignIn()
     {
-        foreach (string url in new[] { "/api/OAuth/Status?provider=Github", "/api/OAuth/Unbind?provider=Github" })
-        {
-            using HttpResponseMessage response = await client.GetAsync(url, TestContext.Current.CancellationToken);
-            TestResponse parsed = await response.ReadTestResponseAsync();
-            Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
-        }
+        using HttpResponseMessage status = await client.GetAsync("/api/oauth/bindings/Github", TestContext.Current.CancellationToken);
+        Assert.Equal(ReturnCodes.LoginFail, (await status.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage unbind = await client.DeleteAsync("/api/oauth/bindings/Github", TestContext.Current.CancellationToken);
+        Assert.Equal(ReturnCodes.LoginFail, (await unbind.ReadTestResponseAsync()).Retcode);
     }
 
     [Fact]
     public async Task UnknownProvider_IsRejected()
     {
-        using HttpResponseMessage response = await client.GetAsync("/api/OAuth/Auth?provider=9527&device_id=d&device_name=n&device_os=Windows&callback=https://hutao.app/cb",
+        using HttpResponseMessage response = await client.GetAsync("/api/oauth/authorizations/9527?device_id=d&device_name=n&device_os=Windows&callback=https://hutao.app/cb",
             TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

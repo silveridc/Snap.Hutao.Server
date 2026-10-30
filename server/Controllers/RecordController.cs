@@ -4,7 +4,7 @@ using server.Models.Upload;
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/records")]
 [ApiExplorerSettings(GroupName = "SpiralAbyss")]
 public class RecordController(RecordService recordService, IRankService rankService) : ControllerBase
 {
@@ -14,7 +14,7 @@ public class RecordController(RecordService recordService, IRankService rankServ
     /// <param name="record">深渊记录数据。</param>
     /// <param name="returningRank">是否返回排行数据。</param>
     /// <returns>上传结果或排行数据。</returns>
-    [HttpPost("Upload")]
+    [HttpPost("abyss")]
     public async Task<IActionResult> ProcessUploadRecordAsync([FromBody] SimpleRecord record, [FromQuery] bool returningRank = false)
     {
         RecordUploadResult result = await recordService.ProcessUploadAsync(record).ConfigureAwait(false);
@@ -48,8 +48,8 @@ public class RecordController(RecordService recordService, IRankService rankServ
     /// </summary>
     /// <param name="uid">游戏 Uid。</param>
     /// <returns>是否已上传。</returns>
-    [HttpGet("Check")]
-    public async Task<IActionResult> CheckUidUploadedAsync([FromQuery(Name = "Uid")] string uid)
+    [HttpGet("abyss/{uid}/status")]
+    public async Task<IActionResult> CheckUidUploadedAsync([FromRoute] string uid)
     {
         if (recordService.IsStatisticsServiceWorking())
         {
@@ -70,8 +70,8 @@ public class RecordController(RecordService recordService, IRankService rankServ
     /// </summary>
     /// <param name="uid">游戏 Uid。</param>
     /// <returns>排行数据。</returns>
-    [HttpGet("Rank")]
-    public async Task<IActionResult> RankAsync([FromQuery(Name = "Uid")] string uid)
+    [HttpGet("abyss/{uid}/rank")]
+    public async Task<IActionResult> RankAsync([FromRoute] string uid)
     {
         if (recordService.IsStatisticsServiceWorking())
         {

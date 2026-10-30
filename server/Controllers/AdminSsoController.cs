@@ -4,7 +4,7 @@ using server.Services.Admin;
 namespace server.Controllers;
 
 [ApiController]
-[Route("Admin/Sso")]
+[Route("api/admin/sso")]
 [ApiExplorerSettings(GroupName = "Services")]
 public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<AdminSsoController> logger) : ControllerBase
 {
@@ -14,7 +14,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     /// 查询后台是否启用了单点登录。
     /// </summary>
     /// <returns>启用状态与身份源显示名。</returns>
-    [HttpGet("Status")]
+    [HttpGet("status")]
     public IActionResult GetStatus()
     {
         return Success<AdminSsoStatus>("Admin SSO status acquired successfully", new AdminSsoStatus
@@ -30,7 +30,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     /// <param name="returnPath">登录完成后要回到的后台内路径，必须是站内绝对路径。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>授权地址。</returns>
-    [HttpGet("Challenge")]
+    [HttpGet("challenge")]
     public async Task<IActionResult> ChallengeAsync([FromQuery] string? returnPath, CancellationToken cancellationToken)
     {
         if (!adminSsoService.IsEnabled)
@@ -57,7 +57,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     /// <param name="error">身份源直接返回的错误名。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>302 回跳后台。</returns>
-    [HttpGet("Callback")]
+    [HttpGet("~/Admin/Sso/Callback")]
     public async Task<IActionResult> CallbackAsync([FromQuery] string? code, [FromQuery] string? state, [FromQuery] string? error, CancellationToken cancellationToken)
     {
         AdminSsoCallbackResult result = await adminSsoService.HandleCallbackAsync(code, state, error, cancellationToken).ConfigureAwait(false);
@@ -90,7 +90,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     /// <param name="request">包含票据的请求体。</param>
     /// <param name="cancellationToken">请求取消令牌。</param>
     /// <returns>后台令牌与账号信息。</returns>
-    [HttpPost("Exchange")]
+    [HttpPost("sessions")]
     public async Task<IActionResult> ExchangeAsync([FromBody] AdminSsoExchangeRequest request, CancellationToken cancellationToken)
     {
         AdminSsoTokenResponse? token = await adminSsoService

@@ -23,7 +23,9 @@ const CONFIG_SECTIONS = computed(() => [
     description: t('pages.settings.sections.killSwitch.description'),
     fields: [
       { key: 'Patch.DisableFpsUnlock', label: t('pages.settings.fields.disableFpsUnlock.label'), type: 'switch', hint: t('pages.settings.fields.disableFpsUnlock.hint') },
+      { key: 'Patch.DisableFpsUnlockReason', label: t('pages.settings.fields.disableFpsUnlockReason.label'), type: 'text', hint: t('pages.settings.fields.disableFpsUnlockReason.hint') },
       { key: 'Patch.DisableIslandInjection', label: t('pages.settings.fields.disableIslandInjection.label'), type: 'switch', hint: t('pages.settings.fields.disableIslandInjection.hint') },
+      { key: 'Patch.DisableIslandInjectionReason', label: t('pages.settings.fields.disableIslandInjectionReason.label'), type: 'text', hint: t('pages.settings.fields.disableIslandInjectionReason.hint') },
     ],
   },
   {
@@ -35,16 +37,6 @@ const CONFIG_SECTIONS = computed(() => [
       { key: 'Patch.S3.AccessKeyId', label: t('pages.settings.fields.s3AccessKeyId.label'), type: 'text', hint: t('pages.settings.fields.s3AccessKeyId.hint') },
       { key: 'Patch.S3.SecretAccessKey', label: t('pages.settings.fields.s3SecretAccessKey.label'), type: 'password', hint: t('pages.settings.fields.s3SecretAccessKey.hint') },
       { key: 'Patch.S3.ExpiresHours', label: t('pages.settings.fields.s3ExpiresHours.label'), type: 'text', hint: t('pages.settings.fields.s3ExpiresHours.hint') },
-    ],
-  },
-  {
-    title: t('pages.settings.sections.todayWallpaper.title'),
-    description: t('pages.settings.sections.todayWallpaper.description'),
-    fields: [
-      { key: 'Wallpaper.Today.Url', label: t('pages.settings.fields.todayWallpaperUrl.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperUrl.hint') },
-      { key: 'Wallpaper.Today.SourceUrl', label: t('pages.settings.fields.todayWallpaperSourceUrl.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperSourceUrl.hint') },
-      { key: 'Wallpaper.Today.Author', label: t('pages.settings.fields.todayWallpaperAuthor.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperAuthor.hint') },
-      { key: 'Wallpaper.Today.Uploader', label: t('pages.settings.fields.todayWallpaperUploader.label'), type: 'text', hint: t('pages.settings.fields.todayWallpaperUploader.hint') },
     ],
   },
   {

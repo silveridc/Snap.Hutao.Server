@@ -1,5 +1,4 @@
-﻿using server.Extension;
-using server.Models.PublicAPI;
+﻿using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
 

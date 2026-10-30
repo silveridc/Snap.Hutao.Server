@@ -1,4 +1,4 @@
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 
 namespace server.Tests.Infrastructure;
 
@@ -45,9 +45,38 @@ public static class TestHttpClientExtension
         return request;
     }
 
+    public static Task<HttpResponseMessage> DeleteWithTokenAsync(this HttpClient client, string url, string? token, bool device = true)
+    {
+        HttpRequestMessage request = new(HttpMethod.Delete, url);
+        request.WithToken(token);
+        if (device)
+        {
+            request.WithDevice();
+        }
+
+        return client.SendAsync(request);
+    }
+
     public static Task<HttpResponseMessage> GetWithTokenAsync(this HttpClient client, string url, string? token, bool device = true)
     {
         HttpRequestMessage request = new(HttpMethod.Get, url);
+        request.WithToken(token);
+        if (device)
+        {
+            request.WithDevice();
+        }
+
+        return client.SendAsync(request);
+    }
+
+    public static Task<HttpResponseMessage> SendJsonWithTokenAsync<T>(this HttpClient client, HttpMethod method, string url, T? body, string? token, bool device = true)
+    {
+        HttpRequestMessage request = new(method, url);
+        if (body is not null)
+        {
+            request.Content = JsonContent.Create(body);
+        }
+
         request.WithToken(token);
         if (device)
         {

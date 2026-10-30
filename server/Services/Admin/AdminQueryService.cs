@@ -217,7 +217,7 @@ public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService
         string[] ips = [.. rows.Select(row => row.Ip).OfType<string>().Distinct()];
         Task<string?[]?>[] lookups = [.. ips.Select(ip => ipRegionService.GetRegionAsync(ip))];
         await Task.WhenAll(lookups).ConfigureAwait(false);
-        Dictionary<string, string?[]?> regions = new();
+        Dictionary<string, string?[]?> regions = [];
         for (int i = 0; i < ips.Length; i++)
         {
             regions[ips[i]] = lookups[i].Result;
@@ -241,6 +241,80 @@ public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService
         ];
 
         return new PagedResult<AuditLogItem> { Total = total, Page = page, PageSize = pageSize, Items = items };
+    }
+
+    /// <summary>客户端登录日志：关键字匹配邮箱或 IP，可按结果、时间范围与用户过滤，IP 属地读取时现查。</summary>
+    public async Task<PagedResult<UserLoginLogItem>> GetLoginLogsAsync(int page, int pageSize, string? keyword, bool? success, long? from, long? to, int? userId = null)
+    {
+        page = page < 1 ? 1 : page;
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        IQueryable<UserLoginLog> query = appDbContext.UserLoginLogs.AsNoTracking();
+        if (userId is int ownerId)
+        {
+            query = query.Where(log => log.UserId == ownerId);
+        }
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            string pattern = keyword.Trim();
+            query = query.Where(log => (log.UserName != null && log.UserName.Contains(pattern)) || (log.Ip != null && log.Ip.Contains(pattern)));
+        }
+
+        if (success is bool successFilter)
+        {
+            query = query.Where(log => log.Success == successFilter);
+        }
+
+        if (from is long fromRaw)
+        {
+            DateTimeOffset start = DateTimeOffset.FromUnixTimeSeconds(Math.Clamp(fromRaw, 0L, 253402300799L));
+            query = query.Where(log => log.LoginAt >= start);
+        }
+
+        if (to is long toRaw)
+        {
+            DateTimeOffset end = DateTimeOffset.FromUnixTimeSeconds(Math.Clamp(toRaw, 0L, 253402300799L));
+            query = query.Where(log => log.LoginAt <= end);
+        }
+
+        long total = await query.LongCountAsync().ConfigureAwait(false);
+        List<UserLoginLog> rows = await query
+            .OrderByDescending(log => log.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        string[] ips = [.. rows.Select(row => row.Ip).OfType<string>().Distinct()];
+        Task<string?[]?>[] lookups = [.. ips.Select(ip => ipRegionService.GetRegionAsync(ip))];
+        await Task.WhenAll(lookups).ConfigureAwait(false);
+        Dictionary<string, string?[]?> regions = [];
+        for (int i = 0; i < ips.Length; i++)
+        {
+            regions[ips[i]] = lookups[i].Result;
+        }
+
+        List<UserLoginLogItem> items =
+        [
+            .. rows.Select(row => new UserLoginLogItem
+            {
+                Id = row.Id,
+                UserId = row.UserId,
+                UserName = row.UserName,
+                Method = row.Method,
+                Success = row.Success,
+                FailureKey = row.FailureKey,
+                Ip = row.Ip,
+                IpRegion = row.Ip is null ? null : regions[row.Ip],
+                DeviceId = row.DeviceId,
+                DeviceName = row.DeviceName,
+                OperatingSystem = row.OperatingSystem,
+                LoginAt = row.LoginAt,
+            }),
+        ];
+
+        return new PagedResult<UserLoginLogItem> { Total = total, Page = page, PageSize = pageSize, Items = items };
     }
 
     private sealed class AuditLogRow

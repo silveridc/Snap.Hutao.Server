@@ -1,4 +1,4 @@
-{
+﻿{
   "settings": {
     "header": {
       "title": "系统设置",
@@ -34,10 +34,6 @@
       "s3Sign": {
         "title": "更新包 S3 直链签名",
         "description": "镜像地址匹配该主机名时，/Patch/hutao 下发前现场签发限时访问 URL，桶可保持私有。留空不启用。"
-      },
-      "todayWallpaper": {
-        "title": "今日壁纸",
-        "description": "客户端选「今日壁纸」背景时返回这张图；URL 留空回退到 Bing 每日壁纸，保存后立即生效。"
       }
     },
     "fields": {
@@ -51,7 +47,7 @@
       },
       "captchaEnabled": {
         "label": "启用验证码",
-        "hint": "关闭后登录/注册不再校验 reCaptcha"
+        "hint": "关闭后登录不再校验 reCAPTCHA；需在 appsettings.json 的 App 段同时配置 ReCaptchaKey 与 ReCaptchaSiteKey"
       },
       "uidSalt": {
         "label": "Uid Salt",
@@ -133,9 +129,17 @@
         "label": "禁用解锁帧率",
         "hint": "强制所有客户端本次会话内不启用帧率解锁"
       },
+      "disableFpsUnlockReason": {
+        "label": "帧率解锁熔断原因",
+        "hint": "功能被禁用时客户端展示给用户，留空则显示默认提示"
+      },
       "disableIslandInjection": {
         "label": "禁用 Island 注入",
         "hint": "强制所有客户端本次会话内不启用 Island 注入"
+      },
+      "disableIslandInjectionReason": {
+        "label": "Island 注入熔断原因",
+        "hint": "功能被禁用时客户端展示给用户，留空则显示默认提示"
       },
       "s3Host": {
         "label": "对象主机名",
@@ -156,22 +160,6 @@
       "s3ExpiresHours": {
         "label": "有效期（小时）",
         "hint": "1-168，建议 24"
-      },
-      "todayWallpaperUrl": {
-        "label": "壁纸直链",
-        "hint": "HTTPS 绝对地址；客户端的「今日壁纸」优先使用它"
-      },
-      "todayWallpaperSourceUrl": {
-        "label": "来源页",
-        "hint": "图片来源页，留空用壁纸直链"
-      },
-      "todayWallpaperAuthor": {
-        "label": "作者",
-        "hint": "显示在客户端背景图描述里，留空为 Snap Hutao"
-      },
-      "todayWallpaperUploader": {
-        "label": "上传者",
-        "hint": "留空为 Snap Hutao"
       }
     },
     "form": {

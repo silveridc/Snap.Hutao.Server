@@ -1,4 +1,4 @@
-namespace server.Models.Admin;
+﻿namespace server.Models.Admin;
 
 public sealed class BanItem
 {
@@ -91,6 +91,36 @@ public sealed class AnnouncementUpdateRequest
     public string Link { get; set; } = default!;
 
     public string? MaxPresentVersion { get; set; }
+}
+
+public sealed class UserLoginLogItem
+{
+    public long Id { get; set; }
+
+    public int? UserId { get; set; }
+
+    public string? UserName { get; set; }
+
+    /// <summary>登录方式：password / sso。</summary>
+    public string Method { get; set; } = default!;
+
+    public bool Success { get; set; }
+
+    /// <summary>失败原因对应的本地化词条键，成功时为空。</summary>
+    public string? FailureKey { get; set; }
+
+    public string? Ip { get; set; }
+
+    /// <summary>IP 属地，IP2Region 的四段：国家/省份/城市/运营商，缺段为 "0"；按 IP 现查，查不到为 null。</summary>
+    public string?[]? IpRegion { get; set; }
+
+    public string? DeviceId { get; set; }
+
+    public string? DeviceName { get; set; }
+
+    public string? OperatingSystem { get; set; }
+
+    public DateTimeOffset LoginAt { get; set; }
 }
 
 public sealed class AuditLogItem
@@ -235,6 +265,9 @@ public sealed class HutaoReleasePublishFromBucketRequest
 
     /// <summary>留空时从对象键的文件名里解析四段版本号。</summary>
     public string? Version { get; set; }
+
+    /// <summary>预先计算好的 SHA-256；留空时服务端下载整个对象计算。</summary>
+    public string? Validation { get; set; }
 
     /// <summary>镜像名称，留空用存储桶主机名。</summary>
     public string? MirrorName { get; set; }
