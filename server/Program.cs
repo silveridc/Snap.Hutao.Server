@@ -1,4 +1,4 @@
-﻿using IP2Region.Net.Abstractions;
+using IP2Region.Net.Abstractions;
 using IP2Region.Net.XDB;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi;
@@ -18,11 +18,12 @@ namespace server;
 
 public static class Program
 {
-    private static ILogger? _logger;
     public const string applicationVersion = "server@v1.0.4";
     private const string _sentryProjectId = "7";
     private const string _sentryDsn = "https://26b2259ad03e4fd26fedf7b08226eaa2@sentry.silveridc.cn/7";
     private const string _otlpToken = "sentry sentry_key=26b2259ad03e4fd26fedf7b08226eaa2";
+
+    private static ILogger? _logger;
 
     public static async Task Main(string[] args)
     {
@@ -154,8 +155,8 @@ public static class Program
                 config.ScheduleJob<RoleCombatRecordCleanJob>(t => t.StartNow().WithCronSchedule("0 0 4 1 * ?"));
             })
             .AddQuartzHostedService(options => options.WaitForJobsToComplete = true)
-            //.AddResponseCompression()
 
+            // .AddResponseCompression()
             .AddScoped<AccessionService>()
             .AddScoped<AnnouncementService>()
             .AddScoped<DistributionService>()
@@ -256,15 +257,60 @@ public static class Program
             .AddEndpointsApiExplorer()
             .AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("Public", new() { Version = "1.0", Title = "公共api", Description = "公共api" });
-                options.SwaggerDoc("SpiralAbyss", new() { Version = "1.0", Title = "深渊统计", Description = "深渊统计数据" });
-                options.SwaggerDoc("RoleCombat", new() { Version = "1.0", Title = "剧诗统计", Description = "幻想真境剧诗" });
-                options.SwaggerDoc("Passport", new() { Version = "1.0", Title = "账户", Description = "账户" });
-                options.SwaggerDoc("GachaLog", new() { Version = "1.0", Title = "祈愿记录", Description = "账户祈愿记录管理" });
-                options.SwaggerDoc("Distribution", new() { Version = "1.0", Title = "分发管理", Description = "分发管理" });
-                options.SwaggerDoc("Services", new() { Version = "1.0", Title = "服务管理", Description = "维护专用管理接口，调用需要维护权限" });
-                options.SwaggerDoc("Redeem", new() { Version = "1.0", Title = "兑换码", Description = "兑换码相关接口" });
-                options.SwaggerDoc("OAuth", new() { Version = "1.0", Title = "OAuth", Description = "OAuth相关接口" });
+                options.SwaggerDoc("Public", new()
+                {
+                    Version = "1.0",
+                    Title = "公共api",
+                    Description = "公共api",
+                });
+                options.SwaggerDoc("SpiralAbyss", new()
+                {
+                    Version = "1.0",
+                    Title = "深渊统计",
+                    Description = "深渊统计数据",
+                });
+                options.SwaggerDoc("RoleCombat", new()
+                {
+                    Version = "1.0",
+                    Title = "剧诗统计",
+                    Description = "幻想真境剧诗",
+                });
+                options.SwaggerDoc("Passport", new()
+                {
+                    Version = "1.0",
+                    Title = "账户",
+                    Description = "账户",
+                });
+                options.SwaggerDoc("GachaLog", new()
+                {
+                    Version = "1.0",
+                    Title = "祈愿记录",
+                    Description = "账户祈愿记录管理",
+                });
+                options.SwaggerDoc("Distribution", new()
+                {
+                    Version = "1.0",
+                    Title = "分发管理",
+                    Description = "分发管理",
+                });
+                options.SwaggerDoc("Services", new()
+                {
+                    Version = "1.0",
+                    Title = "服务管理",
+                    Description = "维护专用管理接口，调用需要维护权限",
+                });
+                options.SwaggerDoc("Redeem", new()
+                {
+                    Version = "1.0",
+                    Title = "兑换码",
+                    Description = "兑换码相关接口",
+                });
+                options.SwaggerDoc("OAuth", new()
+                {
+                    Version = "1.0",
+                    Title = "OAuth",
+                    Description = "OAuth相关接口",
+                });
                 options.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
 
                 // 添加JWT Bearer认证支持
@@ -334,8 +380,9 @@ public static class Program
         });
         app.UseStaticFiles();
         app.UseSwagger();
-        //app.UseSwaggerUI(options =>
-        //{
+
+        // app.UseSwaggerUI(options =>
+        // {
         //    options.SwaggerEndpoint("/swagger/Public/swagger.json", "PublicApi");
         //    options.SwaggerEndpoint("/swagger/Passport/swagger.json", "账户");
         //    options.SwaggerEndpoint("/swagger/OAuth/swagger.json", "OAuth");
@@ -345,7 +392,7 @@ public static class Program
         //    options.SwaggerEndpoint("/swagger/Distribution/swagger.json", "分发管理");
         //    options.SwaggerEndpoint("/swagger/Redeem/swagger.json", "兑换码");
         //    options.SwaggerEndpoint("/swagger/Services/swagger.json", "服务管理");
-        //});
+        // });
 
         // Routes
         // CORS
@@ -367,9 +414,9 @@ public static class Program
     }
 
     /// <summary>
-    /// 迁移数据库
+    /// 迁移数据库.
     /// </summary>
-    /// <param name="app">app</param>
+    /// <param name="app">app.</param>
     private static async Task MigrateDatabasesAsync(WebApplication app)
     {
         using IServiceScope scope = app.Services.CreateScope();

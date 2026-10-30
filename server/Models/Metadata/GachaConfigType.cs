@@ -1,4 +1,4 @@
-﻿namespace server.Models.Metadata;
+namespace server.Models.Metadata;
 
 public enum GachaConfigType
 {

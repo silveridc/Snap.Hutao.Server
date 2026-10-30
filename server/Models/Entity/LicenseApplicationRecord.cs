@@ -1,11 +1,14 @@
-﻿namespace server.Models.Entity;
+namespace server.Models.Entity;
 
 [Table("license_application_records")]
 public sealed class LicenseApplicationRecord
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long PrimaryId { get; set; }
+    public long PrimaryId
+    {
+        get; set;
+    }
 
     public int UserId { get; set; } = default!;
 
@@ -16,5 +19,8 @@ public sealed class LicenseApplicationRecord
 
     public string ApprovalCode { get; set; } = default!;
 
-    public bool IsApproved { get; set; }
+    public bool IsApproved
+    {
+        get; set;
+    }
 }

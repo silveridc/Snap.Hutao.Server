@@ -1,4 +1,4 @@
-﻿using server.Filter;
+using server.Filter;
 using server.Models.Admin;
 using server.Services.Admin;
 
@@ -14,7 +14,7 @@ namespace server.Controllers;
 public sealed class AdminReleaseController(ReleaseService releaseService, ReleaseBucketService releaseBucketService) : ControllerBase
 {
     /// <summary>
-    /// 获取当前激活的 Snap Hutao 客户端版本。
+    /// 获取当前激活的 Snap Hutao 客户端版本.
     /// </summary>
     [HttpGet("releases/current")]
     public async Task<IActionResult> ReleaseCurrentAsync()
@@ -24,7 +24,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     }
 
     /// <summary>
-    /// 分页获取 Snap Hutao 客户端发布历史。
+    /// 分页获取 Snap Hutao 客户端发布历史.
     /// </summary>
     [HttpGet("releases")]
     public async Task<IActionResult> ReleaseListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -34,7 +34,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     }
 
     /// <summary>
-    /// 发布并激活新的 Snap Hutao 客户端版本。
+    /// 发布并激活新的 Snap Hutao 客户端版本.
     /// </summary>
     [HttpPost("releases")]
     public async Task<IActionResult> ReleasePublishAsync([FromBody] HutaoReleasePublishRequest request)
@@ -51,7 +51,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     }
 
     /// <summary>
-    /// 激活历史版本，用于显式回滚。
+    /// 激活历史版本，用于显式回滚.
     /// </summary>
     [HttpPut("releases/{id}/activation")]
     public async Task<IActionResult> ReleaseActivateAsync([FromRoute] long id, [FromBody] HutaoReleaseActivateRequest request)
@@ -65,7 +65,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     }
 
     /// <summary>
-    /// 下架当前激活的版本，客户端将不再收到该版本更新。
+    /// 下架当前激活的版本，客户端将不再收到该版本更新.
     /// </summary>
     [HttpDelete("releases/{id}/activation")]
     public async Task<IActionResult> ReleaseDeactivateAsync([FromRoute] long id)
@@ -77,7 +77,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     }
 
     /// <summary>
-    /// 列出补丁存储桶中的对象，供后台按对象发布时选择。
+    /// 列出补丁存储桶中的对象，供后台按对象发布时选择.
     /// </summary>
     [HttpGet("releases/bucket-objects")]
     public async Task<IActionResult> ReleaseBucketObjectsAsync([FromQuery] string? prefix, CancellationToken cancellationToken)
@@ -92,7 +92,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     }
 
     /// <summary>
-    /// 从补丁存储桶发布版本：服务端读取对象计算 SHA-256，并据此生成下载镜像。
+    /// 从补丁存储桶发布版本：服务端读取对象计算 SHA-256，并据此生成下载镜像.
     /// </summary>
     [HttpPost("releases/from-bucket")]
     public async Task<IActionResult> ReleaseBucketPublishAsync([FromBody] HutaoReleasePublishFromBucketRequest request, CancellationToken cancellationToken)

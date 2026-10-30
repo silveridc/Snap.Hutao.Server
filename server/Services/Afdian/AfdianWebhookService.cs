@@ -1,4 +1,4 @@
-﻿using MailKit.Net.Smtp;
+using MailKit.Net.Smtp;
 using MimeKit;
 using server.Models.Afdian;
 using server.Services.Admin;
@@ -6,28 +6,29 @@ using server.Services.Admin;
 namespace server.Services.Afdian;
 
 // Scoped
-public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
+public sealed class AfdianWebhookService(
+    IDistributedCache cache,
+    AppOptions appOptions,
+    SystemConfigService config,
+    GachaLogExpireService gachaLogExpireService,
+    CdnExpireService cdnExpireService,
+    MailService mailService,
+    HttpClient httpClient,
+    RedeemService redeemService)
 {
-    private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
-    private readonly AfdianOptions _afdianOptions = serviceProvider.GetRequiredService<AppOptions>().Afdian;
-    private readonly Afdian2Options _afdian2Options = serviceProvider.GetRequiredService<AppOptions>().Afdian2;
-    private readonly SystemConfigService _config = serviceProvider.GetRequiredService<SystemConfigService>();
-    private readonly GachaLogExpireService _gachaLogExpireService = serviceProvider.GetRequiredService<GachaLogExpireService>();
-    private readonly CdnExpireService _cdnExpireService = serviceProvider.GetRequiredService<CdnExpireService>();
-    private readonly MailService _mailService = serviceProvider.GetRequiredService<MailService>();
-    private readonly HttpClient _httpClient = serviceProvider.GetRequiredService<HttpClient>();
-    private readonly RedeemService _redeemService = serviceProvider.GetRequiredService<RedeemService>();
+    private readonly AfdianOptions _afdianOptions = appOptions.Afdian;
+    private readonly Afdian2Options _afdian2Options = appOptions.Afdian2;
 
     public async ValueTask ProcessIncomingOrderAsync(Order order)
     {
         string orderNumber = order.OutTradeNo;
-        if (_cache.HasFlag(orderNumber))
+        if (cache.HasFlag(orderNumber))
         {
             return;
         }
 
         // prevent multiple requests in 10 minutes
-        _cache.SetFlag(orderNumber, TimeSpan.FromMinutes(10));
+        cache.SetFlag(orderNumber, TimeSpan.FromMinutes(10));
 
         _ = await ProcessIncomingOrderCoreAsync(order).ConfigureAwait(false);
     }
@@ -50,7 +51,7 @@ public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
         info.OrderCount = skuDetail.Count;
 
         // GachaLog Upload
-        if (skuDetail.SkuId == _config.AfdianSkuGachaLog)
+        if (skuDetail.SkuId == config.AfdianSkuGachaLog)
         {
             if (!await ValidateOrderInformationAsync(info, _afdianOptions).ConfigureAwait(false))
             {
@@ -58,16 +59,16 @@ public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
                 return info;
             }
 
-            TermExtendResult result = await _gachaLogExpireService.ExtendGachaLogTermForAfdianOrderAsync(info).ConfigureAwait(false);
+            TermExtendResult result = await gachaLogExpireService.ExtendGachaLogTermForAfdianOrderAsync(info).ConfigureAwait(false);
             switch (result.Kind)
             {
                 case TermExtendResultKind.Ok:
                     break;
                 case TermExtendResultKind.NoSuchUser:
-                    string redeemCode = await _redeemService.GenerateRedeemCodeForPurchaseGachaLogServiceAsync(info).ConfigureAwait(false);
+                    string redeemCode = await redeemService.GenerateRedeemCodeForPurchaseGachaLogServiceAsync(info).ConfigureAwait(false);
                     try
                     {
-                        await _mailService.SendPurchaseGachaLogStorageServiceNoSuchUserAsync(info.UserName, redeemCode, info.OrderNumber).ConfigureAwait(false);
+                        await mailService.SendPurchaseGachaLogStorageServiceNoSuchUserAsync(info.UserName, redeemCode, info.OrderNumber).ConfigureAwait(false);
                         info.Status = AfdianOrderStatus.GachaLogTermExtendNoSuchUser;
                     }
                     catch (SmtpCommandException)
@@ -85,7 +86,7 @@ public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
                     break;
             }
         }
-        else if (skuDetail.SkuId == _config.Afdian2SkuCdn)
+        else if (skuDetail.SkuId == config.Afdian2SkuCdn)
         {
             if (!await ValidateOrderInformationAsync(info, _afdian2Options).ConfigureAwait(false))
             {
@@ -93,16 +94,16 @@ public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
                 return info;
             }
 
-            TermExtendResult result = await _cdnExpireService.ExtendCdnTermForAfdianOrderAsync(info).ConfigureAwait(false);
+            TermExtendResult result = await cdnExpireService.ExtendCdnTermForAfdianOrderAsync(info).ConfigureAwait(false);
             switch (result.Kind)
             {
                 case TermExtendResultKind.Ok:
                     break;
                 case TermExtendResultKind.NoSuchUser:
-                    string redeemCode = await _redeemService.GenerateRedeemCodeForPurchaseCdnServiceAsync(info).ConfigureAwait(false);
+                    string redeemCode = await redeemService.GenerateRedeemCodeForPurchaseCdnServiceAsync(info).ConfigureAwait(false);
                     try
                     {
-                        await _mailService.SendPurchaseCdnServiceNoSuchUserAsync(info.UserName, redeemCode, info.OrderNumber).ConfigureAwait(false);
+                        await mailService.SendPurchaseCdnServiceNoSuchUserAsync(info.UserName, redeemCode, info.OrderNumber).ConfigureAwait(false);
                         info.Status = AfdianOrderStatus.CdnTermExtendNoSuchUser;
                     }
                     catch (SmtpCommandException)
@@ -137,7 +138,7 @@ public sealed class AfdianWebhookService(IServiceProvider serviceProvider)
         int requestCount = 0;
         while (++requestCount <= 10)
         {
-            response = await _httpClient.PostAsJsonAsync("https://afdian.com/api/open/query-order", query).ConfigureAwait(false);
+            response = await httpClient.PostAsJsonAsync("https://afdian.com/api/open/query-order", query).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
                 break;

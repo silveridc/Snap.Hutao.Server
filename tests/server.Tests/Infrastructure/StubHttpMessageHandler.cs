@@ -6,10 +6,10 @@ public sealed class StubHttpMessageHandler : HttpMessageHandler
 {
     private readonly List<Rule> rules = [];
 
-    /// <summary>已收到的请求，用于断言服务确实发起了外部调用。</summary>
+    /// <summary>已收到的请求，用于断言服务确实发起了外部调用.</summary>
     public List<RecordedRequest> Requests { get; } = [];
 
-    /// <summary>登记一条匹配规则，后登记的规则优先。</summary>
+    /// <summary>登记一条匹配规则，后登记的规则优先.</summary>
     public StubHttpMessageHandler Map(Func<HttpRequestMessage, bool> match, Func<HttpRequestMessage, HttpResponseMessage> respond)
     {
         lock (rules)
@@ -21,10 +21,10 @@ public sealed class StubHttpMessageHandler : HttpMessageHandler
     }
 
     /// <summary>
-    /// 按 URL 片段登记一条返回固定 JSON 的规则。
+    /// 按 URL 片段登记一条返回固定 JSON 的规则.
     /// </summary>
     /// <param name="bodyFragment">
-    /// 额外要求请求体包含该片段，用于让多条同地址规则互不覆盖（如爱发电按订单号回查）。
+    /// 额外要求请求体包含该片段，用于让多条同地址规则互不覆盖（如爱发电按订单号回查）.
     /// </param>
     public StubHttpMessageHandler MapJson(string urlFragment, string json, HttpStatusCode status = HttpStatusCode.OK, string? bodyFragment = null)
     {
@@ -42,7 +42,7 @@ public sealed class StubHttpMessageHandler : HttpMessageHandler
         return text?.Contains(fragment, StringComparison.Ordinal) is true;
     }
 
-    /// <summary>移除所有规则（用于单个用例内切换外部返回）。</summary>
+    /// <summary>移除所有规则（用于单个用例内切换外部返回）.</summary>
     public void Reset()
     {
         lock (rules)

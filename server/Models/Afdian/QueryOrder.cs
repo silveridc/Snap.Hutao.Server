@@ -1,20 +1,32 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 
 namespace server.Models.Afdian;
 
 public class QueryOrder
 {
     [JsonPropertyName("user_id")]
-    public string? UserId { get; set; }
+    public string? UserId
+    {
+        get; set;
+    }
 
     [JsonPropertyName("params")]
-    public string? Params { get; set; }
+    public string? Params
+    {
+        get; set;
+    }
 
     [JsonPropertyName("ts")]
-    public long Ts { get; set; }
+    public long Ts
+    {
+        get; set;
+    }
 
     [JsonPropertyName("sign")]
-    public string? Sign { get; set; }
+    public string? Sign
+    {
+        get; set;
+    }
 
     public static QueryOrder Create(string userId, string tradeNumber, string token)
     {

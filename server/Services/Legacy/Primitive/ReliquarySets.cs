@@ -1,9 +1,9 @@
-﻿namespace server.Services.Legacy.Primitive;
+namespace server.Services.Legacy.Primitive;
 
 public readonly struct ReliquarySets(string value) : IEquatable<ReliquarySets>
 {
     /// <summary>
-    /// 值
+    /// 值.
     /// </summary>
     public readonly string Value = value;
 

@@ -8,7 +8,7 @@ public sealed class CacheService(IConnectionMultiplexer multiplexer, IDistribute
     private const int _scanPageSize = 512;
 
     /// <summary>
-    /// 按精确键批量移除缓存（逻辑键，前缀由 <see cref="IDistributedCache"/> 自动补齐）。
+    /// 按精确键批量移除缓存（逻辑键，前缀由 <see cref="IDistributedCache"/> 自动补齐）.
     /// </summary>
     public async Task<int> RemoveKeysAsync(IEnumerable<string> keys)
     {
@@ -28,7 +28,7 @@ public sealed class CacheService(IConnectionMultiplexer multiplexer, IDistribute
     }
 
     /// <summary>
-    /// 按 glob 模式批量移除缓存（逻辑模式，前缀自动补齐，例如 <c>RoleCombatStatistics:*</c> 或 <c>*</c>）。
+    /// 按 glob 模式批量移除缓存（逻辑模式，前缀自动补齐，例如 <c>RoleCombatStatistics:*</c> 或 <c>*</c>）.
     /// </summary>
     public async Task<long> RemoveByPatternsAsync(IEnumerable<string> patterns)
     {
@@ -47,7 +47,7 @@ public sealed class CacheService(IConnectionMultiplexer multiplexer, IDistribute
     }
 
     /// <summary>
-    /// 列出匹配指定 glob 模式的逻辑缓存键（已去除实例前缀），供管理界面查看。
+    /// 列出匹配指定 glob 模式的逻辑缓存键（已去除实例前缀），供管理界面查看.
     /// </summary>
     public List<string> ListKeys(string pattern, int limit = 500)
     {
@@ -69,6 +69,13 @@ public sealed class CacheService(IConnectionMultiplexer multiplexer, IDistribute
         }
 
         return result;
+    }
+
+    private static string StripPrefix(string key)
+    {
+        return key.StartsWith(DistributedCacheExtension.InstanceName, StringComparison.Ordinal)
+            ? key[DistributedCacheExtension.InstanceName.Length..]
+            : key;
     }
 
     private async Task<long> RemoveMatchingAsync(string fullPattern)
@@ -110,12 +117,5 @@ public sealed class CacheService(IConnectionMultiplexer multiplexer, IDistribute
                 yield return server;
             }
         }
-    }
-
-    private static string StripPrefix(string key)
-    {
-        return key.StartsWith(DistributedCacheExtension.InstanceName, StringComparison.Ordinal)
-            ? key[DistributedCacheExtension.InstanceName.Length..]
-            : key;
     }
 }

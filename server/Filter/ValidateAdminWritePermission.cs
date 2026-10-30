@@ -1,4 +1,4 @@
-﻿using server.Services.Admin;
+using server.Services.Admin;
 
 namespace server.Filter;
 

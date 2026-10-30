@@ -1,16 +1,15 @@
-﻿using System.Runtime.InteropServices;
-using server.Core;
+﻿using server.Core;
 using server.Models.Entity.SpiralAbyss;
 using server.Models.Legacy;
 using server.Models.Upload;
 using server.Services.Legacy.Primitive;
+using System.Runtime.InteropServices;
 
 namespace server.Services.Legacy;
 
 public class StatisticsTracker
 {
     // TODO: 不换队专项统计/一遍过、三间连打统计/总览
-    #region Counters
 
     // 对应层满星 | 出场
     private readonly Map<AvatarId, int> _level09PresentCounter = [];
@@ -61,13 +60,9 @@ public class StatisticsTracker
     private int _level10TotalRecordCounter;
     private int _level11TotalRecordCounter;
     private int _level12TotalRecordCounter;
-    #endregion
-
-    #region Specialized Counters
     private int _totalSpiralAbyssPassedCounter;
     private int _totalSpiralAbyssStarCounter;
     private long _totalSpiralAbyssBattleTimesCounter;
-    #endregion
 
     public long LastId { get; private set; } = -1;
 
@@ -272,10 +267,18 @@ public class StatisticsTracker
     {
         switch (index)
         {
-            case 09: ++_level09TotalRecordCounter; break;
-            case 10: ++_level10TotalRecordCounter; break;
-            case 11: ++_level11TotalRecordCounter; break;
-            case 12: ++_level12TotalRecordCounter; break;
+            case 09:
+                ++_level09TotalRecordCounter;
+                break;
+            case 10:
+                ++_level10TotalRecordCounter;
+                break;
+            case 11:
+                ++_level11TotalRecordCounter;
+                break;
+            case 12:
+                ++_level12TotalRecordCounter;
+                break;
         }
     }
 
@@ -284,10 +287,18 @@ public class StatisticsTracker
         // 递增当前层且持有对应角色的记录数
         switch (index)
         {
-            case 09: _level09RecordwithAvatarCounter.IncreaseOne(avatarId); break;
-            case 10: _level10RecordwithAvatarCounter.IncreaseOne(avatarId); break;
-            case 11: _level11RecordwithAvatarCounter.IncreaseOne(avatarId); break;
-            case 12: _level12RecordwithAvatarCounter.IncreaseOne(avatarId); break;
+            case 09:
+                _level09RecordwithAvatarCounter.IncreaseOne(avatarId);
+                break;
+            case 10:
+                _level10RecordwithAvatarCounter.IncreaseOne(avatarId);
+                break;
+            case 11:
+                _level11RecordwithAvatarCounter.IncreaseOne(avatarId);
+                break;
+            case 12:
+                _level12RecordwithAvatarCounter.IncreaseOne(avatarId);
+                break;
         }
     }
 
@@ -295,14 +306,30 @@ public class StatisticsTracker
     {
         switch ((floor, battle))
         {
-            case (09, 1): _level09Battle1TeamCounter.IncreaseOne(team); break;
-            case (09, 2): _level09Battle2TeamCounter.IncreaseOne(team); break;
-            case (10, 1): _level10Battle1TeamCounter.IncreaseOne(team); break;
-            case (10, 2): _level10Battle2TeamCounter.IncreaseOne(team); break;
-            case (11, 1): _level11Battle1TeamCounter.IncreaseOne(team); break;
-            case (11, 2): _level11Battle2TeamCounter.IncreaseOne(team); break;
-            case (12, 1): _level12Battle1TeamCounter.IncreaseOne(team); break;
-            case (12, 2): _level12Battle2TeamCounter.IncreaseOne(team); break;
+            case (09, 1):
+                _level09Battle1TeamCounter.IncreaseOne(team);
+                break;
+            case (09, 2):
+                _level09Battle2TeamCounter.IncreaseOne(team);
+                break;
+            case (10, 1):
+                _level10Battle1TeamCounter.IncreaseOne(team);
+                break;
+            case (10, 2):
+                _level10Battle2TeamCounter.IncreaseOne(team);
+                break;
+            case (11, 1):
+                _level11Battle1TeamCounter.IncreaseOne(team);
+                break;
+            case (11, 2):
+                _level11Battle2TeamCounter.IncreaseOne(team);
+                break;
+            case (12, 1):
+                _level12Battle1TeamCounter.IncreaseOne(team);
+                break;
+            case (12, 2):
+                _level12Battle2TeamCounter.IncreaseOne(team);
+                break;
         }
     }
 
@@ -310,10 +337,18 @@ public class StatisticsTracker
     {
         switch (index)
         {
-            case 09: _level09PresentCounter.IncreaseOne(avatarId); break;
-            case 10: _level10PresentCounter.IncreaseOne(avatarId); break;
-            case 11: _level11PresentCounter.IncreaseOne(avatarId); break;
-            case 12: _level12PresentCounter.IncreaseOne(avatarId); break;
+            case 09:
+                _level09PresentCounter.IncreaseOne(avatarId);
+                break;
+            case 10:
+                _level10PresentCounter.IncreaseOne(avatarId);
+                break;
+            case 11:
+                _level11PresentCounter.IncreaseOne(avatarId);
+                break;
+            case 12:
+                _level12PresentCounter.IncreaseOne(avatarId);
+                break;
         }
     }
 

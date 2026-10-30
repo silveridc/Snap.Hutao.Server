@@ -1,8 +1,8 @@
-﻿using System.Runtime.InteropServices;
-using server.Models.Entity.GachaLog;
+﻿using server.Models.Entity.GachaLog;
 using server.Models.GachaLog;
 using server.Models.Metadata;
 using server.Services.Legacy.Primitive;
+using System.Runtime.InteropServices;
 
 namespace server.Services.GachaLog.Statistics;
 
@@ -38,14 +38,14 @@ internal sealed class GachaLogStatisticsTracker(Map<int, int> idQualityMap, Gach
     private long _totalStandardValidPullsCounter;
 
     /// <summary>
-    /// 当前处理的 Uid
+    /// Gets or sets 当前处理的 Uid.
     /// </summary>
     public string Uid { get; set; } = string.Empty;
 
     /// <summary>
-    /// 追踪记录
+    /// 追踪记录.
     /// </summary>
-    /// <param name="gachaItems">祈愿记录</param>
+    /// <param name="gachaItems">祈愿记录.</param>
     public void Track(List<EntityGachaItem> gachaItems)
     {
         // Ignore items before first star5 item

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.AspNetCore.Authorization.Policy;
 
 namespace server.Services.Authorization;
 

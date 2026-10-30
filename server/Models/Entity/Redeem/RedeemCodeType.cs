@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.Redeem;
+namespace server.Models.Entity.Redeem;
 
 [Flags]
 public enum RedeemCodeType : uint

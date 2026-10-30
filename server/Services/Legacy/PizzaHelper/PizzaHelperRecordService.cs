@@ -1,12 +1,12 @@
-﻿using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using server.Models.Upload;
+﻿using server.Models.Upload;
 using server.Services.Admin;
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
 
 namespace server.Services.Legacy.PizzaHelper;
 
 // Scoped
-internal sealed class PizzaHelperRecordService(HttpClient _httpClient, SystemConfigService config, ILogger<PizzaHelperRecordService> _logger, TimeProvider timeProvider)
+public sealed class PizzaHelperRecordService(HttpClient _httpClient, SystemConfigService config, ILogger<PizzaHelperRecordService> _logger, TimeProvider timeProvider)
 {
     private readonly HttpClient _httpClient = InitializeHttpClient(_httpClient);
     private readonly ILogger<PizzaHelperRecordService> _logger = _logger;

@@ -1,4 +1,4 @@
-﻿using server.Models.Admin;
+using server.Models.Admin;
 using server.Services.Admin;
 
 namespace server.Controllers;
@@ -11,9 +11,20 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     private const string _callbackPage = "/admin/#/sso";
 
     /// <summary>
-    /// 查询后台是否启用了单点登录。
+    /// 拼出带回跳参数的地址.后台是 hash 路由，参数必须写在 <c>#</c> 之后前端才读得到，
+    /// 而 QueryHelpers 会把查询串插到 <c>#</c> 之前，所以只取它编码好的那一段自己接上去.
     /// </summary>
-    /// <returns>启用状态与身份源显示名。</returns>
+    /// <param name="query">要带给回跳页的参数.</param>
+    /// <returns>形如 <c>/admin/#/sso?ticket=...</c> 的地址.</returns>
+    public static string CallbackUrl(IDictionary<string, string?> query)
+    {
+        return $"{_callbackPage}{QueryString.Create(query).ToUriComponent()}";
+    }
+
+    /// <summary>
+    /// 查询后台是否启用了单点登录.
+    /// </summary>
+    /// <returns>启用状态与身份源显示名.</returns>
     [HttpGet("status")]
     public IActionResult GetStatus()
     {
@@ -25,11 +36,11 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     }
 
     /// <summary>
-    /// 生成跳转到身份源的授权地址。前端拿到地址后整页跳转，不要在 XHR 里跟随。
+    /// 生成跳转到身份源的授权地址.前端拿到地址后整页跳转，不要在 XHR 里跟随.
     /// </summary>
-    /// <param name="returnPath">登录完成后要回到的后台内路径，必须是站内绝对路径。</param>
-    /// <param name="cancellationToken">请求取消令牌。</param>
-    /// <returns>授权地址。</returns>
+    /// <param name="returnPath">登录完成后要回到的后台内路径，必须是站内绝对路径.</param>
+    /// <param name="cancellationToken">请求取消令牌.</param>
+    /// <returns>授权地址.</returns>
     [HttpGet("challenge")]
     public async Task<IActionResult> ChallengeAsync([FromQuery] string? returnPath, CancellationToken cancellationToken)
     {
@@ -50,13 +61,13 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     }
 
     /// <summary>
-    /// 身份源的回调入口。无论成功与否都只回跳后台页面，凭证只出现在 hash 片段里。
+    /// 身份源的回调入口.无论成功与否都只回跳后台页面，凭证只出现在 hash 片段里.
     /// </summary>
-    /// <param name="code">身份源返回的授权码。</param>
-    /// <param name="state">身份源原样带回的 state。</param>
-    /// <param name="error">身份源直接返回的错误名。</param>
-    /// <param name="cancellationToken">请求取消令牌。</param>
-    /// <returns>302 回跳后台。</returns>
+    /// <param name="code">身份源返回的授权码.</param>
+    /// <param name="state">身份源原样带回的 state.</param>
+    /// <param name="error">身份源直接返回的错误名.</param>
+    /// <param name="cancellationToken">请求取消令牌.</param>
+    /// <returns>302 回跳后台.</returns>
     [HttpGet("~/Admin/Sso/Callback")]
     public async Task<IActionResult> CallbackAsync([FromQuery] string? code, [FromQuery] string? state, [FromQuery] string? error, CancellationToken cancellationToken)
     {
@@ -64,7 +75,10 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
 
         if (result.Status is AdminSsoCallbackStatus.Success)
         {
-            Dictionary<string, string?> success = new() { ["ticket"] = result.Ticket! };
+            Dictionary<string, string?> success = new()
+            {
+                ["ticket"] = result.Ticket!,
+            };
             if (!string.IsNullOrEmpty(result.ReturnPath))
             {
                 success["return"] = result.ReturnPath;
@@ -75,7 +89,10 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
 
         logger.LogWarning("Admin SSO callback ended with {Status}: {Detail}", result.Status, result.Detail);
 
-        Dictionary<string, string?> failure = new() { ["error"] = ToErrorSlug(result.Status) };
+        Dictionary<string, string?> failure = new()
+        {
+            ["error"] = ToErrorSlug(result.Status),
+        };
         if (!string.IsNullOrEmpty(result.Subject))
         {
             failure["subject"] = result.Subject;
@@ -85,11 +102,11 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     }
 
     /// <summary>
-    /// 用一次性票据换取后台令牌。票据用过即废，后台令牌不带刷新令牌，到期后重新走一次登录。
+    /// 用一次性票据换取后台令牌.票据用过即废，后台令牌不带刷新令牌，到期后重新走一次登录.
     /// </summary>
-    /// <param name="request">包含票据的请求体。</param>
-    /// <param name="cancellationToken">请求取消令牌。</param>
-    /// <returns>后台令牌与账号信息。</returns>
+    /// <param name="request">包含票据的请求体.</param>
+    /// <param name="cancellationToken">请求取消令牌.</param>
+    /// <returns>后台令牌与账号信息.</returns>
     [HttpPost("sessions")]
     public async Task<IActionResult> ExchangeAsync([FromBody] AdminSsoExchangeRequest request, CancellationToken cancellationToken)
     {
@@ -105,24 +122,6 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
         return Success<AdminSsoTokenResponse>("Admin login succeeded", token, ServerKeys.ServerAdminSsoLoginSucceed);
     }
 
-    private IActionResult RedirectToCallback(IDictionary<string, string?> query)
-    {
-        // 直接写 Location 而不是 Redirect()，避免框架对整串做二次编码后前端解析不到参数
-        Response.Headers.Location = CallbackUrl(query);
-        return StatusCode(StatusCodes.Status302Found);
-    }
-
-    /// <summary>
-    /// 拼出带回跳参数的地址。后台是 hash 路由，参数必须写在 <c>#</c> 之后前端才读得到，
-    /// 而 QueryHelpers 会把查询串插到 <c>#</c> 之前，所以只取它编码好的那一段自己接上去。
-    /// </summary>
-    /// <param name="query">要带给回跳页的参数。</param>
-    /// <returns>形如 <c>/admin/#/sso?ticket=...</c> 的地址。</returns>
-    public static string CallbackUrl(IDictionary<string, string?> query)
-    {
-        return $"{_callbackPage}{QueryString.Create(query).ToUriComponent()}";
-    }
-
     private static string ToErrorSlug(AdminSsoCallbackStatus status)
     {
         return status switch
@@ -134,5 +133,12 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
             AdminSsoCallbackStatus.Disabled => "disabled",
             _ => "unknown",
         };
+    }
+
+    private StatusCodeResult RedirectToCallback(Dictionary<string, string?> query)
+    {
+        // 直接写 Location 而不是 Redirect()，避免框架对整串做二次编码后前端解析不到参数
+        Response.Headers.Location = CallbackUrl(query);
+        return StatusCode(StatusCodes.Status302Found);
     }
 }

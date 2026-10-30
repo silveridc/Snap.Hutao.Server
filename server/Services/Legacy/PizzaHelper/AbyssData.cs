@@ -1,4 +1,4 @@
-﻿namespace server.Services.Legacy.PizzaHelper;
+namespace server.Services.Legacy.PizzaHelper;
 
 internal sealed class AbyssData
 {
@@ -21,14 +21,23 @@ internal sealed class AbyssData
     public List<SubmitDetailModel> SubmitDetails { get; set; } = default!;
 
     [JsonPropertyName("abyssRank")]
-    public AbyssRankModel? AbyssRank { get; set; }
+    public AbyssRankModel? AbyssRank
+    {
+        get; set;
+    }
 
     [JsonPropertyName("owningChars")]
     public List<int> OwningChars { get; set; } = default!;
 
     [JsonPropertyName("battleCount")]
-    public int BattleCount { get; set; }
+    public int BattleCount
+    {
+        get; set;
+    }
 
     [JsonPropertyName("winCount")]
-    public int WinCount { get; set; }
+    public int WinCount
+    {
+        get; set;
+    }
 }

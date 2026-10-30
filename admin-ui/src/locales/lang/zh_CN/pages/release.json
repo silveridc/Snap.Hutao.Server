@@ -14,7 +14,7 @@
     "form": {
       "title": "发布新版本",
       "tipPre": "对应 ",
-      "tipSuf": "。发布后自动激活，旧版本变为历史版本。",
+      "tipSuf": ".发布后自动激活，旧版本变为历史版本.",
       "version": "版本号",
       "versionPlaceholder": "四段数字，如 1.17.2.0",
       "validation": "SHA-256 校验值",
@@ -50,7 +50,7 @@
     },
     "bucket": {
       "title": "从存储桶发布",
-      "tip": "对象先传到补丁存储桶，这里选一个安装包即可：服务端会读取对象计算 SHA-256、按文件名解析版本号，并生成 Direct 镜像地址。",
+      "tip": "对象先传到补丁存储桶，这里选一个安装包即可：服务端会读取对象计算 SHA-256、按文件名解析版本号，并生成 Direct 镜像地址.",
       "prefix": "对象前缀",
       "prefixPlaceholder": "如 patch/，留空列出全部",
       "refreshObjects": "刷新对象",
@@ -76,9 +76,9 @@
     },
     "dialog": {
       "activateHeader": "激活历史版本",
-      "activateConfirmBody": "确定将版本 {version} 设为当前激活版本？当前激活版本将被替换。",
+      "activateConfirmBody": "确定将版本 {version} 设为当前激活版本？当前激活版本将被替换.",
       "deactivateHeader": "下架当前版本",
-      "deactivateConfirmBody": "确定下架版本 {version}？下架后客户端将不再收到该版本更新。"
+      "deactivateConfirmBody": "确定下架版本 {version}？下架后客户端将不再收到该版本更新."
     },
     "messages": {
       "versionRequired": "请填写版本号",

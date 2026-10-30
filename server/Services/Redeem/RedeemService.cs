@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 using server.Core;
 using server.Models.Entity.Redeem;
 using server.Models.Redeem;
@@ -6,12 +6,13 @@ using server.Models.Redeem;
 namespace server.Services.Redeem;
 
 // Scoped
-public sealed class RedeemService(IServiceProvider serviceProvider, TimeProvider timeProvider)
+public sealed class RedeemService(
+    GachaLogExpireService gachaLogExpireService,
+    CdnExpireService cdnExpireService,
+    AppDbContext appDbContext,
+    TimeProvider timeProvider)
 {
     private static readonly AsyncLock RedeemLock = new();
-    private readonly GachaLogExpireService _gachaLogExpireService = serviceProvider.GetRequiredService<GachaLogExpireService>();
-    private readonly CdnExpireService _cdnExpireService = serviceProvider.GetRequiredService<CdnExpireService>();
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
 
     public async Task<RedeemUseResponse> UseRedeemCodeAsync(RedeemUseRequest request)
     {
@@ -23,19 +24,19 @@ public sealed class RedeemService(IServiceProvider serviceProvider, TimeProvider
                 return new(RedeemStatus.Invalid);
             }
 
-            if (await _appDbContext.RedeemCodes.Where(c => c.Code == request.Code).SingleOrDefaultAsync().ConfigureAwait(false) is not { } code)
+            if (await appDbContext.RedeemCodes.Where(c => c.Code == request.Code).SingleOrDefaultAsync().ConfigureAwait(false) is not { } code)
             {
                 return new(RedeemStatus.NotExists);
             }
 
             string normalizedUsername = request.Username.ToUpperInvariant();
-            if (await _appDbContext.Users.Where(u => u.UserName == normalizedUsername).SingleOrDefaultAsync().ConfigureAwait(false) is not { } user)
+            if (await appDbContext.Users.Where(u => u.UserName == normalizedUsername).SingleOrDefaultAsync().ConfigureAwait(false) is not { } user)
             {
                 return new(RedeemStatus.NoSuchUser);
             }
 
             int userId = user.Id;
-            if (await _appDbContext.RedeemCodeUseItems.AnyAsync(i => i.RedeemCodeId == code.Id && i.UsedBy == userId).ConfigureAwait(false))
+            if (await appDbContext.RedeemCodeUseItems.AnyAsync(i => i.RedeemCodeId == code.Id && i.UsedBy == userId).ConfigureAwait(false))
             {
                 return new(RedeemStatus.AlreadyUsed);
             }
@@ -50,7 +51,7 @@ public sealed class RedeemService(IServiceProvider serviceProvider, TimeProvider
 
             if (code.Type.HasFlag(RedeemCodeType.TimesLimited))
             {
-                if (code.TimesAllowed <= await _appDbContext.RedeemCodeUseItems.Where(i => i.RedeemCodeId == code.Id).CountAsync().ConfigureAwait(false))
+                if (code.TimesAllowed <= await appDbContext.RedeemCodeUseItems.Where(i => i.RedeemCodeId == code.Id).CountAsync().ConfigureAwait(false))
                 {
                     return new(RedeemStatus.NotEnough);
                 }
@@ -87,10 +88,10 @@ public sealed class RedeemService(IServiceProvider serviceProvider, TimeProvider
             }
 
             // Avoid generating duplicate code
-            if (!await _appDbContext.RedeemCodes.AnyAsync(c => c.Code == code.Code).ConfigureAwait(false))
+            if (!await appDbContext.RedeemCodes.AnyAsync(c => c.Code == code.Code).ConfigureAwait(false))
             {
                 codes.Add(code.Code);
-                await _appDbContext.RedeemCodes.AddAndSaveAsync(code).ConfigureAwait(false);
+                await appDbContext.RedeemCodes.AddAndSaveAsync(code).ConfigureAwait(false);
             }
         }
 
@@ -99,15 +100,15 @@ public sealed class RedeemService(IServiceProvider serviceProvider, TimeProvider
 
     private async ValueTask<RedeemUseResponse> ExtendTermForUserByCodeAsync(HutaoUser user, RedeemCode code)
     {
-        using IDbContextTransaction transaction = await _appDbContext.Database.BeginTransactionAsync().ConfigureAwait(false);
+        using IDbContextTransaction transaction = await appDbContext.Database.BeginTransactionAsync().ConfigureAwait(false);
         IExpireService expireService = code.ServiceType switch
         {
-            RedeemCodeTargetServiceType.GachaLog => _gachaLogExpireService,
-            RedeemCodeTargetServiceType.Cdn => _cdnExpireService,
+            RedeemCodeTargetServiceType.GachaLog => gachaLogExpireService,
+            RedeemCodeTargetServiceType.Cdn => cdnExpireService,
             _ => throw new NotSupportedException(),
         };
 
-        TermExtendResult result = await expireService.ExtendTermForUserAsync(_appDbContext.Users, user, code.Value).ConfigureAwait(false);
+        TermExtendResult result = await expireService.ExtendTermForUserAsync(appDbContext.Users, user, code.Value).ConfigureAwait(false);
         if (result.Kind is TermExtendResultKind.NoSuchUser)
         {
             return new(RedeemStatus.NoSuchUser);
@@ -125,7 +126,7 @@ public sealed class RedeemService(IServiceProvider serviceProvider, TimeProvider
             UseTime = timeProvider.GetUtcNow(),
         };
 
-        await _appDbContext.RedeemCodeUseItems.AddAndSaveAsync(useItem);
+        await appDbContext.RedeemCodeUseItems.AddAndSaveAsync(useItem);
         await transaction.CommitAsync().ConfigureAwait(false);
 
         return new(RedeemStatus.Ok, code.ServiceType, code.Value, result.ExpiredAt);

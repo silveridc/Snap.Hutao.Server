@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -30,7 +30,7 @@ public partial class AddAuditLogAndAnnouncementEnabled : Migration
                 Detail = table.Column<string>(type: "longtext", nullable: true)
                     .Annotation("MySql:CharSet", "utf8mb4"),
                 Success = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                Timestamp = table.Column<long>(type: "bigint", nullable: false)
+                Timestamp = table.Column<long>(type: "bigint", nullable: false),
             },
             constraints: table =>
             {

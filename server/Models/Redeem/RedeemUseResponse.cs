@@ -1,4 +1,4 @@
-﻿using server.Models.Entity.Redeem;
+using server.Models.Entity.Redeem;
 
 namespace server.Models.Redeem;
 

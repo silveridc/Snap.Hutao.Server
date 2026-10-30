@@ -1,4 +1,4 @@
-﻿using server.Core.Protobuf;
+using server.Core.Protobuf;
 using server.Models.Yae;
 
 namespace server.Services.Yae;
@@ -20,16 +20,11 @@ public static class YaeBucketDecoder
     // MethodRvaConfig 的字段号，与 MethodRvaPayload 的十个键一一对应
     private static readonly int[] RvaFieldNumbers = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
-    public sealed record Result(AchievementFieldIdPayload? Payload, string? Version, uint ChineseHash, uint OverseaHash, uint ItemCount, uint GroupCount, string? Error)
-    {
-        public bool Succeeded => Error is null;
-    }
-
     /// <summary>
-    /// 解析 bucket 响应体：识别版本号与国服指纹，抽出成就字段号映射。
+    /// 解析 bucket 响应体：识别版本号与国服指纹，抽出成就字段号映射.
     /// </summary>
-    /// <param name="data">bucket 响应体原文。</param>
-    /// <param name="chineseHashes">已确认为国服的 exe 指纹集合；命中其中一个的 RVA 组写进 chinese。</param>
+    /// <param name="data">bucket 响应体原文.</param>
+    /// <param name="chineseHashes">已确认为国服的 exe 指纹集合；命中其中一个的 RVA 组写进 chinese.</param>
     public static Result Decode(byte[] data, IReadOnlyCollection<uint> chineseHashes)
     {
         List<ProtobufField> root = ProtobufReader.Parse(data);
@@ -95,8 +90,8 @@ public static class YaeBucketDecoder
     }
 
     /// <summary>
-    /// 按 exe 指纹给 chinese/oversea 对号。指纹是 <c>CRC32(主 exe 前 64 KiB)</c>（Yae 侧 <c>Utils.GetGameHash</c>），
-    /// 与游戏版本号无关，所以每次大版本都可能变；判定不了就报错，绝不猜，因为错的 RVA 会让注入 DLL 直接跳飞。
+    /// 按 exe 指纹给 chinese/oversea 对号.指纹是 <c>CRC32(主 exe 前 64 KiB)</c>（Yae 侧 <c>Utils.GetGameHash</c>），
+    /// 与游戏版本号无关，所以每次大版本都可能变；判定不了就报错，绝不猜，因为错的 RVA 会让注入 DLL 直接跳飞.
     /// </summary>
     private static bool TryClassify(ICollection<uint> keys, IReadOnlyCollection<uint> chineseHashes, out uint chinese, out uint oversea, out string? error)
     {
@@ -112,7 +107,7 @@ public static class YaeBucketDecoder
                     return false;
                 }
 
-            // 上游只发布了一组 RVA 时，两端只能共用同一组；多键时不允许这样退让。
+            // 上游只发布了一组 RVA 时，两端只能共用同一组；多键时不允许这样退让.
             case 1:
                 {
                     chinese = oversea = keys.First();
@@ -146,5 +141,10 @@ public static class YaeBucketDecoder
         chinese = matched;
         oversea = keys.First(key => key != matched);
         return true;
+    }
+
+    public sealed record Result(AchievementFieldIdPayload? Payload, string? Version, uint ChineseHash, uint OverseaHash, uint ItemCount, uint GroupCount, string? Error)
+    {
+        public bool Succeeded => Error is null;
     }
 }

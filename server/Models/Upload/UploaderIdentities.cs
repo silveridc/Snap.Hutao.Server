@@ -1,4 +1,4 @@
-﻿namespace server.Models.Upload;
+namespace server.Models.Upload;
 
 public static class UploaderIdentities
 {

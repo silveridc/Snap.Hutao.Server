@@ -1,4 +1,4 @@
-﻿namespace server.Models.OpenSource;
+namespace server.Models.OpenSource;
 
 public class LicenseApplication
 {

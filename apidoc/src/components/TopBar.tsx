@@ -139,7 +139,7 @@ export default function TopBar({
           />
         </div>
         <p className="dim" style={{ fontSize: 12, marginTop: 10 }}>
-          这里添加的只保存在本浏览器；标着 config.json 的条目来自部署目录的配置文件，要改文件才能移除。
+          这里添加的只保存在本浏览器；标着 config.json 的条目来自部署目录的配置文件，要改文件才能移除.
         </p>
       </Modal>
     </header>

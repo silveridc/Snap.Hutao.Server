@@ -1,17 +1,29 @@
-﻿namespace server.Models.Entity.SpiralAbyss;
+namespace server.Models.Entity.SpiralAbyss;
 
 [Table("spiral_abysses")]
 public class EntitySpiralAbyss
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long PrimaryId { get; set; }
+    public long PrimaryId
+    {
+        get; set;
+    }
 
-    public long RecordId { get; set; }
+    public long RecordId
+    {
+        get; set;
+    }
 
-    public int TotalBattleTimes { get; set; }
+    public int TotalBattleTimes
+    {
+        get; set;
+    }
 
-    public int TotalWinTimes { get; set; }
+    public int TotalWinTimes
+    {
+        get; set;
+    }
 
     [ForeignKey(nameof(RecordId))]
     public EntityRecord Record { get; set; } = null!;

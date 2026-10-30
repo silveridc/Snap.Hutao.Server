@@ -1,8 +1,8 @@
-// 服务端 RSA 公钥 (SPKI / DER, base64)。
+// 服务端 RSA 公钥 (SPKI / DER, base64).
 // 用于登录时对邮箱、密码以及刷新令牌做 RSA-OAEP(SHA-1) 加密，
-// 与后端 PassportService.Decrypt 使用的 RSAEncryptionPadding.OaepSHA1 对应。
+// 与后端 PassportService.Decrypt 使用的 RSAEncryptionPadding.OaepSHA1 对应.
 //
-// 该值由服务端私钥 (server/privkey.key) 推导得到，属于公钥，可安全放在前端。
+// 该值由服务端私钥 (server/privkey.key) 推导得到，属于公钥，可安全放在前端.
 // 若后端更换了 RSA 私钥，请同步更新此处：
 //   openssl rsa -in privkey.key -pubout -outform DER | base64 -w0
 export const RSA_PUBLIC_KEY_DER_BASE64 =

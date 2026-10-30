@@ -1,8 +1,8 @@
-﻿using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
 using server.Models.Admin;
 using server.Models.Entity;
 using server.Models.Patch;
+using System.Text.RegularExpressions;
 
 namespace server.Services.Admin;
 
@@ -44,34 +44,6 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
         return info;
     }
 
-    /// <summary>
-    /// 配置了 S3 签名且镜像主机名匹配时，把镜像 URL 换成限时预签名 URL——桶保持私有，
-    /// 每次响应都重新签发，客户端拿到即下载，过期也不影响。
-    /// </summary>
-    private void SignS3Mirrors(HutaoPackageInformation info)
-    {
-        if (!systemConfig.IsPatchS3SigningEnabled)
-        {
-            return;
-        }
-
-        string host = systemConfig.PatchS3Host;
-        int expiresHours = Math.Clamp(int.TryParse(systemConfig.GetOrDefault(Keys.PatchS3ExpiresHours, "24"), out int parsed) ? parsed : 24, 1, 168);
-        string region = systemConfig.GetOrDefault(Keys.PatchS3Region, string.Empty).Trim();
-        string accessKeyId = systemConfig.GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty).Trim();
-        string secretAccessKey = systemConfig.GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty);
-
-        foreach (server.Models.Patch.HutaoPackageMirror mirror in info.Mirrors)
-        {
-            if (Uri.TryCreate(mirror.Url, UriKind.Absolute, out Uri? uri) &&
-                uri.Authority is not null &&
-                string.Equals(uri.Authority, host, StringComparison.OrdinalIgnoreCase))
-            {
-                mirror.Url = S3Presigner.PresignGet(mirror.Url, region, accessKeyId, secretAccessKey, expiresHours * 3600, timeProvider.GetUtcNow());
-            }
-        }
-    }
-
     public async Task<HutaoReleaseItem?> GetCurrentAsync()
     {
         HutaoRelease? release = await appDbContext.HutaoReleases
@@ -97,9 +69,15 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
             .ToListAsync()
             .ConfigureAwait(false);
         Dictionary<int, string?> publisherNames = await GetPublisherNamesAsync(releases.Select(r => r.PublishedBy)).ConfigureAwait(false);
-        List<HutaoReleaseItem> items = releases.Select(r => ToItem(r, publisherNames.GetValueOrDefault(r.PublishedBy))).ToList();
+        List<HutaoReleaseItem> items = [.. releases.Select(r => ToItem(r, publisherNames.GetValueOrDefault(r.PublishedBy)))];
 
-        return new() { Total = total, Page = page, PageSize = pageSize, Items = items };
+        return new()
+        {
+            Total = total,
+            Page = page,
+            PageSize = pageSize,
+            Items = items,
+        };
     }
 
     public async Task<(bool Success, string Message, string? LocalizationKey, HutaoReleaseItem? Release)> PublishAsync(HutaoReleasePublishRequest request, int publisherId)
@@ -167,31 +145,6 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
             .ExecuteUpdateAsync(update => update.SetProperty(r => r.IsActive, false))
             .ConfigureAwait(false);
         return updated > 0;
-    }
-
-    private async Task<HutaoReleaseItem?> GetByIdAsync(long id)
-    {
-        HutaoRelease? release = await appDbContext.HutaoReleases.AsNoTracking().SingleOrDefaultAsync(r => r.Id == id).ConfigureAwait(false);
-        return release is null ? null : await ToItemAsync(release).ConfigureAwait(false);
-    }
-
-    private async Task<HutaoReleaseItem> ToItemAsync(HutaoRelease release)
-    {
-        string? publisherName = await appDbContext.Users.AsNoTracking()
-            .Where(u => u.Id == release.PublishedBy)
-            .Select(u => u.UserName)
-            .FirstOrDefaultAsync()
-            .ConfigureAwait(false);
-        return ToItem(release, publisherName);
-    }
-
-    private async Task<Dictionary<int, string?>> GetPublisherNamesAsync(IEnumerable<int> publisherIds)
-    {
-        List<int> ids = publisherIds.Distinct().ToList();
-        return await appDbContext.Users.AsNoTracking()
-            .Where(u => ids.Contains(u.Id))
-            .ToDictionaryAsync(u => u.Id, u => u.UserName)
-            .ConfigureAwait(false);
     }
 
     private static HutaoReleaseItem ToItem(HutaoRelease release, string? publisherName)
@@ -279,4 +232,57 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
 
     [GeneratedRegex("^[0-9a-fA-F]{64}$", RegexOptions.CultureInvariant)]
     private static partial Regex Sha256Pattern();
+
+    private async Task<HutaoReleaseItem?> GetByIdAsync(long id)
+    {
+        HutaoRelease? release = await appDbContext.HutaoReleases.AsNoTracking().SingleOrDefaultAsync(r => r.Id == id).ConfigureAwait(false);
+        return release is null ? null : await ToItemAsync(release).ConfigureAwait(false);
+    }
+
+    private async Task<HutaoReleaseItem> ToItemAsync(HutaoRelease release)
+    {
+        string? publisherName = await appDbContext.Users.AsNoTracking()
+            .Where(u => u.Id == release.PublishedBy)
+            .Select(u => u.UserName)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
+        return ToItem(release, publisherName);
+    }
+
+    private async Task<Dictionary<int, string?>> GetPublisherNamesAsync(IEnumerable<int> publisherIds)
+    {
+        List<int> ids = [.. publisherIds.Distinct()];
+        return await appDbContext.Users.AsNoTracking()
+            .Where(u => ids.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.UserName)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 配置了 S3 签名且镜像主机名匹配时，把镜像 URL 换成限时预签名 URL——桶保持私有，
+    /// 每次响应都重新签发，客户端拿到即下载，过期也不影响.
+    /// </summary>
+    private void SignS3Mirrors(HutaoPackageInformation info)
+    {
+        if (!systemConfig.IsPatchS3SigningEnabled)
+        {
+            return;
+        }
+
+        string host = systemConfig.PatchS3Host;
+        int expiresHours = Math.Clamp(int.TryParse(systemConfig.GetOrDefault(Keys.PatchS3ExpiresHours, "24"), out int parsed) ? parsed : 24, 1, 168);
+        string region = systemConfig.GetOrDefault(Keys.PatchS3Region, string.Empty).Trim();
+        string accessKeyId = systemConfig.GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty).Trim();
+        string secretAccessKey = systemConfig.GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty);
+
+        foreach (server.Models.Patch.HutaoPackageMirror mirror in info.Mirrors)
+        {
+            if (Uri.TryCreate(mirror.Url, UriKind.Absolute, out Uri? uri) &&
+                uri.Authority is not null &&
+                string.Equals(uri.Authority, host, StringComparison.OrdinalIgnoreCase))
+            {
+                mirror.Url = S3Presigner.PresignGet(mirror.Url, region, accessKeyId, secretAccessKey, expiresHours * 3600, timeProvider.GetUtcNow());
+            }
+        }
+    }
 }

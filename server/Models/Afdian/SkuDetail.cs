@@ -1,4 +1,4 @@
-﻿namespace server.Models.Afdian;
+namespace server.Models.Afdian;
 
 public sealed class SkuDetail
 {
@@ -6,7 +6,10 @@ public sealed class SkuDetail
     public string SkuId { get; set; } = default!;
 
     [JsonPropertyName("count")]
-    public int Count { get; set; }
+    public int Count
+    {
+        get; set;
+    }
 
     [JsonPropertyName("name")]
     public string Name { get; set; } = default!;

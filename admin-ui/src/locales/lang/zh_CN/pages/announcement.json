@@ -13,7 +13,7 @@
     "form": {
       "title": "发布公告",
       "tipPre": "对应 ",
-      "tipSuf": "。公告仅对携带版本号的胡桃客户端可见。",
+      "tipSuf": ".公告仅对携带版本号的胡桃客户端可见.",
       "titleLabel": "标题",
       "titlePlaceholder": "公告标题",
       "severity": "严重级别",

@@ -1,4 +1,4 @@
-﻿using server.Models.Afdian;
+using server.Models.Afdian;
 
 namespace server.Controllers;
 
@@ -8,10 +8,10 @@ namespace server.Controllers;
 public class WebhookController(AfdianWebhookService afdianWebhookService) : ControllerBase
 {
     /// <summary>
-    /// 处理爱发电订单回调。
+    /// 处理爱发电订单回调.
     /// </summary>
-    /// <param name="request">爱发电订单回调数据。</param>
-    /// <returns>处理结果。</returns>
+    /// <param name="request">爱发电订单回调数据.</param>
+    /// <returns>处理结果.</returns>
     // [HttpGet("Incoming/Afdian")]
     // [HttpPost("Incoming/Afdian")]
     public async Task<IActionResult> IncomingAfdianAsync([FromBody] AfdianResponse<OrderWrapper> request)

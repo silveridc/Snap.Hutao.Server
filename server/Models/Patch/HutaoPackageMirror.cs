@@ -10,5 +10,8 @@ public sealed class HutaoPackageMirror
 
     [JsonPropertyName("mirror_type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public HutaoPackageMirrorType MirrorType { get; set; }
+    public HutaoPackageMirrorType MirrorType
+    {
+        get; set;
+    }
 }

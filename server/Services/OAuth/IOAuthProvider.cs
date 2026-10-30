@@ -1,9 +1,9 @@
-﻿namespace server.Services.OAuth;
+namespace server.Services.OAuth;
 
 public interface IOAuthProvider
 {
-    Task<string> RequestAuthUrlAsync(string state);
+    public Task<string> RequestAuthUrlAsync(string state);
 
     // Internal use
-    Task<bool> RefreshTokenAsync(OAuthBindIdentity identity);
+    public Task<bool> RefreshTokenAsync(OAuthBindIdentity identity);
 }

@@ -29,8 +29,8 @@ public sealed class ClientFlowTests
     private static int uidCounter;
 
     /// <summary>
-    /// 生成一个不与其它用例冲突的游戏 Uid。服务端要求纯数字、不少于 9 位且能放进 Int32
-    /// （<c>/Record/Check</c> 会用 int.TryParse 校验），所以在 2 亿到 3 亿之间递增取值。
+    /// 生成一个不与其它用例冲突的游戏 Uid.服务端要求纯数字、不少于 9 位且能放进 Int32
+    /// （<c>/Record/Check</c> 会用 int.TryParse 校验），所以在 2 亿到 3 亿之间递增取值.
     /// </summary>
     private static string NewUid() => $"2{Interlocked.Increment(ref uidCounter):D8}";
 
@@ -471,7 +471,7 @@ public sealed class ClientFlowTests
     }
 
     /// <summary>
-    /// 启动器的 IP 属地接口：ip 取 ForwardedHeaders 还原出来的真实地址，四段属地由 service 现查（带 Redis 缓存）。
+    /// 启动器的 IP 属地接口：ip 取 ForwardedHeaders 还原出来的真实地址，四段属地由 service 现查（带 Redis 缓存）.
     /// </summary>
     [Fact]
     public async Task PublicIp_ReturnsTheFourRegionSegments()
@@ -493,7 +493,7 @@ public sealed class ClientFlowTests
 
     /// <summary>
     /// 今日壁纸：从壁纸池里按天稳定随机取一张（同一天重复请求结果一致），来源页/作者/上传者留空时用默认值；
-    /// 保存空池后回退到 Bing 每日壁纸。
+    /// 保存空池后回退到 Bing 每日壁纸.
     /// </summary>
     [Fact]
     public async Task TodayWallpaper_PicksFromThePoolStablyAndFallsBackWhenEmpty()
@@ -538,7 +538,7 @@ public sealed class ClientFlowTests
     }
 
     /// <summary>
-    /// 壁纸池创建前，旧版单张配置仍然生效；后台页面会把它作为池里的一条记录展示。
+    /// 壁纸池创建前，旧版单张配置仍然生效；后台页面会把它作为池里的一条记录展示.
     /// </summary>
     [Fact]
     public async Task TodayWallpaper_LegacySingleEntry_IsStillServedWithoutAPool()
@@ -591,10 +591,10 @@ public sealed class ClientFlowTests
         await SendAsync("DELETE", $"/api/admin/settings/{Uri.EscapeDataString(key)}", null, user.AccessToken);
     }
 
-    /// <summary>HutaoLogSingleItem.DeviceId 与 client_versions.DeviceId 都限长 32。</summary>
+    /// <summary>HutaoLogSingleItem.DeviceId 与 client_versions.DeviceId 都限长 32.</summary>
     private static string NewDeviceId() => $"ver-{Guid.NewGuid():N}".Substring(0, 32);
 
-    /// <summary>以一个设备 id 和一个客户端版本发一次请求，触发版本记录过滤器。</summary>
+    /// <summary>以一个设备 id 和一个客户端版本发一次请求，触发版本记录过滤器.</summary>
     private async Task SendAsClientAsync(string url, string deviceId, string version)
     {
         using HttpRequestMessage request = new(HttpMethod.Get, url);

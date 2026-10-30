@@ -1,4 +1,4 @@
-﻿using server.Models.Admin;
+using server.Models.Admin;
 using server.Models.Entity;
 
 namespace server.Services.Telemetry;
@@ -6,10 +6,10 @@ namespace server.Services.Telemetry;
 // Scoped
 public sealed class ClientVersionService(AppDbContext appDbContext, TimeProvider timeProvider)
 {
-    /// <summary>同一设备两次落库的最小间隔（秒），版本没变时按这个节流。</summary>
+    /// <summary>同一设备两次落库的最小间隔（秒），版本没变时按这个节流.</summary>
     public const long TrackIntervalSeconds = 3600;
 
-    /// <summary>记录一台设备当前使用的客户端版本：新设备建行，版本变化或超过节流窗口才写库。</summary>
+    /// <summary>记录一台设备当前使用的客户端版本：新设备建行，版本变化或超过节流窗口才写库.</summary>
     public async ValueTask TrackAsync(string deviceId, string version)
     {
         ClientVersion? tracked = await appDbContext.ClientVersions.SingleOrDefaultAsync(v => v.DeviceId == deviceId).ConfigureAwait(false);
@@ -39,7 +39,7 @@ public sealed class ClientVersionService(AppDbContext appDbContext, TimeProvider
         await appDbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    /// <summary>按版本汇总在册设备数，设备数相同的按版本号降序。</summary>
+    /// <summary>按版本汇总在册设备数，设备数相同的按版本号降序.</summary>
     public async Task<ClientVersionStatistics> GetStatisticsAsync()
     {
         List<ClientVersionCount> counts = await appDbContext.ClientVersions

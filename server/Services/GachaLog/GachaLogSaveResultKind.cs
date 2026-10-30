@@ -1,4 +1,4 @@
-﻿namespace server.Services.GachaLog;
+namespace server.Services.GachaLog;
 
 public enum GachaLogSaveResultKind
 {

@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.GachaLog;
+namespace server.Models.Entity.GachaLog;
 
 [Table("invalid_gacha_uids")]
 public class InvalidGachaUid

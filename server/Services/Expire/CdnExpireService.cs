@@ -1,10 +1,10 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace server.Services.Expire;
 
 // Singleton
-public sealed class CdnExpireService(IServiceProvider serviceProvider, TimeProvider timeProvider)
-    : ExpireServiceBase(serviceProvider, timeProvider)
+public sealed class CdnExpireService(IServiceScopeFactory scopeFactory, TimeProvider timeProvider)
+    : ExpireServiceBase(scopeFactory, timeProvider)
 {
     protected override Expression<Func<HutaoUser, long>> ExpireAtSelector => user => user.CdnExpireAt;
 

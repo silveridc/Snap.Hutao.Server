@@ -3,12 +3,12 @@ namespace server.Extension;
 public static class DistributedCacheExtension
 {
     /// <summary>
-    /// 分布式缓存键前缀（<see cref="Microsoft.Extensions.Caching.StackExchangeRedis.RedisCacheOptions.InstanceName"/>）。
+    /// 分布式缓存键前缀（<see cref="Microsoft.Extensions.Caching.StackExchangeRedis.RedisCacheOptions.InstanceName"/>）.
     /// </summary>
     public const string InstanceName = "SnapHutaoServer:";
 
     /// <summary>
-    /// 工作标志的兜底过期时间：进程崩溃未执行 finally 时，避免分布式锁永久残留。
+    /// 工作标志的兜底过期时间：进程崩溃未执行 finally 时，避免分布式锁永久残留.
     /// </summary>
     public static readonly TimeSpan WorkingExpiration = TimeSpan.FromHours(6);
 
@@ -69,7 +69,7 @@ public static class DistributedCacheExtension
     }
 
     /// <summary>
-    /// 设置一个仅用于存在性判断的标志键（带过期时间）。
+    /// 设置一个仅用于存在性判断的标志键（带过期时间）.
     /// </summary>
     public static void SetFlag(this IDistributedCache cache, string key, TimeSpan expiration)
     {
@@ -80,7 +80,7 @@ public static class DistributedCacheExtension
     }
 
     /// <summary>
-    /// 判断标志键是否存在。
+    /// 判断标志键是否存在.
     /// </summary>
     public static bool HasFlag(this IDistributedCache cache, string key)
     {
@@ -88,9 +88,9 @@ public static class DistributedCacheExtension
     }
 
     /// <summary>
-    /// 持锁互斥执行：标志已存在时直接跳过（返回 false），否则置标志、执行主体、finally 摘除。
+    /// 持锁互斥执行：标志已存在时直接跳过（返回 false），否则置标志、执行主体、finally 摘除.
     /// 统计刷新与记录清理共用这一个模板——过去三套统计各写各的 Working 模板，清理 job
-    /// 复制时把锁标志粘成了抽卡统计的，清理期间误挡误清抽卡统计的锁（生产 bug）。
+    /// 复制时把锁标志粘成了抽卡统计的，清理期间误挡误清抽卡统计的锁（生产 bug）.
     /// </summary>
     public static async Task<bool> RunExclusiveAsync(this IDistributedCache cache, string key, Func<Task> body)
     {

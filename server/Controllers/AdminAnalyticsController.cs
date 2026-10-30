@@ -1,7 +1,6 @@
 using server.Filter;
 using server.Models.Admin;
 using server.Services.Admin;
-using server.Services.Ranking;
 
 namespace server.Controllers;
 
@@ -20,10 +19,10 @@ public sealed class AdminAnalyticsController(
     IRankService rankService) : ControllerBase
 {
     /// <summary>
-    /// 获取服务端运行状态概览（进程与机器、资源占用、数据库连接、Redis、Quartz 调度）。
+    /// 获取服务端运行状态概览（进程与机器、资源占用、数据库连接、Redis、Quartz 调度）.
     /// </summary>
-    /// <param name="cancellationToken">请求取消令牌。</param>
-    /// <returns>系统概览数据。</returns>
+    /// <param name="cancellationToken">请求取消令牌.</param>
+    /// <returns>系统概览数据.</returns>
     [HttpGet("system/overview")]
     public async Task<IActionResult> SystemOverviewAsync(CancellationToken cancellationToken)
     {
@@ -32,10 +31,10 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 卡池抽卡分布：按卡池类型汇总抽数与五星，并给出出得最多的五星物品。
+    /// 卡池抽卡分布：按卡池类型汇总抽数与五星，并给出出得最多的五星物品.
     /// </summary>
-    /// <param name="days">统计最近多少天，0 表示全部历史。</param>
-    /// <returns>抽卡分布。</returns>
+    /// <param name="days">统计最近多少天，0 表示全部历史.</param>
+    /// <returns>抽卡分布.</returns>
     [HttpGet("analytics/gacha")]
     public async Task<IActionResult> GachaAnalyticsAsync([FromQuery] int days = 30)
     {
@@ -44,9 +43,9 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 深渊玩法数据：深境螺旋与幻想真境剧诗的上传量、满星率与角色出场。
+    /// 深渊玩法数据：深境螺旋与幻想真境剧诗的上传量、满星率与角色出场.
     /// </summary>
-    /// <returns>深渊数据。</returns>
+    /// <returns>深渊数据.</returns>
     [HttpGet("analytics/abyss")]
     public async Task<IActionResult> AbyssAnalyticsAsync()
     {
@@ -55,10 +54,10 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 伤害分布：直接聚合 damage_ranks 明细，取伤害最高的若干角色。
+    /// 伤害分布：直接聚合 damage_ranks 明细，取伤害最高的若干角色.
     /// </summary>
-    /// <param name="top">返回前多少名，1-50。</param>
-    /// <returns>伤害分布。</returns>
+    /// <param name="top">返回前多少名，1-50.</param>
+    /// <returns>伤害分布.</returns>
     [HttpGet("analytics/damage")]
     public async Task<IActionResult> DamageAnalyticsAsync([FromQuery] int top = 10)
     {
@@ -67,9 +66,9 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 获取胡桃客户端版本分布（每个版本在册的设备数、首次与最近上报时间）。
+    /// 获取胡桃客户端版本分布（每个版本在册的设备数、首次与最近上报时间）.
     /// </summary>
-    /// <returns>客户端版本统计数据。</returns>
+    /// <returns>客户端版本统计数据.</returns>
     [HttpGet("client-versions")]
     public async Task<IActionResult> ClientVersionListAsync()
     {
@@ -78,7 +77,7 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 获取放行的客户端版本 Header 列表。
+    /// 获取放行的客户端版本 Header 列表.
     /// </summary>
     [HttpGet("allowed-client-versions")]
     public async Task<IActionResult> AllowedVersionListAsync()
@@ -88,7 +87,7 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 新增放行的客户端版本 Header。
+    /// 新增放行的客户端版本 Header.
     /// </summary>
     [HttpPost("allowed-client-versions")]
     public async Task<IActionResult> AllowedVersionAddAsync([FromQuery] string header)
@@ -105,7 +104,7 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 移除放行的客户端版本 Header。
+    /// 移除放行的客户端版本 Header.
     /// </summary>
     [HttpDelete("allowed-client-versions")]
     public async Task<IActionResult> AllowedVersionRemoveAsync([FromQuery] string header)
@@ -117,7 +116,7 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 获取排行榜可用的 Redis 键列表。
+    /// 获取排行榜可用的 Redis 键列表.
     /// </summary>
     [HttpGet("ranks")]
     public async Task<IActionResult> RankKeysAsync()
@@ -127,7 +126,7 @@ public sealed class AdminAnalyticsController(
     }
 
     /// <summary>
-    /// 获取指定排行榜的前 N 名。
+    /// 获取指定排行榜的前 N 名.
     /// </summary>
     [HttpGet("ranks/{key}")]
     public async Task<IActionResult> RankLeaderboardAsync([FromRoute] string key, [FromQuery] int count = 50)

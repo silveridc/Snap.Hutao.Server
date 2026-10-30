@@ -8,9 +8,18 @@ public class SystemSetting
     public string Key { get; set; } = default!;
 
     [Column(TypeName = "longtext")]
-    public string? Value { get; set; }
+    public string? Value
+    {
+        get; set;
+    }
 
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt
+    {
+        get; set;
+    }
 
-    public int UpdatedBy { get; set; }
+    public int UpdatedBy
+    {
+        get; set;
+    }
 }

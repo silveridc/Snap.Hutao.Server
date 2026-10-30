@@ -206,7 +206,7 @@ public sealed class S3PresignTests
 
 file static class UriExtension
 {
-    /// <summary>不经 System.Uri（避免其对 %2F 的二次转义），直接切原始 URL 的查询串。</summary>
+    /// <summary>不经 System.Uri（避免其对 %2F 的二次转义），直接切原始 URL 的查询串.</summary>
     public static Dictionary<string, string> ParseRawQuery(this string url)
     {
         Dictionary<string, string> result = [];

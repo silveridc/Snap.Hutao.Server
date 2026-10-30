@@ -1,5 +1,5 @@
-// 生成并持久化一个稳定的设备标识，用于登录时的 x-hutao-device-* 请求头。
-// 后端 DeviceExtension 要求 x-hutao-device-id 必须存在，否则登录会抛异常。
+// 生成并持久化一个稳定的设备标识，用于登录时的 x-hutao-device-* 请求头.
+// 后端 DeviceExtension 要求 x-hutao-device-id 必须存在，否则登录会抛异常.
 const DEVICE_ID_KEY = 'hutao-admin-device-id'
 
 function uuid() {

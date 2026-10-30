@@ -1,5 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 using server.Extension;
 using server.Job;
 using server.Models.Context;
@@ -9,7 +10,6 @@ using server.Services.GachaLog.Statistics;
 using server.Services.Legacy;
 using server.Services.RoleCombat;
 using server.Tests.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 
 namespace server.Tests;
 
@@ -139,7 +139,7 @@ public sealed class ExclusiveLockTests
             cache.SetFlag(StatisticsService.Working, DistributedCacheExtension.WorkingExpiration);
             using (IServiceScope scope = factory.Services.CreateScope())
             {
-                SpiralAbyssRecordCleanJob job = new(scope.ServiceProvider, TimeProvider.System);
+                SpiralAbyssRecordCleanJob job = scope.ServiceProvider.GetRequiredService<SpiralAbyssRecordCleanJob>();
                 await job.Execute(null!, TestContext.Current.CancellationToken);
             }
 
@@ -154,7 +154,7 @@ public sealed class ExclusiveLockTests
             cache.SetFlag(GachaLogStatisticsService.Working, DistributedCacheExtension.WorkingExpiration);
             using (IServiceScope scope = factory.Services.CreateScope())
             {
-                SpiralAbyssRecordCleanJob job = new(scope.ServiceProvider, TimeProvider.System);
+                SpiralAbyssRecordCleanJob job = scope.ServiceProvider.GetRequiredService<SpiralAbyssRecordCleanJob>();
                 await job.Execute(null!, TestContext.Current.CancellationToken);
             }
 
@@ -190,7 +190,7 @@ public sealed class ExclusiveLockTests
             cache.SetFlag(RoleCombatService.Working, DistributedCacheExtension.WorkingExpiration);
             using (IServiceScope scope = factory.Services.CreateScope())
             {
-                RoleCombatRecordCleanJob job = new(scope.ServiceProvider);
+                RoleCombatRecordCleanJob job = scope.ServiceProvider.GetRequiredService<RoleCombatRecordCleanJob>();
                 await job.Execute(null!, TestContext.Current.CancellationToken);
             }
 
@@ -205,7 +205,7 @@ public sealed class ExclusiveLockTests
             cache.SetFlag(GachaLogStatisticsService.Working, DistributedCacheExtension.WorkingExpiration);
             using (IServiceScope scope = factory.Services.CreateScope())
             {
-                RoleCombatRecordCleanJob job = new(scope.ServiceProvider);
+                RoleCombatRecordCleanJob job = scope.ServiceProvider.GetRequiredService<RoleCombatRecordCleanJob>();
                 await job.Execute(null!, TestContext.Current.CancellationToken);
             }
 

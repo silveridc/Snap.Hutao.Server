@@ -13,11 +13,11 @@ public static class TestData
 {
     /// <summary>
     /// <see cref="SimpleRecord.Validate"/> 的角色列表要求：不少于 9 个角色、恰好一个主角
-    /// （10000005 或 10000007）、御三家（10000006/10000015/10000021）齐全。
+    /// （10000005 或 10000007）、御三家（10000006/10000015/10000021）齐全.
     /// </summary>
     private static readonly int[] RequiredAvatars = [10000005, 10000006, 10000015, 10000021, 10000002, 10000003, 10000014, 10000016, 10000020];
 
-    /// <summary>一份能通过 <see cref="SimpleRecord.Validate"/> 的深渊上传数据。</summary>
+    /// <summary>一份能通过 <see cref="SimpleRecord.Validate"/> 的深渊上传数据.</summary>
     public static SimpleRecord SimpleRecord(string uid = "100000001", string identity = UploaderIdentities.SnapHutao, string? reservedUserName = null)
     {
         List<SimpleAvatar> avatars = [.. RequiredAvatars.Select(id => new SimpleAvatar
@@ -67,7 +67,7 @@ public static class TestData
         };
     }
 
-    /// <summary>一份能通过 <see cref="server.Models.RoleCombat.SimpleRoleCombatRecord.Validate"/> 的剧诗上传数据。</summary>
+    /// <summary>一份能通过 <see cref="server.Models.RoleCombat.SimpleRoleCombatRecord.Validate"/> 的剧诗上传数据.</summary>
     public static server.Models.RoleCombat.SimpleRoleCombatRecord RoleCombatRecord(string uid = "100000002")
     {
         return new()
@@ -80,7 +80,7 @@ public static class TestData
         };
     }
 
-    /// <summary>一批合法的祈愿记录。</summary>
+    /// <summary>一批合法的祈愿记录.</summary>
     public static UidAndItems GachaItems(string uid = "100000003", int count = 3)
     {
         // 记录主键由客户端提供，随机化基址避免不同用例上传同一批 Id 时撞主键
@@ -100,15 +100,15 @@ public static class TestData
         };
     }
 
-    /// <summary>深渊上传数据的 JSON 形式，供冒烟测试直接作为请求体。</summary>
+    /// <summary>深渊上传数据的 JSON 形式，供冒烟测试直接作为请求体.</summary>
     public static string SimpleRecordJson(string uid)
     {
         return JsonSerializer.Serialize(SimpleRecord(uid));
     }
 
     /// <summary>
-    /// 把深渊数据改成「上一期」的 JSON。服务端拿到后会先按当前期查询记录，
-    /// 直接改对象上的 ScheduleId 会让那次查询命中两行并抛异常，所以只改序列化后的文本。
+    /// 把深渊数据改成「上一期」的 JSON.服务端拿到后会先按当前期查询记录，
+    /// 直接改对象上的 ScheduleId 会让那次查询命中两行并抛异常，所以只改序列化后的文本.
     /// </summary>
     public static string OutdatedSpiralAbyssRecordJson(string uid)
     {
@@ -118,19 +118,19 @@ public static class TestData
             StringComparison.Ordinal);
     }
 
-    /// <summary>剧诗上传数据的 JSON 形式。</summary>
+    /// <summary>剧诗上传数据的 JSON 形式.</summary>
     public static string RoleCombatRecordJson(string uid)
     {
         return JsonSerializer.Serialize(RoleCombatRecord(uid));
     }
 
-    /// <summary>祈愿记录上传数据的 JSON 形式。</summary>
+    /// <summary>祈愿记录上传数据的 JSON 形式.</summary>
     public static string GachaItemsJson(string uid)
     {
         return JsonSerializer.Serialize(GachaItems(uid));
     }
 
-    /// <summary>公告上传请求体。</summary>
+    /// <summary>公告上传请求体.</summary>
     public static string AnnouncementJson()
     {
         return JsonSerializer.Serialize(new HutaoUploadAnnouncement
@@ -142,7 +142,7 @@ public static class TestData
         });
     }
 
-    /// <summary>公告编辑请求体。</summary>
+    /// <summary>公告编辑请求体.</summary>
     public static string AnnouncementUpdateJson()
     {
         return JsonSerializer.Serialize(new AnnouncementUpdateRequest
@@ -153,7 +153,7 @@ public static class TestData
         });
     }
 
-    /// <summary>兑换码生成请求体。</summary>
+    /// <summary>兑换码生成请求体.</summary>
     public static string RedeemGenerateJson()
     {
         return JsonSerializer.Serialize(new RedeemGenerateRequest
@@ -168,7 +168,7 @@ public static class TestData
         });
     }
 
-    /// <summary>兑换码编辑请求体。</summary>
+    /// <summary>兑换码编辑请求体.</summary>
     public static string RedeemUpdateJson()
     {
         return JsonSerializer.Serialize(new RedeemCodeUpdateRequest
@@ -183,7 +183,7 @@ public static class TestData
         });
     }
 
-    /// <summary>客户端版本发布请求体；<paramref name="minimumVersion"/> 非空时携带最低强制版本。</summary>
+    /// <summary>客户端版本发布请求体；<paramref name="minimumVersion"/> 非空时携带最低强制版本.</summary>
     public static string ReleasePublishJson(string version = "1.17.2.0", string? minimumVersion = null)
     {
         return JsonSerializer.Serialize(new HutaoReleasePublishRequest
@@ -196,7 +196,7 @@ public static class TestData
     }
 
     /// <summary>
-    /// 爱发电订单回调（<c>POST /Webhook</c>）的请求体；服务端用 remark 里的邮箱定位用户。
+    /// 爱发电订单回调（<c>POST /Webhook</c>）的请求体；服务端用 remark 里的邮箱定位用户.
     /// </summary>
     public static string AfdianOrderJson(string tradeNo, string skuId, int count, string remark)
     {
@@ -216,7 +216,7 @@ public static class TestData
     }
 
     /// <summary>
-    /// 爱发电 <c>query-order</c> 的应答：回显同一笔订单，使 Webhook 的订单校验通过。
+    /// 爱发电 <c>query-order</c> 的应答：回显同一笔订单，使 Webhook 的订单校验通过.
     /// </summary>
     public static string AfdianQueryOrderResponseJson(string tradeNo, string skuId, int count)
     {

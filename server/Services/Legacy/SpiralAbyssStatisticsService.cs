@@ -1,4 +1,4 @@
-﻿using server.Models.Entity.SpiralAbyss;
+using server.Models.Entity.SpiralAbyss;
 
 namespace server.Services.Legacy;
 

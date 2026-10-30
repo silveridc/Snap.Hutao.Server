@@ -22,7 +22,7 @@ public sealed class WebhookTests
         users = factory.Users;
     }
 
-    /// <summary>把两个捐赠 sku 配置成用例使用的固定值（配置是进程级单例，重复设置无副作用）。</summary>
+    /// <summary>把两个捐赠 sku 配置成用例使用的固定值（配置是进程级单例，重复设置无副作用）.</summary>
     private async Task ConfigureSkusAsync()
     {
         TestUser maintainer = await users.MaintainerAsync();
@@ -42,7 +42,7 @@ public sealed class WebhookTests
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
     }
 
-    /// <summary>让爱发电的订单查询桩按订单号回显这笔订单，使回调的安全校验通过。</summary>
+    /// <summary>让爱发电的订单查询桩按订单号回显这笔订单，使回调的安全校验通过.</summary>
     private void StubOrderValidation(string tradeNo, string skuId, int count)
     {
         factory.StubHttp.MapJson("afdian.com/api/open/query-order",
@@ -114,7 +114,7 @@ public sealed class WebhookTests
         AssertExpiringAround((await UserInfoAsync(buyer)).GachaLogExpireAt, DateTimeOffset.UtcNow.AddDays(30), TimeSpan.FromMinutes(5));
     }
 
-    /// <summary>断言到期时间落在期望值附近（服务端以秒存储，另有请求耗时）。</summary>
+    /// <summary>断言到期时间落在期望值附近（服务端以秒存储，另有请求耗时）.</summary>
     private static void AssertExpiringAround(DateTimeOffset actual, DateTimeOffset expected, TimeSpan tolerance)
     {
         Assert.True((actual - expected).Duration() <= tolerance,

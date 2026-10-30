@@ -26,8 +26,8 @@ public sealed class StatisticsTests
     }
 
     /// <summary>
-    /// 清掉这个统计键的缓存与旧行，再插入指定的毒行。多个用例共用同一个
-    /// (Name, ScheduleId)，不清会让 SaveStatistics 的 SingleOrDefault 与缓存互相污染。
+    /// 清掉这个统计键的缓存与旧行，再插入指定的毒行.多个用例共用同一个
+    /// (Name, ScheduleId)，不清会让 SaveStatistics 的 SingleOrDefault 与缓存互相污染.
     /// </summary>
     private async Task PreparePoisonRowAsync(string name, string data)
     {
@@ -93,8 +93,8 @@ public sealed class StatisticsTests
     [Fact]
     public async Task ListEndpoint_ServesPoisonedRates_AsFiniteZero()
     {
-        // 转换器注册在 MVC 全局：列表型统计（ItemRate.Rate 是 double）同样被兜住。
-        // AttendanceRate 的元素类型是基类 ItemRate（只有 Item 与 Rate），毒化字段按这个形状写。
+        // 转换器注册在 MVC 全局：列表型统计（ItemRate.Rate 是 double）同样被兜住.
+        // AttendanceRate 的元素类型是基类 ItemRate（只有 Item 与 Rate），毒化字段按这个形状写.
         await PreparePoisonRowAsync(LegacyStatistics.AvatarAppearanceRank,
             """[{"Floor":9,"Ranks":[{"Item":10000002,"Rate":"NaN"}]}]""");
 
@@ -108,7 +108,7 @@ public sealed class StatisticsTests
         Assert.Equal(10000002, (int)rank["Item"]!);
     }
 
-    /// <summary>转换器必须真的挂在 MVC 输出 options 上——只存在于程序集里救不了任何接口。</summary>
+    /// <summary>转换器必须真的挂在 MVC 输出 options 上——只存在于程序集里救不了任何接口.</summary>
     [Fact]
     public void MvcOutputOptions_ContainTheFiniteNumberConverters()
     {

@@ -6,15 +6,15 @@ namespace server.Services.Admin;
 public static class S3Presigner
 {
     /// <summary>
-    /// 生成预签名 URL。不修改原路径与查询，只追加 X-Amz-* 参数与签名。
+    /// 生成预签名 URL.不修改原路径与查询，只追加 X-Amz-* 参数与签名.
     /// </summary>
-    /// <param name="objectUrl">对象的 https 绝对地址（虚拟主机风格或路径风格均可）。</param>
-    /// <param name="region">区域名，如 us-east-1。</param>
-    /// <param name="accessKeyId">S3 访问密钥 ID。</param>
-    /// <param name="secretAccessKey">S3 访问密钥。</param>
-    /// <param name="expiresSeconds">有效期（秒），S3 上限 7 天。</param>
-    /// <param name="now">签名时刻（UTC），测试可注入。</param>
-    /// <returns>带 X-Amz-Signature 的完整 URL。</returns>
+    /// <param name="objectUrl">对象的 https 绝对地址（虚拟主机风格或路径风格均可）.</param>
+    /// <param name="region">区域名，如 us-east-1.</param>
+    /// <param name="accessKeyId">S3 访问密钥 ID.</param>
+    /// <param name="secretAccessKey">S3 访问密钥.</param>
+    /// <param name="expiresSeconds">有效期（秒），S3 上限 7 天.</param>
+    /// <param name="now">签名时刻（UTC），测试可注入.</param>
+    /// <returns>带 X-Amz-Signature 的完整 URL.</returns>
     public static string PresignGet(string objectUrl, string region, string accessKeyId, string secretAccessKey, int expiresSeconds, DateTimeOffset? now = null)
     {
         Uri uri = new(objectUrl, UriKind.Absolute);
@@ -51,7 +51,7 @@ public static class S3Presigner
         return $"{uri.Scheme}://{uri.Authority}{uri.AbsolutePath}?{canonicalQuery}&X-Amz-Signature={signature}";
     }
 
-    /// <summary>S3 规范路径：每段先解再按未保留字符集编码，'/' 保留。</summary>
+    /// <summary>S3 规范路径：每段先解再按未保留字符集编码，'/' 保留.</summary>
     private static string CanonicalizePath(string absolutePath)
     {
         return string.Join('/', absolutePath.Split('/').Select(Rfc3986EncodeSegment));

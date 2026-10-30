@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.GachaLog;
+namespace server.Models.Entity.GachaLog;
 
 [Table("gacha_statistics")]
 public class GachaStatistics
@@ -11,7 +11,10 @@ public class GachaStatistics
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long PrimaryId { get; set; }
+    public long PrimaryId
+    {
+        get; set;
+    }
 
     public string Name { get; set; } = default!;
 

@@ -2,7 +2,7 @@
   "settings": {
     "header": {
       "title": "系统设置",
-      "tip": "动态配置存储在数据库中，优先于 appsettings.json。留空表示使用配置文件默认值。",
+      "tip": "动态配置存储在数据库中，优先于 appsettings.json.留空表示使用配置文件默认值.",
       "reload": "重新加载",
       "saveBtn": "保存修改（{n}）"
     },
@@ -25,15 +25,15 @@
       },
       "sso": {
         "title": "单点登录（SSO）",
-        "description": "外部 OIDC 身份源配置。留空的项跟随 appsettings/环境变量里的 App:Oidc；保存后立即生效，无需重启。"
+        "description": "外部 OIDC 身份源配置.留空的项跟随 appsettings/环境变量里的 App:Oidc；保存后立即生效，无需重启."
       },
       "killSwitch": {
         "title": "功能熔断",
-        "description": "紧急关闭客户端的注入类功能，经 /Patch/hutao 下发，客户端下次启动生效；关闭开关后客户端自动恢复用户本地设置。"
+        "description": "紧急关闭客户端的注入类功能，经 /Patch/hutao 下发，客户端下次启动生效；关闭开关后客户端自动恢复用户本地设置."
       },
       "s3Sign": {
         "title": "更新包 S3 直链签名",
-        "description": "镜像地址匹配该主机名时，/Patch/hutao 下发前现场签发限时访问 URL，桶可保持私有。留空不启用。"
+        "description": "镜像地址匹配该主机名时，/Patch/hutao 下发前现场签发限时访问 URL，桶可保持私有.留空不启用."
       }
     },
     "fields": {
@@ -79,7 +79,7 @@
       },
       "sso": {
         "title": "单点登录（SSO）",
-        "description": "外部 OIDC 身份源配置。留空的项跟随 appsettings/环境变量里的 App:Oidc；保存后立即生效，无需重启。"
+        "description": "外部 OIDC 身份源配置.留空的项跟随 appsettings/环境变量里的 App:Oidc；保存后立即生效，无需重启."
       },
       "ssoEnabled": {
         "label": "启用 SSO",

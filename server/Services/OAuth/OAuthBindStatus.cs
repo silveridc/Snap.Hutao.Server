@@ -1,8 +1,11 @@
-﻿namespace server.Services.OAuth;
+namespace server.Services.OAuth;
 
 public sealed class OAuthBindStatus
 {
-    public bool IsBinded { get; set; }
+    public bool IsBinded
+    {
+        get; set;
+    }
 
     [MemberNotNullWhen(true, nameof(IsBinded))]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -10,7 +13,10 @@ public sealed class OAuthBindStatus
 
     [MemberNotNullWhen(true, nameof(IsBinded))]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public long? CreateTime { get; set; }
+    public long? CreateTime
+    {
+        get; set;
+    }
 
     public static OAuthBindStatus Binded(OAuthBindIdentity identity)
     {

@@ -1,4 +1,4 @@
-﻿using server.Filter;
+using server.Filter;
 
 namespace server.Controllers;
 
@@ -8,9 +8,9 @@ namespace server.Controllers;
 public class DistributionController(DistributionService distributionService) : ControllerBase
 {
     /// <summary>
-    /// 获取下载令牌。
+    /// 获取下载令牌.
     /// </summary>
-    /// <returns>下载令牌。</returns>
+    /// <returns>下载令牌.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateCdnPermission))]
     [HttpGet("download-token")]
@@ -26,10 +26,10 @@ public class DistributionController(DistributionService distributionService) : C
     }
 
     /// <summary>
-    /// 获取加速镜像地址。
+    /// 获取加速镜像地址.
     /// </summary>
-    /// <param name="filename">需要下载的文件名。</param>
-    /// <returns>加速镜像信息。</returns>
+    /// <param name="filename">需要下载的文件名.</param>
+    /// <returns>加速镜像信息.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateCdnPermission))]
     [HttpGet("accelerated-mirror")]

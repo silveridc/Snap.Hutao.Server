@@ -1,17 +1,17 @@
+using server.Tests.Infrastructure;
 using System.Reflection;
 using System.Text.Json;
-using server.Tests.Infrastructure;
 
 namespace server.Tests;
 
 public sealed class ServerKeyLocalizationTests
 {
-    /// <summary>语言包里这些键由前端自己维护，不来自 <see cref="ServerKeys"/>。</summary>
+    /// <summary>语言包里这些键由前端自己维护，不来自 <see cref="ServerKeys"/>.</summary>
     private static readonly string[] ClientOnlyKeys = ["requestFailed", "httpError", "networkError"];
 
     /// <summary>
-    /// 契约：l10nKey 的值就是词条名，后台按 l10nKey 直接查 pages/server.json。
-    /// 常量名与取值不一致时这条链路会静默退化成服务端英文 message。
+    /// 契约：l10nKey 的值就是词条名，后台按 l10nKey 直接查 pages/server.json.
+    /// 常量名与取值不一致时这条链路会静默退化成服务端英文 message.
     /// </summary>
     [Fact]
     public void EveryServerKey_IsNamedAfterItsValue()

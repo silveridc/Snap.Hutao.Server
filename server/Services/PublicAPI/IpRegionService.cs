@@ -1,5 +1,5 @@
-﻿using System.Net.Sockets;
-using IP2Region.Net.Abstractions;
+﻿using IP2Region.Net.Abstractions;
+using System.Net.Sockets;
 
 namespace server.Services.PublicAPI;
 
@@ -12,8 +12,8 @@ public class IpRegionService([FromKeyedServices("IPv4DB")] ISearcher searcher, [
     private static readonly string?[] _emptyRegion = [null, null, null, null];
 
     /// <summary>
-    /// 取 IP 的属地四段数组（国家/省份/城市/运营商，缺段为 "0"），是唯一的属地入口：查到的结果（含查不到）按 IP 缓存到 Redis。
-    /// IP 为空或非法、内网/回环等查不到的情况返回 null。
+    /// 取 IP 的属地四段数组（国家/省份/城市/运营商，缺段为 "0"），是唯一的属地入口：查到的结果（含查不到）按 IP 缓存到 Redis.
+    /// IP 为空或非法、内网/回环等查不到的情况返回 null.
     /// </summary>
     public Task<string?[]?> GetRegionAsync(string? ip)
     {

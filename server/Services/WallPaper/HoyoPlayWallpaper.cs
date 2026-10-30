@@ -1,4 +1,4 @@
-﻿using server.Models.PublicAPI;
+using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
 
@@ -34,8 +34,7 @@ public class HoyoPlayWallpaper(IHttpClientFactory httpClientFactory, IDistribute
                 Url: imgUrl,
                 SourceUrl: "https://ys.mihoyo.com",
                 Author: "HoYoPlay",
-                Uploader: "启动器官方壁纸"
-            );
+                Uploader: "启动器官方壁纸");
 
             cache.Set(todayKey, result, new DateTimeOffset(DateTime.Today.AddDays(1)));
             return result;
@@ -49,27 +48,21 @@ public class HoyoPlayWallpaper(IHttpClientFactory httpClientFactory, IDistribute
 }
 
 file record HypApiResponse(
-    [property: JsonPropertyName("data")] HypData? Data
-);
+    [property: JsonPropertyName("data")] HypData? Data);
 
 file record HypData(
-    [property: JsonPropertyName("game_info_list")] List<HypGameItem>? GameInfoList
-);
+    [property: JsonPropertyName("game_info_list")] List<HypGameItem>? GameInfoList);
 
 file record HypGameItem(
     [property: JsonPropertyName("game")] HypGame? Game,
-    [property: JsonPropertyName("backgrounds")] List<HypBackground>? Backgrounds
-);
+    [property: JsonPropertyName("backgrounds")] List<HypBackground>? Backgrounds);
 
 file record HypGame(
-    [property: JsonPropertyName("biz")] string? Biz
-);
+    [property: JsonPropertyName("biz")] string? Biz);
 
 file record HypBackground(
     [property: JsonPropertyName("background")] HypUrl? Background,
-    [property: JsonPropertyName("video")] HypUrl? Video
-);
+    [property: JsonPropertyName("video")] HypUrl? Video);
 
 file record HypUrl(
-    [property: JsonPropertyName("url")] string? Url
-);
+    [property: JsonPropertyName("url")] string? Url);

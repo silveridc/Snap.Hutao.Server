@@ -14,7 +14,7 @@
     "gen": {
       "title": "生成兑换码",
       "tipPre": "对应 ",
-      "tipSuf": "。可叠加时间限制与次数限制。",
+      "tipSuf": ".可叠加时间限制与次数限制.",
       "serviceType": "服务类型",
       "count": "生成数量",
       "valueDays": "时长天数 (Value)",
@@ -30,7 +30,7 @@
     "use": {
       "title": "使用兑换码",
       "tipPre": "对应 ",
-      "tipSuf": "。留空用户邮箱表示为当前登录账号兑换。",
+      "tipSuf": ".留空用户邮箱表示为当前登录账号兑换.",
       "code": "兑换码",
       "codePlaceholder": "18 位兑换码",
       "username": "目标用户邮箱",
@@ -65,9 +65,9 @@
     },
     "dialog": {
       "removeHeader": "删除兑换码",
-      "removeConfirmBody": "确定删除兑换码「{code}」？其使用记录也会一并删除。",
+      "removeConfirmBody": "确定删除兑换码「{code}」？其使用记录也会一并删除.",
       "batchRemoveHeader": "批量删除兑换码",
-      "batchRemoveConfirmBody": "确定删除选中的 {n} 个兑换码？其使用记录也会一并删除。"
+      "batchRemoveConfirmBody": "确定删除选中的 {n} 个兑换码？其使用记录也会一并删除."
     },
     "messages": {
       "countRequired": "请填写生成数量",

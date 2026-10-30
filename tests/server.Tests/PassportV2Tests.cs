@@ -93,8 +93,8 @@ public sealed class PassportV2Tests
     }
 
     /// <summary>
-    /// 申请验证码并从假 SMTP 中取出邮件里的验证码。
-    /// 每次调用前清空收件队列，避免取到其它用例遗留的验证码。
+    /// 申请验证码并从假 SMTP 中取出邮件里的验证码.
+    /// 每次调用前清空收件队列，避免取到其它用例遗留的验证码.
     /// </summary>
     private async Task<string> RequestVerifyCodeAsync(Dictionary<string, object?> body, string? token = null)
     {
@@ -473,7 +473,7 @@ public sealed class PassportV2Tests
     }
 
     /// <summary>
-    /// 登录日志：失败与成功各落一条，后台按邮箱能查到；成功那条关联用户 id，失败那条带失败词条。
+    /// 登录日志：失败与成功各落一条，后台按邮箱能查到；成功那条关联用户 id，失败那条带失败词条.
     /// </summary>
     [Fact]
     public async Task Login_WithCaptchaEnabled_RequiresAValidToken()

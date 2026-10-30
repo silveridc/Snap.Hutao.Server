@@ -1,4 +1,4 @@
-﻿namespace server.Extension;
+namespace server.Extension;
 
 public static class TimeProviderExtension
 {

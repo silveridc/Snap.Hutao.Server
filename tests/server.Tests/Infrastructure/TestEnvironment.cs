@@ -5,24 +5,24 @@ namespace server.Tests.Infrastructure;
 
 public static class TestEnvironment
 {
-    /// <summary>具备建库权限的连接串（默认使用本地 root）。</summary>
+    /// <summary>具备建库权限的连接串（默认使用本地 root）.</summary>
     public static string AdminConnectionString { get; } =
         Environment.GetEnvironmentVariable("HUTAO_TEST_MYSQL_ADMIN")
         ?? "Server=127.0.0.1;Uid=root;Pwd=1qaz2wsx;";
 
-    /// <summary>测试库连接串。</summary>
+    /// <summary>测试库连接串.</summary>
     public static string AppConnectionString { get; } =
         Environment.GetEnvironmentVariable("HUTAO_TEST_MYSQL")
         ?? "Server=127.0.0.1;Database=snaphutao_test;Uid=snaphutao_test;Pwd=1qaz2wsx;Charset=utf8mb4;AllowLoadLocalInfile=true;";
 
-    /// <summary>测试库名（从连接串中解析）。</summary>
+    /// <summary>测试库名（从连接串中解析）.</summary>
     public static string DatabaseName { get; } = ParseDatabase(AppConnectionString);
 
-    /// <summary>假 SMTP 监听端口，MailKit 默认拨号 25。</summary>
+    /// <summary>假 SMTP 监听端口，MailKit 默认拨号 25.</summary>
     public static int SmtpPort { get; } =
         int.TryParse(Environment.GetEnvironmentVariable("HUTAO_TEST_SMTP_PORT"), out int port) ? port : 25;
 
-    /// <summary>测试库中允许使用的用户名/密码（供建库时授权）。</summary>
+    /// <summary>测试库中允许使用的用户名/密码（供建库时授权）.</summary>
     public static (string User, string Password) AppCredentials { get; } = ParseCredentials(AppConnectionString);
 
     private static string ParseDatabase(string connectionString)
@@ -69,7 +69,7 @@ public static class TestEnvironment
         return (user, password);
     }
 
-    /// <summary>寻找一个当前空闲的本地端口。</summary>
+    /// <summary>寻找一个当前空闲的本地端口.</summary>
     public static int FindFreePort()
     {
         TcpListener listener = new(IPAddress.Loopback, 0);

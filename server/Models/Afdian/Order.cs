@@ -1,4 +1,4 @@
-﻿namespace server.Models.Afdian;
+namespace server.Models.Afdian;
 
 public sealed class Order
 {
@@ -12,7 +12,10 @@ public sealed class Order
     public string PlanId { get; set; } = default!;
 
     [JsonPropertyName("month")]
-    public int Month { get; set; }
+    public int Month
+    {
+        get; set;
+    }
 
     [JsonPropertyName("total_amount")]
     public string TotalAmount { get; set; } = default!;
@@ -21,7 +24,10 @@ public sealed class Order
     public string ShowAmount { get; set; } = default!;
 
     [JsonPropertyName("status")]
-    public int Status { get; set; }
+    public int Status
+    {
+        get; set;
+    }
 
     [JsonPropertyName("remark")]
     public string Remark { get; set; } = default!;
@@ -30,7 +36,10 @@ public sealed class Order
     public string RedeemId { get; set; } = default!;
 
     [JsonPropertyName("product_type")]
-    public int ProductType { get; set; }
+    public int ProductType
+    {
+        get; set;
+    }
 
     [JsonPropertyName("discount")]
     public string Discount { get; set; } = default!;
@@ -39,7 +48,10 @@ public sealed class Order
     public List<SkuDetail> SkuDetail { get; set; } = default!;
 
     [JsonPropertyName("create_time")]
-    public long CreateTime { get; set; }
+    public long CreateTime
+    {
+        get; set;
+    }
 
     [JsonPropertyName("plan_title")]
     public string PlanTitle { get; set; } = default!;

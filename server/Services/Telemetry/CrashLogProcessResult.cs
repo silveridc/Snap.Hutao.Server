@@ -1,4 +1,4 @@
-﻿namespace server.Services.Telemetry;
+namespace server.Services.Telemetry;
 
 public enum CrashLogProcessResult
 {

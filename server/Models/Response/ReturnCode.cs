@@ -1,4 +1,4 @@
-﻿namespace server.Models.Response;
+namespace server.Models.Response;
 
 // |5| X | Y |  ZZZ  |
 // |5|1-5|1-8|000-999|

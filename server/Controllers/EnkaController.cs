@@ -1,4 +1,4 @@
-﻿namespace server.Controllers;
+namespace server.Controllers;
 
 [ApiController]
 [Route("api/enka")]
@@ -12,11 +12,11 @@ public sealed class EnkaController(IHttpClientFactory httpClientFactory, IDistri
     };
 
     /// <summary>
-    /// 中转获取 Enka 完整展柜数据（客户端优先直连 enka.network，直连失败时回退到此处）。
+    /// 中转获取 Enka 完整展柜数据（客户端优先直连 enka.network，直连失败时回退到此处）.
     /// </summary>
-    /// <param name="uid">游戏 Uid。</param>
-    /// <param name="token">取消令牌。</param>
-    /// <returns>Enka 原始响应。</returns>
+    /// <param name="uid">游戏 Uid.</param>
+    /// <param name="token">取消令牌.</param>
+    /// <returns>Enka 原始响应.</returns>
     [HttpGet("{uid}")]
     public Task<IActionResult> GetDataAsync([FromRoute] string uid, CancellationToken token)
     {
@@ -24,11 +24,11 @@ public sealed class EnkaController(IHttpClientFactory httpClientFactory, IDistri
     }
 
     /// <summary>
-    /// 中转获取 Enka 玩家基础信息（?info）。
+    /// 中转获取 Enka 玩家基础信息（?info）.
     /// </summary>
-    /// <param name="uid">游戏 Uid。</param>
-    /// <param name="token">取消令牌。</param>
-    /// <returns>Enka 原始响应。</returns>
+    /// <param name="uid">游戏 Uid.</param>
+    /// <param name="token">取消令牌.</param>
+    /// <returns>Enka 原始响应.</returns>
     [HttpGet("{uid}/info")]
     public Task<IActionResult> GetPlayerInfoAsync([FromRoute] string uid, CancellationToken token)
     {

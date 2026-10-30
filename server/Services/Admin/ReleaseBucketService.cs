@@ -1,10 +1,10 @@
-﻿using System.Globalization;
+using server.Models.Admin;
+using server.Models.Patch;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
-using server.Models.Admin;
-using server.Models.Patch;
 
 namespace server.Services.Admin;
 
@@ -20,6 +20,20 @@ public sealed partial class ReleaseBucketService(
     private const int _presignSeconds = 600;
 
     public bool IsConfigured => systemConfig.IsPatchS3SigningEnabled;
+
+    private string Host
+    {
+        get
+        {
+            string host = systemConfig.PatchS3Host;
+            if (host.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                host = host[8..];
+            }
+
+            return host.TrimEnd('/');
+        }
+    }
 
     public async Task<(ReleaseBucketListResult? Result, string Message, string? LocalizationKey)> ListAsync(string? prefix, CancellationToken cancellationToken)
     {
@@ -164,25 +178,46 @@ public sealed partial class ReleaseBucketService(
         return (success, publishMessage, localizationKey, release);
     }
 
-    private string Host
+    private static bool IsValidKey(string key)
     {
-        get
+        if (key.Length is 0 or > _maxKeyLength || key[0] == '/' || key.Contains('\\', StringComparison.Ordinal))
         {
-            string host = systemConfig.PatchS3Host;
-            if (host.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-            {
-                host = host[8..];
-            }
-
-            return host.TrimEnd('/');
+            return false;
         }
+
+        foreach (string segment in key.Split('/'))
+        {
+            if (segment is "" or "." or "..")
+            {
+                return false;
+            }
+        }
+
+        return key.All(c => !char.IsControl(c));
     }
+
+    private static string? ParseVersion(string key)
+    {
+        Match match = VersionPattern().Match(key.Split('/')[^1]);
+        return match.Success ? match.Value : null;
+    }
+
+    private static string? ChildValue(XElement parent, string localName)
+    {
+        return parent.Elements().FirstOrDefault(e => e.Name.LocalName == localName)?.Value;
+    }
+
+    [GeneratedRegex(@"\d+\.\d+\.\d+\.\d+", RegexOptions.CultureInvariant)]
+    private static partial Regex VersionPattern();
+
+    [GeneratedRegex("^[0-9a-fA-F]{64}$", RegexOptions.CultureInvariant)]
+    private static partial Regex Sha256Pattern();
 
     private async Task<(string? Sha256, long Length, string Message, string? LocalizationKey)> TryHashAsync(string key, CancellationToken cancellationToken)
     {
         using HttpClient client = httpClientFactory.CreateClient();
 
-        // 安装包动辄几百 MiB，默认 100 秒的超时不够从桶里读完一遍。
+        // 安装包动辄几百 MiB，默认 100 秒的超时不够从桶里读完一遍.
         client.Timeout = TimeSpan.FromMinutes(30);
         using HttpResponseMessage response = await client
             .GetAsync(Sign(BuildObjectUrl(key)), HttpCompletionOption.ResponseHeadersRead, cancellationToken)
@@ -226,38 +261,6 @@ public sealed partial class ReleaseBucketService(
             _presignSeconds);
     }
 
-    private static bool IsValidKey(string key)
-    {
-        if (key.Length is 0 or > _maxKeyLength || key[0] == '/' || key.Contains('\\', StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        foreach (string segment in key.Split('/'))
-        {
-            if (segment is "" or "." or "..")
-            {
-                return false;
-            }
-        }
-
-        return key.All(c => !char.IsControl(c));
-    }
-
-    private static string? ParseVersion(string key)
-    {
-        Match match = VersionPattern().Match(key.Split('/')[^1]);
-        return match.Success ? match.Value : null;
-    }
-
-    private static string? ChildValue(XElement parent, string localName)
-    {
-        return parent.Elements().FirstOrDefault(e => e.Name.LocalName == localName)?.Value;
-    }
-
-    [GeneratedRegex(@"\d+\.\d+\.\d+\.\d+", RegexOptions.CultureInvariant)]
-    private static partial Regex VersionPattern();
-
     private async Task<(bool Exists, long Length, string Message, string? LocalizationKey)> TryHeadAsync(string key, CancellationToken cancellationToken)
     {
         using HttpClient client = httpClientFactory.CreateClient();
@@ -275,7 +278,4 @@ public sealed partial class ReleaseBucketService(
 
         return (true, response.Content.Headers.ContentLength ?? 0, string.Empty, null);
     }
-
-    [GeneratedRegex("^[0-9a-fA-F]{64}$", RegexOptions.CultureInvariant)]
-    private static partial Regex Sha256Pattern();
 }

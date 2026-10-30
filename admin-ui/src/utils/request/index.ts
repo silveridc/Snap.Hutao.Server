@@ -17,7 +17,7 @@ const host = env === 'mock' || import.meta.env.VITE_IS_REQUEST_PROXY !== 'true' 
 
 // 数据处理，方便区分多种处理方式
 const transform: AxiosTransform = {
-  // 处理请求数据。如果数据不是预期格式，可直接抛出错误
+  // 处理请求数据.如果数据不是预期格式，可直接抛出错误
   transformRequestHook: (res, options) => {
     const { isTransformResponse, isReturnNativeResponse } = options;
 
@@ -76,7 +76,7 @@ const transform: AxiosTransform = {
     }
     if (config.method?.toUpperCase() === 'GET') {
       if (!isString(params)) {
-        // 给 get 请求加上时间戳参数，避免从缓存中拿数据。
+        // 给 get 请求加上时间戳参数，避免从缓存中拿数据.
         config.params = Object.assign(params || {}, joinTimestamp(joinTime, false));
       } else {
         // 兼容restful风格

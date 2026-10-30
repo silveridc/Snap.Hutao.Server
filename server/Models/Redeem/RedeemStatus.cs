@@ -1,4 +1,4 @@
-﻿namespace server.Models.Redeem;
+namespace server.Models.Redeem;
 
 public enum RedeemStatus
 {

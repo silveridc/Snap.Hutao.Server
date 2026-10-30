@@ -15,7 +15,7 @@ public sealed class ApiSmokeTests
         client = factory.CreateApiClient();
     }
 
-    /// <summary>不返回统一响应外壳的接口前缀（第三方透传、302 重定向、回调协议自有格式）。</summary>
+    /// <summary>不返回统一响应外壳的接口前缀（第三方透传、302 重定向、回调协议自有格式）.</summary>
     private static readonly string[] RawEndpointPrefixes =
     [
         "/api/Enka",
@@ -28,12 +28,12 @@ public sealed class ApiSmokeTests
         "/Passport/Sso/Callback",
     ];
 
-    /// <summary>每次运行都使用不同账号，避免与其它用例的验证码缓存互相干扰。</summary>
+    /// <summary>每次运行都使用不同账号，避免与其它用例的验证码缓存互相干扰.</summary>
     private static string UniqueUser(string tag) => $"smoke-{tag}-{Guid.NewGuid():N}@example.com";
 
     /// <summary>
-    /// 构造 PassportRequest 请求体。UserName / Password / VerifyCode 等字段
-    /// 在客户端均以 RSA-OAEP-SHA1 加密后提交，这里按同样规则构造。
+    /// 构造 PassportRequest 请求体.UserName / Password / VerifyCode 等字段
+    /// 在客户端均以 RSA-OAEP-SHA1 加密后提交，这里按同样规则构造.
     /// </summary>
     private static string PassportBody(
         string? userName = null,
@@ -183,8 +183,8 @@ public sealed class ApiSmokeTests
 
     /// <summary>
     /// 覆盖性校验：宿主实际注册的每一条路由都必须出现在冒烟清单或维护接口清单里，
-    /// 清单里的每一条地址也必须命中一条实际路由。新增接口忘了补用例、或接口被改名后
-    /// 清单里留下打不到人的死地址，都会在这里暴露。
+    /// 清单里的每一条地址也必须命中一条实际路由.新增接口忘了补用例、或接口被改名后
+    /// 清单里留下打不到人的死地址，都会在这里暴露.
     /// </summary>
     [Fact]
     public void EveryRegisteredRoute_IsListedInTheSmokeTables()
@@ -253,8 +253,8 @@ public sealed class ApiSmokeTests
     }
 
     /// <summary>
-    /// 维护接口单独用共享清单再跑一遍，保证 <c>/Service/*</c> 的每一行都被覆盖到。
-    /// 语义断言（鉴权分支、业务分支）见 <see cref="ServiceTests"/>。
+    /// 维护接口单独用共享清单再跑一遍，保证 <c>/Service/*</c> 的每一行都被覆盖到.
+    /// 语义断言（鉴权分支、业务分支）见 <see cref="ServiceTests"/>.
     /// </summary>
     [Theory]
     [MemberData(nameof(ServiceEndpointData))]

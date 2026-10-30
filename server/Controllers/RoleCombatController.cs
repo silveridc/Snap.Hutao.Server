@@ -1,7 +1,7 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Storage;
 using server.Models.Entity.RoleCombat;
 using server.Models.RoleCombat;
+using System.Collections.Concurrent;
 
 namespace server.Controllers;
 
@@ -13,10 +13,10 @@ public class RoleCombatController(AppDbContext appDbContext, IDistributedCache c
     private static readonly ConcurrentDictionary<string, UploadToken> UploadingUids = new();
 
     /// <summary>
-    /// 上传剧演记录。
+    /// 上传剧演记录.
     /// </summary>
-    /// <param name="record">剧演记录数据。</param>
-    /// <returns>上传结果。</returns>
+    /// <param name="record">剧演记录数据.</param>
+    /// <returns>上传结果.</returns>
     [HttpPost]
     public async Task<IActionResult> Upload([FromBody] SimpleRoleCombatRecord record)
     {
@@ -75,9 +75,9 @@ public class RoleCombatController(AppDbContext appDbContext, IDistributedCache c
     }
 
     /// <summary>
-    /// 获取当前剧演的统计数据。
+    /// 获取当前剧演的统计数据.
     /// </summary>
-    /// <returns>剧演统计数据。</returns>
+    /// <returns>剧演统计数据.</returns>
     [HttpGet("statistics")]
     public IActionResult GetStatistics()
     {

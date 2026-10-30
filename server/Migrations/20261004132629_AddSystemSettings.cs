@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -19,7 +19,7 @@ public partial class AddSystemSettings : Migration
                 Value = table.Column<string>(type: "longtext", nullable: true)
                     .Annotation("MySql:CharSet", "utf8mb4"),
                 UpdatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
-                UpdatedBy = table.Column<int>(type: "int", nullable: false)
+                UpdatedBy = table.Column<int>(type: "int", nullable: false),
             },
             constraints: table =>
             {

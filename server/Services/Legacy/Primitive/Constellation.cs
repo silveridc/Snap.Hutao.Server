@@ -1,9 +1,9 @@
-﻿namespace server.Services.Legacy.Primitive;
+namespace server.Services.Legacy.Primitive;
 
 public readonly struct Constellation(int value) : IEquatable<Constellation>
 {
     /// <summary>
-    /// value
+    /// value.
     /// </summary>
     public readonly int Value = value;
 

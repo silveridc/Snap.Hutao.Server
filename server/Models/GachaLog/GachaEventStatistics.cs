@@ -1,8 +1,11 @@
-﻿namespace server.Models.GachaLog;
+namespace server.Models.GachaLog;
 
 public sealed class GachaEventStatistics
 {
-    public GachaEventStatisticsStatus Status { get; set; }
+    public GachaEventStatisticsStatus Status
+    {
+        get; set;
+    }
 
     public List<ItemCount> AvatarEvent { get; set; } = default!;
 
@@ -14,5 +17,8 @@ public sealed class GachaEventStatistics
 
     public HashSet<string> InvalidUids { get; set; } = default!;
 
-    public long PullsEnumerated { get; set; }
+    public long PullsEnumerated
+    {
+        get; set;
+    }
 }

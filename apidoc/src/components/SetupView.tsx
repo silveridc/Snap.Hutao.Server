@@ -31,8 +31,8 @@ export default function SetupView({ onAdd }: { onAdd: (entry: DocEntry) => void 
           <IconGlobe /> 还没有文档源
         </div>
         <div className="op-desc">
-          添加一个 <code>swagger.json</code> / <code>openapi.json</code> 地址即可开始浏览。
-          这里填写的地址只保存在当前浏览器，刷新后仍然可用。
+          添加一个 <code>swagger.json</code> / <code>openapi.json</code> 地址即可开始浏览.
+          这里填写的地址只保存在当前浏览器，刷新后仍然可用.
         </div>
       </div>
 
@@ -57,7 +57,7 @@ export default function SetupView({ onAdd }: { onAdd: (entry: DocEntry) => void 
         <div className="section-title">团队共享</div>
         <div className="op-desc">
           把 <code>config.json</code> 放在站点根目录（构建产物目录），所有访问者都会看到同一批文档源；
-          也支持 <code>?url=</code> 单链接直接进入，或 <code>?config=</code> 指定另一份配置。
+          也支持 <code>?url=</code> 单链接直接进入，或 <code>?config=</code> 指定另一份配置.
         </div>
         <pre className="code">{EXAMPLE}</pre>
       </div>

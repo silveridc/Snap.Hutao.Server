@@ -1,4 +1,4 @@
-﻿namespace server.Services.GachaLog;
+namespace server.Services.GachaLog;
 
 public sealed class GachaLogSaveResult(GachaLogSaveResultKind kind, int save = 0)
 {

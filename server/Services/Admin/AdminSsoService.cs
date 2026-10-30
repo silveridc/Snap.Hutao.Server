@@ -1,12 +1,12 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using server.Models.Admin;
 using server.Models.Entity;
 using server.Models.Passport;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace server.Services.Admin;
 
@@ -18,10 +18,9 @@ public sealed class AdminSsoService(
     IDistributedCache cache,
     IHttpClientFactory httpClientFactory,
     ILogger<AdminSsoService> logger,
-    TimeProvider timeProvider
-)
+    TimeProvider timeProvider)
 {
-    /// <summary>当前只对接 OIDC 一种身份源，该字段为将来的其它身份源保留。</summary>
+    /// <summary>当前只对接 OIDC 一种身份源，该字段为将来的其它身份源保留.</summary>
     public const string ProviderName = "oidc";
 
     private const int _accessTokenExpirationMinutes = 60;
@@ -42,47 +41,62 @@ public sealed class AdminSsoService(
 
     private readonly SymmetricSecurityKey _jwtSigningKey = appOptions.GetJwtSecurityKey();
 
-    /// <summary>后台 SSO 是否启用。关闭时不做写操作门禁，后台沿用主站维护者账号。</summary>
+    private enum FlowFailure
+    {
+        /// <summary>流程走通，声明可用.</summary>
+        None,
+
+        /// <summary>state 不存在或已被使用.</summary>
+        InvalidState,
+
+        /// <summary>身份源拒绝或无法访问.</summary>
+        UpstreamRejected,
+
+        /// <summary>ID Token 校验失败.</summary>
+        TokenInvalid,
+    }
+
+    /// <summary>Gets a value indicating whether 后台 SSO 是否启用.关闭时不做写操作门禁，后台沿用主站维护者账号.</summary>
     public bool IsEnabled => systemConfig.Oidc.Enabled;
 
-    /// <summary>登录按钮上显示的身份源名称，未配置时为 null。</summary>
+    /// <summary>Gets 登录按钮上显示的身份源名称，未配置时为 null.</summary>
     public string? DisplayName => IsEnabled ? systemConfig.Oidc.DisplayName : null;
 
     /// <summary>
-    /// 启动器（客户端）SSO 是否可用。除了总开关，还必须单独配置客户端回调地址，
-    /// 启动器据此决定登录界面是显示 SSO 入口还是只走邮箱密码登录。
+    /// Gets a value indicating whether 启动器（客户端）SSO 是否可用.除了总开关，还必须单独配置客户端回调地址，
+    /// 启动器据此决定登录界面是显示 SSO 入口还是只走邮箱密码登录.
     /// </summary>
     public bool IsClientLoginEnabled => IsEnabled && !string.IsNullOrWhiteSpace(systemConfig.Oidc.ClientRedirectUri);
 
     /// <summary>
-    /// 生成跳转身份源的授权地址，并把 nonce、code_verifier 与回跳路径按 state 暂存。
+    /// 生成跳转身份源的授权地址，并把 nonce、code_verifier 与回跳路径按 state 暂存.
     /// </summary>
-    /// <param name="returnPath">登录完成后要回到的后台内路径，可为空。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>授权地址；配置或身份源不可用时返回 null 与英文原因。</returns>
+    /// <param name="returnPath">登录完成后要回到的后台内路径，可为空.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>授权地址；配置或身份源不可用时返回 null 与英文原因.</returns>
     public Task<(string? Url, string? Error)> CreateAuthorizeUrlAsync(string? returnPath, CancellationToken cancellationToken = default)
     {
         return CreateAuthorizeUrlAsync(systemConfig.Oidc.RedirectUri, _stateKeyPrefix, returnPath, cancellationToken);
     }
 
     /// <summary>
-    /// 生成启动器登录用的授权地址。回调地址与后台不同，身份源里要登记成两个。
+    /// 生成启动器登录用的授权地址.回调地址与后台不同，身份源里要登记成两个.
     /// </summary>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>授权地址；未启用或身份源不可用时返回 null 与英文原因。</returns>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>授权地址；未启用或身份源不可用时返回 null 与英文原因.</returns>
     public Task<(string? Url, string? Error)> CreateClientAuthorizeUrlAsync(CancellationToken cancellationToken = default)
     {
         return CreateAuthorizeUrlAsync(systemConfig.Oidc.ClientRedirectUri ?? string.Empty, _clientStateKeyPrefix, null, cancellationToken);
     }
 
     /// <summary>
-    /// 处理身份源回调：校验 state → 用授权码换取令牌 → 校验 ID Token → 建立或读取后台账号 → 签发一次性票据。
+    /// 处理身份源回调：校验 state → 用授权码换取令牌 → 校验 ID Token → 建立或读取后台账号 → 签发一次性票据.
     /// </summary>
-    /// <param name="code">身份源返回的授权码。</param>
-    /// <param name="state">身份源原样带回的 state。</param>
-    /// <param name="error">身份源直接返回的错误名（用户拒绝授权等）。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>处理结果。</returns>
+    /// <param name="code">身份源返回的授权码.</param>
+    /// <param name="state">身份源原样带回的 state.</param>
+    /// <param name="error">身份源直接返回的错误名（用户拒绝授权等）.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>处理结果.</returns>
     public async Task<AdminSsoCallbackResult> HandleCallbackAsync(string? code, string? state, string? error, CancellationToken cancellationToken = default)
     {
         if (!IsEnabled)
@@ -102,13 +116,13 @@ public sealed class AdminSsoService(
     }
 
     /// <summary>
-    /// 处理启动器登录的身份源回调：校验 state → 换取并校验 ID Token → 确认这个身份绑定了哪个主站账号 → 签发一次性票据。
+    /// 处理启动器登录的身份源回调：校验 state → 换取并校验 ID Token → 确认这个身份绑定了哪个主站账号 → 签发一次性票据.
     /// </summary>
-    /// <param name="code">身份源返回的授权码。</param>
-    /// <param name="state">身份源原样带回的 state。</param>
-    /// <param name="error">身份源直接返回的错误名。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>处理结果。</returns>
+    /// <param name="code">身份源返回的授权码.</param>
+    /// <param name="state">身份源原样带回的 state.</param>
+    /// <param name="error">身份源直接返回的错误名.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>处理结果.</returns>
     public async Task<PassportSsoCallbackResult> HandleClientCallbackAsync(string? code, string? state, string? error, CancellationToken cancellationToken = default)
     {
         if (!IsClientLoginEnabled)
@@ -128,13 +142,13 @@ public sealed class AdminSsoService(
     }
 
     /// <summary>
-    /// 用启动器登录的一次性票据换取要登录的主站账号。票据只能用一次，账号与绑定关系在使用时重新读库，
-    /// 所以回调与换取之间被停用或解绑的账号换不出令牌。
+    /// 用启动器登录的一次性票据换取要登录的主站账号.票据只能用一次，账号与绑定关系在使用时重新读库，
+    /// 所以回调与换取之间被停用或解绑的账号换不出令牌.
     /// </summary>
-    /// <param name="ticket">回调阶段签发的票据。</param>
-    /// <param name="clientIp">换取票据的客户端 IP，仅用于审计。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>主站账号与对应的后台账号；票据无效或身份已不可用时为 null。</returns>
+    /// <param name="ticket">回调阶段签发的票据.</param>
+    /// <param name="clientIp">换取票据的客户端 IP，仅用于审计.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>主站账号与对应的后台账号；票据无效或身份已不可用时为 null.</returns>
     public async Task<(HutaoUser? User, AdminAccount? Account)> TakeClientTicketAsync(string ticket, string? clientIp = null, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(ticket))
@@ -185,11 +199,11 @@ public sealed class AdminSsoService(
     }
 
     /// <summary>
-    /// 主站账号是否被某个可用的后台账号绑定，用于写操作门禁与维护者判定，结果缓存 15 分钟。
+    /// 主站账号是否被某个可用的后台账号绑定，用于写操作门禁与维护者判定，结果缓存 15 分钟.
     /// </summary>
-    /// <param name="userId">主站账号 ID。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>是否绑定。</returns>
+    /// <param name="userId">主站账号 ID.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>是否绑定.</returns>
     public async Task<bool> IsUserProvisionedAsync(int userId, CancellationToken cancellationToken = default)
     {
         return await cache.GetOrCreateAsync(_boundKeyPrefix + userId, AccountTtl, async () =>
@@ -197,6 +211,328 @@ public sealed class AdminSsoService(
                 .AsNoTracking()
                 .AnyAsync(a => a.UserId == userId && a.IsEnabled, cancellationToken)
                 .ConfigureAwait(false)).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 用一次性票据换取后台令牌.票据无论成功与否都只能使用一次.
+    /// </summary>
+    /// <param name="ticket">回调阶段签发的票据.</param>
+    /// <param name="clientIp">换取票据的客户端 IP，仅用于审计.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>后台令牌；票据无效或账号已不可用时为 null.</returns>
+    public async Task<AdminSsoTokenResponse?> RedeemTicketAsync(string ticket, string? clientIp = null, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrEmpty(ticket))
+        {
+            return null;
+        }
+
+        int? accountId = await TakeAsync<int?>(_ticketKeyPrefix + ticket, cancellationToken).ConfigureAwait(false);
+        if (accountId is null)
+        {
+            logger.LogWarning("Rejected an admin SSO ticket exchange with an unknown ticket");
+            return null;
+        }
+
+        AdminAccount? account = await appDbContext.AdminAccounts
+            .AsNoTracking()
+            .SingleOrDefaultAsync(a => a.Id == accountId && a.IsEnabled, cancellationToken)
+            .ConfigureAwait(false);
+        if (account is null)
+        {
+            return null;
+        }
+
+        DateTimeOffset now = timeProvider.GetUtcNow();
+        appDbContext.AdminAuditLogs.Add(new AdminAuditLog
+        {
+            AdminUserId = 0,
+            AdminAccountId = account.Id,
+            AdminAccountName = account.UserName,
+            Action = "/api/admin/sso/sessions",
+            Detail = null,
+            Ip = clientIp,
+            Success = true,
+            Timestamp = now.ToUnixTimeSeconds(),
+        });
+        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return new AdminSsoTokenResponse
+        {
+            AccessToken = CreateAccessToken(account),
+            ExpiresIn = _accessTokenExpirationMinutes * 60,
+            Principal = ToPrincipal(account),
+        };
+    }
+
+    /// <summary>
+    /// 权限过滤器与审计日志使用：后台账号是否存在且仍然启用，结果缓存 15 分钟.
+    /// </summary>
+    /// <param name="accountId">后台账号 ID.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>账号状态；账号不存在时缓存并返回 null.</returns>
+    public async Task<AdminAccountState?> GetAccountStateAsync(int accountId, CancellationToken cancellationToken = default)
+    {
+        return await cache.GetOrCreateAsync(_accountKeyPrefix + accountId, AccountTtl, async () =>
+            await appDbContext.AdminAccounts
+                .AsNoTracking()
+                .Where(a => a.Id == accountId)
+                .Select(a => new AdminAccountState(a.IsEnabled, a.UserName))
+                .FirstOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false)).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 判断后台账号是否允许继续操作.
+    /// </summary>
+    /// <param name="accountId">后台账号 ID.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>是否可以放行.</returns>
+    public async Task<bool> IsAccountUsableAsync(int accountId, CancellationToken cancellationToken = default)
+    {
+        return await GetAccountStateAsync(accountId, cancellationToken).ConfigureAwait(false) is { IsEnabled: true };
+    }
+
+    /// <summary>
+    /// 后台账号列表.
+    /// </summary>
+    /// <param name="currentAccountId">当前调用者，用于标记「本人」.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>账号列表.</returns>
+    public async Task<List<AdminAccountItem>> ListAsync(int? currentAccountId, CancellationToken cancellationToken = default)
+    {
+        List<AdminAccount> accounts = await appDbContext.AdminAccounts
+            .AsNoTracking()
+            .Include(a => a.User)
+            .OrderBy(a => a.Id)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return
+        [
+            .. accounts.Select(a => new AdminAccountItem
+            {
+                Id = a.Id,
+                Provider = a.Provider,
+                Subject = a.Subject,
+                UserName = a.UserName,
+                Email = a.Email,
+                IsEnabled = a.IsEnabled,
+                IsBootstrap = a.IsBootstrap,
+                CreatedAt = a.CreatedAt,
+                LastLoginAt = a.LastLoginAt,
+                BoundUserId = a.UserId,
+                BoundUserName = a.User?.UserName,
+                IsCurrent = a.Id == currentAccountId,
+            }),
+        ];
+    }
+
+    /// <summary>
+    /// 新增后台账号.身份源只负责证明「你是谁」，能不能进后台由这张表决定.
+    /// </summary>
+    /// <param name="subject">身份源中的主体标识（OIDC 的 sub）.</param>
+    /// <param name="userName">显示名.</param>
+    /// <param name="email">备注邮箱，可空.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>返回码、英文说明与本地化键.</returns>
+    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> AddAsync(string subject, string? userName, string? email, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            return (ReturnCode.InvalidUploadData, "The identity subject is required", ServerKeys.ServerAdminAccountSubjectRequired);
+        }
+
+        subject = subject.Trim();
+        if (subject.Length > _subjectMaxLength)
+        {
+            return (ReturnCode.InvalidUploadData, "The identity subject is too long", ServerKeys.ServerAdminAccountSubjectRequired);
+        }
+
+        if (await appDbContext.AdminAccounts.AnyAsync(a => a.Provider == ProviderName && a.Subject == subject, cancellationToken).ConfigureAwait(false))
+        {
+            return (ReturnCode.InvalidUploadData, "An admin account for this identity already exists", ServerKeys.ServerAdminAccountAlreadyExists);
+        }
+
+        DateTimeOffset now = timeProvider.GetUtcNow();
+        AdminAccount account = new()
+        {
+            Provider = ProviderName,
+            Subject = subject,
+            UserName = string.IsNullOrWhiteSpace(userName) ? subject : Truncate(userName.Trim(), _userNameMaxLength),
+            Email = string.IsNullOrWhiteSpace(email) ? null : Truncate(email.Trim(), _emailMaxLength),
+            IsEnabled = true,
+            CreatedAt = now,
+        };
+
+        appDbContext.AdminAccounts.Add(account);
+        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
+        logger.LogInformation("Added admin account {UserName} (id {Id}, subject {Subject})", account.UserName, account.Id, account.Subject);
+
+        return (ReturnCode.Success, "Admin account added successfully", ServerKeys.ServerAdminAccountAddSucceed);
+    }
+
+    /// <summary>
+    /// 启用或停用后台账号.不允许停用自己，也不允许停用最后一个可用账号.
+    /// </summary>
+    /// <param name="accountId">目标账号.</param>
+    /// <param name="enabled">目标状态.</param>
+    /// <param name="currentAccountId">当前调用者.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>返回码、英文说明与本地化键.</returns>
+    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> SetEnabledAsync(int accountId, bool enabled, int currentAccountId, CancellationToken cancellationToken = default)
+    {
+        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
+        if (account is null)
+        {
+            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
+        }
+
+        if (!enabled)
+        {
+            if (accountId == currentAccountId)
+            {
+                return (ReturnCode.InvalidUploadData, "You cannot disable the admin account you are using", ServerKeys.ServerAdminAccountSelfOperation);
+            }
+
+            if (await appDbContext.AdminAccounts.CountAsync(a => a.IsEnabled && a.Id != accountId, cancellationToken).ConfigureAwait(false) is 0)
+            {
+                return (ReturnCode.InvalidUploadData, "At least one enabled admin account must remain", ServerKeys.ServerAdminAccountLastEnabled);
+            }
+        }
+
+        account.IsEnabled = enabled;
+        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
+
+        return (ReturnCode.Success, enabled
+            ? "Admin account enabled successfully"
+            : "Admin account disabled successfully", ServerKeys.ServerAdminAccountSetEnabledSucceed);
+    }
+
+    /// <summary>
+    /// 删除后台账号.不允许删除自己，也不允许删除到没有任何可用账号.
+    /// </summary>
+    /// <param name="accountId">目标账号.</param>
+    /// <param name="currentAccountId">当前调用者.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>返回码、英文说明与本地化键.</returns>
+    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> RemoveAsync(int accountId, int currentAccountId, CancellationToken cancellationToken = default)
+    {
+        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
+        if (account is null)
+        {
+            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
+        }
+
+        if (accountId == currentAccountId)
+        {
+            return (ReturnCode.InvalidUploadData, "You cannot remove the admin account you are using", ServerKeys.ServerAdminAccountSelfOperation);
+        }
+
+        if (account.IsEnabled && await appDbContext.AdminAccounts.CountAsync(a => a.IsEnabled && a.Id != accountId, cancellationToken).ConfigureAwait(false) is 0)
+        {
+            return (ReturnCode.InvalidUploadData, "At least one enabled admin account must remain", ServerKeys.ServerAdminAccountLastEnabled);
+        }
+
+        appDbContext.AdminAccounts.Remove(account);
+        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
+        logger.LogInformation("Removed admin account {UserName} (id {Id})", account.UserName, accountId);
+
+        return (ReturnCode.Success, "Admin account removed successfully", ServerKeys.ServerAdminAccountRemoveSucceed);
+    }
+
+    /// <summary>
+    /// 使账号状态缓存失效（启用/停用/删除/新建/改绑后调用）.
+    /// 绑定关系变了也要一起清掉，否则写操作门禁会按旧关系放行或拒绝.
+    /// </summary>
+    /// <param name="account">受影响的后台账号.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>异步任务.</returns>
+    public async Task InvalidateAsync(AdminAccount account, CancellationToken cancellationToken = default)
+    {
+        await cache.RemoveAsync(_accountKeyPrefix + account.Id, cancellationToken).ConfigureAwait(false);
+        if (account.UserId is int userId)
+        {
+            await cache.RemoveAsync(_boundKeyPrefix + userId, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// 把后台账号绑定到一个主站账号，这个后台账号从此可以用单点登录进启动器.
+    /// </summary>
+    /// <param name="accountId">目标后台账号.</param>
+    /// <param name="userName">主站账号的邮箱.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>返回码、英文说明与本地化键.</returns>
+    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> BindAsync(int accountId, string? userName, CancellationToken cancellationToken = default)
+    {
+        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
+        if (account is null)
+        {
+            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
+        }
+
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            return (ReturnCode.InvalidUploadData, "The Hutao account is required", ServerKeys.ServerAdminAccountUserRequired);
+        }
+
+        string normalizedUserName = userName.Trim().ToUpperInvariant();
+        HutaoUser? user = await appDbContext.Users
+            .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName, cancellationToken)
+            .ConfigureAwait(false);
+        if (user is null)
+        {
+            return (ReturnCode.NotFound, "The Hutao account does not exist", ServerKeys.ServerAdminAccountUserNotFound);
+        }
+
+        if (await appDbContext.AdminAccounts.AnyAsync(a => a.UserId == user.Id && a.Id != accountId, cancellationToken).ConfigureAwait(false))
+        {
+            return (ReturnCode.InvalidUploadData, "This Hutao account is already bound to another admin account", ServerKeys.ServerAdminAccountUserTaken);
+        }
+
+        int? previous = account.UserId;
+        account.UserId = user.Id;
+        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
+        if (previous is int previousId && previousId != user.Id)
+        {
+            await cache.RemoveAsync(_boundKeyPrefix + previousId, cancellationToken).ConfigureAwait(false);
+        }
+
+        logger.LogInformation("Bound admin account {UserName} (id {Id}) to Hutao account {HutaoUserName}", account.UserName, account.Id, user.UserName);
+
+        return (ReturnCode.Success, "Admin account bound successfully", ServerKeys.ServerAdminAccountBindSucceed);
+    }
+
+    /// <summary>
+    /// 解除后台账号与主站账号的绑定.后台登录不受影响，只是不能再用于启动器登录.
+    /// </summary>
+    /// <param name="accountId">目标后台账号.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>返回码、英文说明与本地化键.</returns>
+    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> UnbindAsync(int accountId, CancellationToken cancellationToken = default)
+    {
+        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
+        if (account is null)
+        {
+            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
+        }
+
+        if (account.UserId is not int userId)
+        {
+            return (ReturnCode.InvalidUploadData, "This admin account is not bound to a Hutao account", ServerKeys.ServerAdminAccountUserUnbound);
+        }
+
+        account.UserId = null;
+        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await cache.RemoveAsync(_boundKeyPrefix + userId, cancellationToken).ConfigureAwait(false);
+        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
+
+        return (ReturnCode.Success, "Admin account unbound successfully", ServerKeys.ServerAdminAccountUnbindSucceed);
     }
 
     private static AdminSsoCallbackStatus ToAdminStatus(FlowFailure failure)
@@ -219,8 +555,96 @@ public sealed class AdminSsoService(
         };
     }
 
+    private static string RandomSegment(int byteLength)
+    {
+        byte[] bytes = new byte[byteLength];
+        RandomNumberGenerator.Fill(bytes);
+        return Base64UrlEncoder.Encode(bytes);
+    }
+
+    private static string CreateCodeChallenge(string codeVerifier)
+    {
+        return Base64UrlEncoder.Encode(SHA256.HashData(Encoding.ASCII.GetBytes(codeVerifier)));
+    }
+
     /// <summary>
-    /// 走完「state → 授权码 → ID Token」这段与业务无关的协议流程，返回已校验的声明。
+    /// 只接受站内绝对路径，拒绝协议相对地址与超长值，避免成为开放重定向.
+    /// </summary>
+    private static string? SanitizeReturnPath(string? returnPath)
+    {
+        if (string.IsNullOrEmpty(returnPath)
+            || returnPath.Length > 256
+            || !returnPath.StartsWith('/')
+            || returnPath.StartsWith("//", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return returnPath;
+    }
+
+    private static string Truncate(string value, int maxLength)
+    {
+        return value.Length <= maxLength ? value : value[..maxLength];
+    }
+
+    private static Dictionary<string, string?> ReadClaims(string compactJwt)
+    {
+        string[] segments = compactJwt.Split('.');
+        if (segments.Length is not 3)
+        {
+            return [];
+        }
+
+        Dictionary<string, string?> claims = [];
+        using JsonDocument document = JsonDocument.Parse(Base64UrlEncoder.DecodeBytes(segments[1]));
+        foreach (JsonProperty property in document.RootElement.EnumerateObject())
+        {
+            claims[property.Name] = property.Value.ValueKind switch
+            {
+                JsonValueKind.String => property.Value.GetString(),
+                JsonValueKind.Null => null,
+                _ => property.Value.GetRawText(),
+            };
+        }
+
+        return claims;
+    }
+
+    private static string? GetClaim(Dictionary<string, string?> claims, string name)
+    {
+        if (claims.TryGetValue(name, out string? value))
+        {
+            return value;
+        }
+
+        // 个别身份源会在自定义声明上改变大小写，这里做一次不区分大小写的兜底
+        foreach ((string key, string? claimValue) in claims)
+        {
+            if (string.Equals(key, name, StringComparison.OrdinalIgnoreCase))
+            {
+                return claimValue;
+            }
+        }
+
+        return null;
+    }
+
+    private static AdminSsoAccount ToPrincipal(AdminAccount account)
+    {
+        return new AdminSsoAccount
+        {
+            Id = account.Id,
+            UserName = account.UserName,
+            Email = account.Email,
+            Provider = account.Provider,
+            Subject = account.Subject,
+            IsBootstrap = account.IsBootstrap,
+        };
+    }
+
+    /// <summary>
+    /// 走完「state → 授权码 → ID Token」这段与业务无关的协议流程，返回已校验的声明.
     /// </summary>
     private async Task<(Dictionary<string, string?>? Claims, string? ReturnPath, FlowFailure Failure, string? Detail)> CompleteAuthorizationAsync(
         string? code,
@@ -282,7 +706,7 @@ public sealed class AdminSsoService(
     }
 
     /// <summary>
-    /// 身份有效之后，确认这个主体在启动器侧允许登录成哪个主站账号。
+    /// 身份有效之后，确认这个主体在启动器侧允许登录成哪个主站账号.
     /// </summary>
     private async Task<PassportSsoCallbackResult> ProvisionClientTicketAsync(Dictionary<string, string?> claims, CancellationToken cancellationToken)
     {
@@ -318,342 +742,6 @@ public sealed class AdminSsoService(
         await SetAsync(_clientTicketKeyPrefix + ticket, account.Id, TicketTtl, cancellationToken).ConfigureAwait(false);
 
         return new(PassportSsoCallbackStatus.Success, Ticket: ticket, Subject: subject);
-    }
-
-    private enum FlowFailure
-    {
-        /// <summary>流程走通，声明可用。</summary>
-        None,
-
-        /// <summary>state 不存在或已被使用。</summary>
-        InvalidState,
-
-        /// <summary>身份源拒绝或无法访问。</summary>
-        UpstreamRejected,
-
-        /// <summary>ID Token 校验失败。</summary>
-        TokenInvalid,
-    }
-
-    /// <summary>
-    /// 用一次性票据换取后台令牌。票据无论成功与否都只能使用一次。
-    /// </summary>
-    /// <param name="ticket">回调阶段签发的票据。</param>
-    /// <param name="clientIp">换取票据的客户端 IP，仅用于审计。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>后台令牌；票据无效或账号已不可用时为 null。</returns>
-    public async Task<AdminSsoTokenResponse?> RedeemTicketAsync(string ticket, string? clientIp = null, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrEmpty(ticket))
-        {
-            return null;
-        }
-
-        int? accountId = await TakeAsync<int?>(_ticketKeyPrefix + ticket, cancellationToken).ConfigureAwait(false);
-        if (accountId is null)
-        {
-            logger.LogWarning("Rejected an admin SSO ticket exchange with an unknown ticket");
-            return null;
-        }
-
-        AdminAccount? account = await appDbContext.AdminAccounts
-            .AsNoTracking()
-            .SingleOrDefaultAsync(a => a.Id == accountId && a.IsEnabled, cancellationToken)
-            .ConfigureAwait(false);
-        if (account is null)
-        {
-            return null;
-        }
-
-        DateTimeOffset now = timeProvider.GetUtcNow();
-        appDbContext.AdminAuditLogs.Add(new AdminAuditLog
-        {
-            AdminUserId = 0,
-            AdminAccountId = account.Id,
-            AdminAccountName = account.UserName,
-            Action = "/api/admin/sso/sessions",
-            Detail = null,
-            Ip = clientIp,
-            Success = true,
-            Timestamp = now.ToUnixTimeSeconds(),
-        });
-        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-        return new AdminSsoTokenResponse
-        {
-            AccessToken = CreateAccessToken(account),
-            ExpiresIn = _accessTokenExpirationMinutes * 60,
-            Principal = ToPrincipal(account),
-        };
-    }
-
-    /// <summary>
-    /// 权限过滤器与审计日志使用：后台账号是否存在且仍然启用，结果缓存 15 分钟。
-    /// </summary>
-    /// <param name="accountId">后台账号 ID。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>账号状态；账号不存在时缓存并返回 null。</returns>
-    public async Task<AdminAccountState?> GetAccountStateAsync(int accountId, CancellationToken cancellationToken = default)
-    {
-        return await cache.GetOrCreateAsync(_accountKeyPrefix + accountId, AccountTtl, async () =>
-            await appDbContext.AdminAccounts
-                .AsNoTracking()
-                .Where(a => a.Id == accountId)
-                .Select(a => new AdminAccountState(a.IsEnabled, a.UserName))
-                .FirstOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false)).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// 判断后台账号是否允许继续操作。
-    /// </summary>
-    /// <param name="accountId">后台账号 ID。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>是否可以放行。</returns>
-    public async Task<bool> IsAccountUsableAsync(int accountId, CancellationToken cancellationToken = default)
-    {
-        return await GetAccountStateAsync(accountId, cancellationToken).ConfigureAwait(false) is { IsEnabled: true };
-    }
-
-    /// <summary>
-    /// 后台账号列表。
-    /// </summary>
-    /// <param name="currentAccountId">当前调用者，用于标记「本人」。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>账号列表。</returns>
-    public async Task<List<AdminAccountItem>> ListAsync(int? currentAccountId, CancellationToken cancellationToken = default)
-    {
-        List<AdminAccount> accounts = await appDbContext.AdminAccounts
-            .AsNoTracking()
-            .Include(a => a.User)
-            .OrderBy(a => a.Id)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        return
-        [
-            .. accounts.Select(a => new AdminAccountItem
-            {
-                Id = a.Id,
-                Provider = a.Provider,
-                Subject = a.Subject,
-                UserName = a.UserName,
-                Email = a.Email,
-                IsEnabled = a.IsEnabled,
-                IsBootstrap = a.IsBootstrap,
-                CreatedAt = a.CreatedAt,
-                LastLoginAt = a.LastLoginAt,
-                BoundUserId = a.UserId,
-                BoundUserName = a.User?.UserName,
-                IsCurrent = a.Id == currentAccountId,
-            }),
-        ];
-    }
-
-    /// <summary>
-    /// 新增后台账号。身份源只负责证明「你是谁」，能不能进后台由这张表决定。
-    /// </summary>
-    /// <param name="subject">身份源中的主体标识（OIDC 的 sub）。</param>
-    /// <param name="userName">显示名。</param>
-    /// <param name="email">备注邮箱，可空。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>返回码、英文说明与本地化键。</returns>
-    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> AddAsync(string subject, string? userName, string? email, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(subject))
-        {
-            return (ReturnCode.InvalidUploadData, "The identity subject is required", ServerKeys.ServerAdminAccountSubjectRequired);
-        }
-
-        subject = subject.Trim();
-        if (subject.Length > _subjectMaxLength)
-        {
-            return (ReturnCode.InvalidUploadData, "The identity subject is too long", ServerKeys.ServerAdminAccountSubjectRequired);
-        }
-
-        if (await appDbContext.AdminAccounts.AnyAsync(a => a.Provider == ProviderName && a.Subject == subject, cancellationToken).ConfigureAwait(false))
-        {
-            return (ReturnCode.InvalidUploadData, "An admin account for this identity already exists", ServerKeys.ServerAdminAccountAlreadyExists);
-        }
-
-        DateTimeOffset now = timeProvider.GetUtcNow();
-        AdminAccount account = new()
-        {
-            Provider = ProviderName,
-            Subject = subject,
-            UserName = string.IsNullOrWhiteSpace(userName) ? subject : Truncate(userName.Trim(), _userNameMaxLength),
-            Email = string.IsNullOrWhiteSpace(email) ? null : Truncate(email.Trim(), _emailMaxLength),
-            IsEnabled = true,
-            CreatedAt = now,
-        };
-
-        appDbContext.AdminAccounts.Add(account);
-        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
-        logger.LogInformation("Added admin account {UserName} (id {Id}, subject {Subject})", account.UserName, account.Id, account.Subject);
-
-        return (ReturnCode.Success, "Admin account added successfully", ServerKeys.ServerAdminAccountAddSucceed);
-    }
-
-    /// <summary>
-    /// 启用或停用后台账号。不允许停用自己，也不允许停用最后一个可用账号。
-    /// </summary>
-    /// <param name="accountId">目标账号。</param>
-    /// <param name="enabled">目标状态。</param>
-    /// <param name="currentAccountId">当前调用者。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>返回码、英文说明与本地化键。</returns>
-    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> SetEnabledAsync(int accountId, bool enabled, int currentAccountId, CancellationToken cancellationToken = default)
-    {
-        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
-        if (account is null)
-        {
-            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
-        }
-
-        if (!enabled)
-        {
-            if (accountId == currentAccountId)
-            {
-                return (ReturnCode.InvalidUploadData, "You cannot disable the admin account you are using", ServerKeys.ServerAdminAccountSelfOperation);
-            }
-
-            if (await appDbContext.AdminAccounts.CountAsync(a => a.IsEnabled && a.Id != accountId, cancellationToken).ConfigureAwait(false) is 0)
-            {
-                return (ReturnCode.InvalidUploadData, "At least one enabled admin account must remain", ServerKeys.ServerAdminAccountLastEnabled);
-            }
-        }
-
-        account.IsEnabled = enabled;
-        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
-
-        return (ReturnCode.Success, enabled
-            ? "Admin account enabled successfully"
-            : "Admin account disabled successfully", ServerKeys.ServerAdminAccountSetEnabledSucceed);
-    }
-
-    /// <summary>
-    /// 删除后台账号。不允许删除自己，也不允许删除到没有任何可用账号。
-    /// </summary>
-    /// <param name="accountId">目标账号。</param>
-    /// <param name="currentAccountId">当前调用者。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>返回码、英文说明与本地化键。</returns>
-    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> RemoveAsync(int accountId, int currentAccountId, CancellationToken cancellationToken = default)
-    {
-        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
-        if (account is null)
-        {
-            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
-        }
-
-        if (accountId == currentAccountId)
-        {
-            return (ReturnCode.InvalidUploadData, "You cannot remove the admin account you are using", ServerKeys.ServerAdminAccountSelfOperation);
-        }
-
-        if (account.IsEnabled && await appDbContext.AdminAccounts.CountAsync(a => a.IsEnabled && a.Id != accountId, cancellationToken).ConfigureAwait(false) is 0)
-        {
-            return (ReturnCode.InvalidUploadData, "At least one enabled admin account must remain", ServerKeys.ServerAdminAccountLastEnabled);
-        }
-
-        appDbContext.AdminAccounts.Remove(account);
-        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
-        logger.LogInformation("Removed admin account {UserName} (id {Id})", account.UserName, accountId);
-
-        return (ReturnCode.Success, "Admin account removed successfully", ServerKeys.ServerAdminAccountRemoveSucceed);
-    }
-
-    /// <summary>
-    /// 使账号状态缓存失效（启用/停用/删除/新建/改绑后调用）。
-    /// 绑定关系变了也要一起清掉，否则写操作门禁会按旧关系放行或拒绝。
-    /// </summary>
-    /// <param name="account">受影响的后台账号。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>异步任务。</returns>
-    public async Task InvalidateAsync(AdminAccount account, CancellationToken cancellationToken = default)
-    {
-        await cache.RemoveAsync(_accountKeyPrefix + account.Id, cancellationToken).ConfigureAwait(false);
-        if (account.UserId is int userId)
-        {
-            await cache.RemoveAsync(_boundKeyPrefix + userId, cancellationToken).ConfigureAwait(false);
-        }
-    }
-
-    /// <summary>
-    /// 把后台账号绑定到一个主站账号，这个后台账号从此可以用单点登录进启动器。
-    /// </summary>
-    /// <param name="accountId">目标后台账号。</param>
-    /// <param name="userName">主站账号的邮箱。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>返回码、英文说明与本地化键。</returns>
-    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> BindAsync(int accountId, string? userName, CancellationToken cancellationToken = default)
-    {
-        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
-        if (account is null)
-        {
-            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
-        }
-
-        if (string.IsNullOrWhiteSpace(userName))
-        {
-            return (ReturnCode.InvalidUploadData, "The Hutao account is required", ServerKeys.ServerAdminAccountUserRequired);
-        }
-
-        HutaoUser? user = await appDbContext.Users
-            .FirstOrDefaultAsync(u => u.NormalizedUserName == userName.Trim().ToUpperInvariant(), cancellationToken)
-            .ConfigureAwait(false);
-        if (user is null)
-        {
-            return (ReturnCode.NotFound, "The Hutao account does not exist", ServerKeys.ServerAdminAccountUserNotFound);
-        }
-
-        if (await appDbContext.AdminAccounts.AnyAsync(a => a.UserId == user.Id && a.Id != accountId, cancellationToken).ConfigureAwait(false))
-        {
-            return (ReturnCode.InvalidUploadData, "This Hutao account is already bound to another admin account", ServerKeys.ServerAdminAccountUserTaken);
-        }
-
-        int? previous = account.UserId;
-        account.UserId = user.Id;
-        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
-        if (previous is int previousId && previousId != user.Id)
-        {
-            await cache.RemoveAsync(_boundKeyPrefix + previousId, cancellationToken).ConfigureAwait(false);
-        }
-
-        logger.LogInformation("Bound admin account {UserName} (id {Id}) to Hutao account {HutaoUserName}", account.UserName, account.Id, user.UserName);
-
-        return (ReturnCode.Success, "Admin account bound successfully", ServerKeys.ServerAdminAccountBindSucceed);
-    }
-
-    /// <summary>
-    /// 解除后台账号与主站账号的绑定。后台登录不受影响，只是不能再用于启动器登录。
-    /// </summary>
-    /// <param name="accountId">目标后台账号。</param>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>返回码、英文说明与本地化键。</returns>
-    public async Task<(ReturnCode Code, string Message, string? LocalizationKey)> UnbindAsync(int accountId, CancellationToken cancellationToken = default)
-    {
-        AdminAccount? account = await appDbContext.AdminAccounts.SingleOrDefaultAsync(a => a.Id == accountId, cancellationToken).ConfigureAwait(false);
-        if (account is null)
-        {
-            return (ReturnCode.NotFound, "Admin account does not exist", ServerKeys.ServerAdminAccountNotFound);
-        }
-
-        if (account.UserId is not int userId)
-        {
-            return (ReturnCode.InvalidUploadData, "This admin account is not bound to a Hutao account", ServerKeys.ServerAdminAccountUserUnbound);
-        }
-
-        account.UserId = null;
-        await appDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await cache.RemoveAsync(_boundKeyPrefix + userId, cancellationToken).ConfigureAwait(false);
-        await InvalidateAsync(account, cancellationToken).ConfigureAwait(false);
-
-        return (ReturnCode.Success, "Admin account unbound successfully", ServerKeys.ServerAdminAccountUnbindSucceed);
     }
 
     private async Task<(string? Url, string? Error)> CreateAuthorizeUrlAsync(string redirectUri, string stateKeyPrefix, string? returnPath, CancellationToken cancellationToken)
@@ -700,84 +788,12 @@ public sealed class AdminSsoService(
         return (QueryHelpers.AddQueryString(configuration.AuthorizationEndpoint, query), null);
     }
 
-    private static string RandomSegment(int byteLength)
-    {
-        byte[] bytes = new byte[byteLength];
-        RandomNumberGenerator.Fill(bytes);
-        return Base64UrlEncoder.Encode(bytes);
-    }
-
-    private static string CreateCodeChallenge(string codeVerifier)
-    {
-        return Base64UrlEncoder.Encode(SHA256.HashData(Encoding.ASCII.GetBytes(codeVerifier)));
-    }
-
-    /// <summary>
-    /// 只接受站内绝对路径，拒绝协议相对地址与超长值，避免成为开放重定向。
-    /// </summary>
-    private static string? SanitizeReturnPath(string? returnPath)
-    {
-        if (string.IsNullOrEmpty(returnPath)
-            || returnPath.Length > 256
-            || !returnPath.StartsWith("/", StringComparison.Ordinal)
-            || returnPath.StartsWith("//", StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        return returnPath;
-    }
-
-    private static string Truncate(string value, int maxLength)
-    {
-        return value.Length <= maxLength ? value : value[..maxLength];
-    }
-
-    private static Dictionary<string, string?> ReadClaims(string compactJwt)
-    {
-        string[] segments = compactJwt.Split('.');
-        if (segments.Length is not 3)
-        {
-            return [];
-        }
-
-        Dictionary<string, string?> claims = [];
-        using JsonDocument document = JsonDocument.Parse(Base64UrlEncoder.DecodeBytes(segments[1]));
-        foreach (JsonProperty property in document.RootElement.EnumerateObject())
-        {
-            claims[property.Name] = property.Value.ValueKind switch
-            {
-                JsonValueKind.String => property.Value.GetString(),
-                JsonValueKind.Null => null,
-                _ => property.Value.GetRawText(),
-            };
-        }
-
-        return claims;
-    }
-
-    private static string? GetClaim(IReadOnlyDictionary<string, string?> claims, string name)
-    {
-        if (claims.TryGetValue(name, out string? value))
-        {
-            return value;
-        }
-
-        // 个别身份源会在自定义声明上改变大小写，这里做一次不区分大小写的兜底
-        foreach ((string key, string? claimValue) in claims)
-        {
-            if (string.Equals(key, name, StringComparison.OrdinalIgnoreCase))
-            {
-                return claimValue;
-            }
-        }
-
-        return null;
-    }
-
     private async Task SetAsync<T>(string key, T value, TimeSpan ttl, CancellationToken cancellationToken)
     {
-        DistributedCacheEntryOptions options = new() { AbsoluteExpirationRelativeToNow = ttl };
+        DistributedCacheEntryOptions options = new()
+        {
+            AbsoluteExpirationRelativeToNow = ttl,
+        };
         await cache.SetAsync(key, JsonSerializer.SerializeToUtf8Bytes(value), options, cancellationToken).ConfigureAwait(false);
     }
 
@@ -936,19 +952,6 @@ public sealed class AdminSsoService(
         };
 
         return handler.WriteToken(handler.CreateToken(descriptor));
-    }
-
-    private static AdminSsoAccount ToPrincipal(AdminAccount account)
-    {
-        return new AdminSsoAccount
-        {
-            Id = account.Id,
-            UserName = account.UserName,
-            Email = account.Email,
-            Provider = account.Provider,
-            Subject = account.Subject,
-            IsBootstrap = account.IsBootstrap,
-        };
     }
 
     private sealed record PendingLogin(string Nonce, string CodeVerifier, string? ReturnPath);

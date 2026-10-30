@@ -1,4 +1,4 @@
-﻿namespace server.Core;
+namespace server.Core;
 
 internal sealed class AsyncLock
 {

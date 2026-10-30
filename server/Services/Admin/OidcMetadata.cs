@@ -1,6 +1,6 @@
-using System.Collections.Concurrent;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Collections.Concurrent;
 
 namespace server.Services.Admin;
 
@@ -10,10 +10,10 @@ public sealed class OidcMetadata(IHttpClientFactory httpClientFactory, SystemCon
         new(StringComparer.Ordinal);
 
     /// <summary>
-    /// 取发现文档。签发者与当前 Authority 不一致时直接拒绝，避免被伪造的元数据带偏。
+    /// 取发现文档.签发者与当前 Authority 不一致时直接拒绝，避免被伪造的元数据带偏.
     /// </summary>
-    /// <param name="cancellationToken">取消令牌。</param>
-    /// <returns>发现文档。</returns>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>发现文档.</returns>
     public async Task<OpenIdConnectConfiguration> GetConfigurationAsync(CancellationToken cancellationToken = default)
     {
         OidcOptions oidc = systemConfig.Oidc;

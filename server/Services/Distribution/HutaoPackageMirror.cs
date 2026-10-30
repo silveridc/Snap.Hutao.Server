@@ -1,4 +1,4 @@
-﻿namespace server.Services.Distribution;
+namespace server.Services.Distribution;
 
 public sealed class HutaoPackageMirror(string url, string mirrorName, string mirrorType)
 {

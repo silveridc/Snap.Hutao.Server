@@ -1,4 +1,4 @@
-﻿namespace server.Services.Authorization;
+namespace server.Services.Authorization;
 
 public static class AdminClaimTypes
 {

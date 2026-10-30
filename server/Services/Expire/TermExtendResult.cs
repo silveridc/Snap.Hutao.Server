@@ -1,4 +1,4 @@
-﻿namespace server.Services.Expire;
+namespace server.Services.Expire;
 
 public class TermExtendResult(TermExtendResultKind kind, DateTimeOffset expiredAt = default)
 {

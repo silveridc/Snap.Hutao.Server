@@ -1,4 +1,4 @@
-﻿using server.Models.Admin;
+using server.Models.Admin;
 using server.Models.Entity.Announcement;
 using server.Models.Upload;
 
@@ -31,29 +31,6 @@ public sealed class AnnouncementService(AppDbContext appDbContext, IDistributedC
         }
 
         return result;
-    }
-
-    private async ValueTask<List<EntityAnnouncement>> GetRecentAnnouncementsAsync(string locale)
-    {
-        string cacheKey = $"{_announcementCachePrefix}{locale}";
-        if (cache.TryGetValue(cacheKey, out List<EntityAnnouncement>? cached) && cached is not null)
-        {
-            return cached;
-        }
-
-        long limit = (timeProvider.GetUtcNow() - MinAnnouncementTimeThreshold).ToUnixTimeSeconds();
-
-        List<EntityAnnouncement> anns = await appDbContext.Announcements
-            .AsNoTracking()
-            .OrderByDescending(ann => ann.LastUpdateTime)
-            .Where(ann => ann.Locale == locale)
-            .Where(ann => ann.Enabled)
-            .Where(ann => ann.LastUpdateTime >= limit)
-            .ToListAsync()
-            .ConfigureAwait(false);
-
-        cache.Set(cacheKey, anns, AnnouncementCacheDuration);
-        return anns;
     }
 
     public async ValueTask ProcessUploadAnnouncementAsync(HutaoUploadAnnouncement announcement)
@@ -143,5 +120,28 @@ public sealed class AnnouncementService(AppDbContext appDbContext, IDistributedC
         }
 
         return affected > 0;
+    }
+
+    private async ValueTask<List<EntityAnnouncement>> GetRecentAnnouncementsAsync(string locale)
+    {
+        string cacheKey = $"{_announcementCachePrefix}{locale}";
+        if (cache.TryGetValue(cacheKey, out List<EntityAnnouncement>? cached) && cached is not null)
+        {
+            return cached;
+        }
+
+        long limit = (timeProvider.GetUtcNow() - MinAnnouncementTimeThreshold).ToUnixTimeSeconds();
+
+        List<EntityAnnouncement> anns = await appDbContext.Announcements
+            .AsNoTracking()
+            .OrderByDescending(ann => ann.LastUpdateTime)
+            .Where(ann => ann.Locale == locale)
+            .Where(ann => ann.Enabled)
+            .Where(ann => ann.LastUpdateTime >= limit)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        cache.Set(cacheKey, anns, AnnouncementCacheDuration);
+        return anns;
     }
 }

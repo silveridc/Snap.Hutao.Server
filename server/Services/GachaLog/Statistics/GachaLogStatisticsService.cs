@@ -1,12 +1,15 @@
-﻿using System.Runtime.InteropServices;
 using server.Models.Entity.GachaLog;
 using server.Models.Metadata;
 using server.Services.Legacy.Primitive;
+using System.Runtime.InteropServices;
 
 namespace server.Services.GachaLog.Statistics;
 
 // Transient
-public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, TimeProvider timeProvider)
+public sealed class GachaLogStatisticsService(
+    AppDbContext appDbContext,
+    IDistributedCache cache,
+    TimeProvider timeProvider)
 {
     public const string Working = "GachaLogStatisticsService.Working";
 
@@ -24,12 +27,9 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
     private static readonly Func<AppDbContext, string, IEnumerable<EntityGachaItem>> GachaItemsQuery = EF.CompileQuery((AppDbContext context, string uid) =>
         context.GachaItems.AsNoTracking().Where(g => g.Uid == uid).OrderBy(g => g.Id).AsQueryable());
 
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-    private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
-
     public async Task RunAsync()
     {
-        await _cache.RunExclusiveAsync(Working, async () =>
+        await cache.RunExclusiveAsync(Working, async () =>
         {
             Map<int, int> idQualityMap = await GetIdQualityMapAsync();
             GachaEventBundle bundle = await GetCurrentGachaEventAsync();
@@ -43,13 +43,13 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
             GachaLogStatisticsTracker tracker = new(idQualityMap, bundle);
 
             await Task.Run(() => RunCore(tracker)).ConfigureAwait(false);
-            _ = tracker.CompleteTracking(_appDbContext, _cache);
+            _ = tracker.CompleteTracking(appDbContext, cache);
         }).ConfigureAwait(false);
     }
 
     private async Task<Map<int, int>> GetIdQualityMapAsync()
     {
-        List<KnownItem> knownItems = await _appDbContext.KnownItems.AsNoTracking().ToListAsync().ConfigureAwait(false);
+        List<KnownItem> knownItems = await appDbContext.KnownItems.AsNoTracking().ToListAsync().ConfigureAwait(false);
         return new(knownItems.ToDictionary(x => (int)x.Id, x => (int)x.Quality));
     }
 
@@ -57,19 +57,19 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
     {
         DateTime now = timeProvider.GetLocalNow().DateTime;
 
-        GachaEventInfo? avatarEvent1 = await _appDbContext.GachaEvents
+        GachaEventInfo? avatarEvent1 = await appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.ActivityAvatar)
             .ConfigureAwait(false);
 
-        GachaEventInfo? avatarEvent2 = await _appDbContext.GachaEvents
+        GachaEventInfo? avatarEvent2 = await appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.SpeicalActivityAvatar)
             .ConfigureAwait(false);
 
-        GachaEventInfo? weaponEvent = await _appDbContext.GachaEvents
+        GachaEventInfo? weaponEvent = await appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.ActivityWeapon)
             .ConfigureAwait(false);
 
-        GachaEventInfo? chronicled = await _appDbContext.GachaEvents
+        GachaEventInfo? chronicled = await appDbContext.GachaEvents
             .FirstOrDefaultAsync(g => g.From < now && g.To > now && g.Type == GachaConfigType.ActivityCity)
             .ConfigureAwait(false);
 
@@ -86,8 +86,8 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
 
     private void RunCore(GachaLogStatisticsTracker tracker)
     {
-        List<string> uids = [.. UidsQuery(_appDbContext)];
-        HashSet<string> invalidUids = [.. _appDbContext.InvalidGachaUids.Select(i => i.Uid)];
+        List<string> uids = [.. UidsQuery(appDbContext)];
+        HashSet<string> invalidUids = [.. appDbContext.InvalidGachaUids.Select(i => i.Uid)];
         foreach (ref string uid in CollectionsMarshal.AsSpan(uids))
         {
             if (invalidUids.Contains(uid))
@@ -98,7 +98,7 @@ public sealed class GachaLogStatisticsService(IServiceProvider serviceProvider, 
             tracker.Uid = uid;
 
             // 按 Id 递增
-            List<EntityGachaItem> gachaItems = [.. GachaItemsQuery(_appDbContext, uid)];
+            List<EntityGachaItem> gachaItems = [.. GachaItemsQuery(appDbContext, uid)];
             tracker.Track(gachaItems);
         }
     }

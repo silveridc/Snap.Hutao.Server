@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -27,7 +27,7 @@ public partial class AddHutaoReleases : Migration
                     .Annotation("MySql:CharSet", "utf8mb4"),
                 IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                 PublishedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
-                PublishedBy = table.Column<int>(type: "int", nullable: false)
+                PublishedBy = table.Column<int>(type: "int", nullable: false),
             },
             constraints: table =>
             {

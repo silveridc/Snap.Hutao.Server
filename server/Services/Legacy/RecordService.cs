@@ -1,23 +1,23 @@
-﻿using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore.Storage;
 using server.Core;
 using server.Models.Entity.SpiralAbyss;
 using server.Models.Upload;
+using System.Runtime.InteropServices;
 
 namespace server.Services.Legacy;
 
-public sealed class RecordService(IServiceProvider serviceProvider, TimeProvider timeProvider)
+public sealed class RecordService(
+    IDistributedCache cache,
+    AppDbContext appDbContext,
+    IRankService rankService,
+    GachaLogExpireService gachaLogExpireService,
+    PizzaHelperRecordService pizzaHelperRecordService,
+    ILogger<RecordService> logger,
+    TimeProvider timeProvider)
 {
     private const int _gachaLogExtendDays = 3;
 
     private static readonly AsyncKeyedLock<string> UploadingUids = new();
-
-    private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-    private readonly IRankService _rankService = serviceProvider.GetRequiredService<IRankService>();
-    private readonly GachaLogExpireService _gachaLogExpireService = serviceProvider.GetRequiredService<GachaLogExpireService>();
-    private readonly PizzaHelperRecordService _pizzaHelperRecordService = serviceProvider.GetRequiredService<PizzaHelperRecordService>();
-    private readonly ILogger<RecordService> _logger = serviceProvider.GetRequiredService<ILogger<RecordService>>();
 
     public async ValueTask<RecordUploadResult> ProcessUploadAsync(SimpleRecord record)
     {
@@ -26,7 +26,7 @@ public sealed class RecordService(IServiceProvider serviceProvider, TimeProvider
             return RecordUploadResult.ComputingStatistics;
         }
 
-        if (_appDbContext.BannedList.Any(banned => banned.Uid == record.Uid))
+        if (appDbContext.BannedList.Any(banned => banned.Uid == record.Uid))
         {
             return RecordUploadResult.UidBanned;
         }
@@ -56,12 +56,12 @@ public sealed class RecordService(IServiceProvider serviceProvider, TimeProvider
             RecordUploadResult result = await SaveRecordAsync(record).ConfigureAwait(false);
             try
             {
-                await _pizzaHelperRecordService.TryPostRecordAsync(record).ConfigureAwait(false);
+                await pizzaHelperRecordService.TryPostRecordAsync(record).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 // Any exception will be ignored.
-                _logger.LogInformation("Exception ignored when upload to PizzaHelper: \n{Ex}", ex);
+                logger.LogInformation("Exception ignored when upload to PizzaHelper: \n{Ex}", ex);
             }
 
             return result;
@@ -76,17 +76,7 @@ public sealed class RecordService(IServiceProvider serviceProvider, TimeProvider
 
     public bool IsStatisticsServiceWorking()
     {
-        return _cache.HasFlag(StatisticsService.Working);
-    }
-
-    private EntityRecord SimpleRecordToEntity(SimpleRecord simpleRecord)
-    {
-        return new()
-        {
-            Uid = simpleRecord.Uid!,
-            Uploader = simpleRecord.Identity!,
-            UploadTime = timeProvider.GetUnixTimeSeconds(),
-        };
+        return cache.HasFlag(StatisticsService.Working);
     }
 
     private static EntityAvatar SimpleAvatarToEntity(SimpleAvatar simpleAvatar, long recordId)
@@ -175,78 +165,88 @@ public sealed class RecordService(IServiceProvider serviceProvider, TimeProvider
         };
     }
 
+    private EntityRecord SimpleRecordToEntity(SimpleRecord simpleRecord)
+    {
+        return new()
+        {
+            Uid = simpleRecord.Uid!,
+            Uploader = simpleRecord.Identity!,
+            UploadTime = timeProvider.GetUnixTimeSeconds(),
+        };
+    }
+
     private async Task<RecordUploadResult> SaveRecordAsync(SimpleRecord record)
     {
         (bool haveUploaded, bool recordExists) = await HaveUploadedForCurrentScheduleAsync(record.Uid!).ConfigureAwait(false);
         RecordUploadResult result = await GetNonErrorRecordUploadResultAsync(record, haveUploaded).ConfigureAwait(false);
 
-        using (IDbContextTransaction transaction = await _appDbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
+        using (IDbContextTransaction transaction = await appDbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
         {
             if (recordExists)
             {
-                long existRecordId = _appDbContext.Records.Where(r => r.Uid == record.Uid).Select(r => r.PrimaryId).Single();
-                await _appDbContext.Avatars.Where(a => a.RecordId == existRecordId).ExecuteDeleteAsync().ConfigureAwait(false);
-                long existSpiralAbyssId = await _appDbContext.SpiralAbysses.Where(s => s.RecordId == existRecordId).Select(s => s.PrimaryId).SingleOrDefaultAsync().ConfigureAwait(false);
+                long existRecordId = appDbContext.Records.Where(r => r.Uid == record.Uid).Select(r => r.PrimaryId).Single();
+                await appDbContext.Avatars.Where(a => a.RecordId == existRecordId).ExecuteDeleteAsync().ConfigureAwait(false);
+                long existSpiralAbyssId = await appDbContext.SpiralAbysses.Where(s => s.RecordId == existRecordId).Select(s => s.PrimaryId).SingleOrDefaultAsync().ConfigureAwait(false);
                 if (existSpiralAbyssId is not 0)
                 {
-                    await _appDbContext.SpiralAbyssFloors.Where(f => f.SpiralAbyssId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
-                    await _appDbContext.DamageRanks.Where(r => r.SpiralAbyssId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
-                    await _appDbContext.TakeDamageRanks.Where(r => r.SpiralAbyssId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
-                    await _appDbContext.SpiralAbysses.Where(s => s.PrimaryId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
+                    await appDbContext.SpiralAbyssFloors.Where(f => f.SpiralAbyssId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
+                    await appDbContext.DamageRanks.Where(r => r.SpiralAbyssId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
+                    await appDbContext.TakeDamageRanks.Where(r => r.SpiralAbyssId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
+                    await appDbContext.SpiralAbysses.Where(s => s.PrimaryId == existSpiralAbyssId).ExecuteDeleteAsync().ConfigureAwait(false);
                 }
 
-                await _appDbContext.Records.Where(r => r.Uid == record.Uid).ExecuteDeleteAsync().ConfigureAwait(false);
+                await appDbContext.Records.Where(r => r.Uid == record.Uid).ExecuteDeleteAsync().ConfigureAwait(false);
             }
 
             // EntityRecord
             EntityRecord entityRecord = SimpleRecordToEntity(record);
-            await _appDbContext.Records.AddAndSaveAsync(entityRecord).ConfigureAwait(false);
+            await appDbContext.Records.AddAndSaveAsync(entityRecord).ConfigureAwait(false);
             long recordId = entityRecord.PrimaryId;
 
             // EntityAvatars
             List<EntityAvatar> entityAvatars = record.Avatars!.SelectList(a => SimpleAvatarToEntity(a, recordId));
-            await _appDbContext.Avatars.AddRangeAndSaveAsync(entityAvatars).ConfigureAwait(false);
+            await appDbContext.Avatars.AddRangeAndSaveAsync(entityAvatars).ConfigureAwait(false);
 
             // EntitySpiralAbyss
             EntitySpiralAbyss entitySpiralAbyss = SimpleSpiralAbyssToEntity(record.SpiralAbyss!, entityRecord.PrimaryId);
-            await _appDbContext.SpiralAbysses.AddAndSaveAsync(entitySpiralAbyss).ConfigureAwait(false);
+            await appDbContext.SpiralAbysses.AddAndSaveAsync(entitySpiralAbyss).ConfigureAwait(false);
             long spiralAbyssId = entitySpiralAbyss.PrimaryId;
 
             // EntityFloors
             List<EntityFloor> entityFloors = [.. record.SpiralAbyss!.Floors.Where(f => f.Index >= 9).Select(f => SimpleFloorToEntity(f, spiralAbyssId))];
-            await _appDbContext.SpiralAbyssFloors.AddRangeAndSaveAsync(entityFloors).ConfigureAwait(false);
+            await appDbContext.SpiralAbyssFloors.AddRangeAndSaveAsync(entityFloors).ConfigureAwait(false);
 
             // EntityDamageRank
             // People must deal damage anyway.
             EntityDamageRank entityDamageRank = SimpleRankToEntityDamageRank(record.SpiralAbyss.Damage, spiralAbyssId, record.Uid!);
-            await _appDbContext.DamageRanks.AddAndSaveAsync(entityDamageRank).ConfigureAwait(false);
+            await appDbContext.DamageRanks.AddAndSaveAsync(entityDamageRank).ConfigureAwait(false);
 
             // EntityTakeDamageRank
             if (record.SpiralAbyss.TakeDamage != null)
             {
                 EntityTakeDamageRank entityTakeDamageRank = SimpleRankToEntityTakeDamageRank(record.SpiralAbyss.TakeDamage, spiralAbyssId, record.Uid!);
-                await _appDbContext.TakeDamageRanks.AddAndSaveAsync(entityTakeDamageRank).ConfigureAwait(false);
+                await appDbContext.TakeDamageRanks.AddAndSaveAsync(entityTakeDamageRank).ConfigureAwait(false);
             }
 
             await transaction.CommitAsync().ConfigureAwait(false);
         }
 
         // Redis rank sync
-        await _rankService.SaveRankAsync(record.Uid!, record.SpiralAbyss.Damage, record.SpiralAbyss.TakeDamage).ConfigureAwait(false);
+        await rankService.SaveRankAsync(record.Uid!, record.SpiralAbyss.Damage, record.SpiralAbyss.TakeDamage).ConfigureAwait(false);
 
         return result;
     }
 
     private async ValueTask<(bool AnyExists, bool RecordExists)> HaveUploadedForCurrentScheduleAsync(string uid)
     {
-        EntityRecord? entityRecord = await _appDbContext.Records.SingleOrDefaultAsync(r => r.Uid == uid).ConfigureAwait(false);
+        EntityRecord? entityRecord = await appDbContext.Records.SingleOrDefaultAsync(r => r.Uid == uid).ConfigureAwait(false);
 
         if (entityRecord == null)
         {
             return (false, false);
         }
 
-        if (!await _appDbContext.SpiralAbysses.AnyAsync(s => s.RecordId == entityRecord.PrimaryId).ConfigureAwait(false))
+        if (!await appDbContext.SpiralAbysses.AnyAsync(s => s.RecordId == entityRecord.PrimaryId).ConfigureAwait(false))
         {
             return (false, true);
         }
@@ -266,7 +266,7 @@ public sealed class RecordService(IServiceProvider serviceProvider, TimeProvider
             return RecordUploadResult.OkWithNoUserNamePresented;
         }
 
-        TermExtendResult result = await _gachaLogExpireService.ExtendTermForUserNameAsync(record.ReservedUserName, _gachaLogExtendDays).ConfigureAwait(false);
+        TermExtendResult result = await gachaLogExpireService.ExtendTermForUserNameAsync(record.ReservedUserName, _gachaLogExtendDays).ConfigureAwait(false);
         if (result.Kind is not TermExtendResultKind.Ok)
         {
             return RecordUploadResult.OkWithGachaLogNoSuchUser;

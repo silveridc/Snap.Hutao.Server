@@ -1,4 +1,4 @@
-﻿using server.Core;
+using server.Core;
 using StackExchange.Redis;
 
 namespace server.Services.Authorization;

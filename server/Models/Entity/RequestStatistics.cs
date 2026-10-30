@@ -1,11 +1,12 @@
-﻿namespace server.Models.Entity;
+namespace server.Models.Entity;
 
 [Table("request_statistics")]
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public class RequestStatistics
 {
     /// <summary>
-    /// EF用
+    /// Initializes a new instance of the <see cref="RequestStatistics"/> class.
+    /// EF用.
     /// </summary>
     public RequestStatistics()
     {
@@ -21,26 +22,32 @@ public class RequestStatistics
     }
 
     /// <summary>
-    /// 主键
+    /// Gets or sets 主键.
     /// </summary>
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long PrimaryId { get; set; }
+    public long PrimaryId
+    {
+        get; set;
+    }
 
     /// <summary>
-    /// UA头
+    /// Gets or sets uA头.
     /// </summary>
     public string UserAgent { get; set; } = default!;
 
     /// <summary>
-    /// 请求路径
+    /// Gets or sets 请求路径.
     /// </summary>
     public string Path { get; set; } = default!;
 
     /// <summary>
-    /// 请求次数
+    /// Gets or sets 请求次数.
     /// </summary>
-    public long Count { get; set; }
+    public long Count
+    {
+        get; set;
+    }
 
     public static RequestStatistics CreateFromContext(ActionExecutingContext context)
     {

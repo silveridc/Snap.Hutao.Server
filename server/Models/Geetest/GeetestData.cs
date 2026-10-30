@@ -1,4 +1,4 @@
-﻿namespace server.Models.Geetest;
+namespace server.Models.Geetest;
 
 internal sealed class GeetestData
 {

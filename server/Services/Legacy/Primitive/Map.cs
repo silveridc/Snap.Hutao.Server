@@ -1,4 +1,4 @@
-﻿namespace server.Services.Legacy.Primitive;
+namespace server.Services.Legacy.Primitive;
 
 /// <inheritdoc cref="Dictionary{TKey, TValue}"/>
 public class Map<TKey, TValue> : Dictionary<TKey, TValue>
@@ -6,7 +6,8 @@ public class Map<TKey, TValue> : Dictionary<TKey, TValue>
     where TValue : new()
 {
     /// <summary>
-    /// 初始化一个新的映射
+    /// Initializes a new instance of the <see cref="Map{TKey, TValue}"/> class.
+    /// 初始化一个新的映射.
     /// </summary>
     public Map()
         : base()
@@ -19,20 +20,21 @@ public class Map<TKey, TValue> : Dictionary<TKey, TValue>
     }
 
     /// <summary>
-    /// 初始化一个新的映射
+    /// Initializes a new instance of the <see cref="Map{TKey, TValue}"/> class.
+    /// 初始化一个新的映射.
     /// </summary>
-    /// <param name="dict">复制的字典</param>
+    /// <param name="dict">复制的字典.</param>
     public Map(IDictionary<TKey, TValue> dict)
         : base(dict)
     {
     }
 
     /// <summary>
-    /// 获取或新增
+    /// 获取或新增.
     /// </summary>
-    /// <param name="key">键</param>
-    /// <param name="valueFactory">值工厂</param>
-    /// <returns>值</returns>
+    /// <param name="key">键.</param>
+    /// <param name="valueFactory">值工厂.</param>
+    /// <returns>值.</returns>
     internal TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
     {
         if (!TryGetValue(key, out TValue? value))
@@ -45,10 +47,10 @@ public class Map<TKey, TValue> : Dictionary<TKey, TValue>
     }
 
     /// <summary>
-    /// 获取或新增
+    /// 获取或新增.
     /// </summary>
-    /// <param name="key">键</param>
-    /// <returns>值</returns>
+    /// <param name="key">键.</param>
+    /// <returns>值.</returns>
     internal TValue GetOrNew(TKey key)
     {
         if (!TryGetValue(key, out TValue? value))

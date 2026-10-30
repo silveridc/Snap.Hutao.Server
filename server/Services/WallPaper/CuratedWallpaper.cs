@@ -1,8 +1,8 @@
+using server.Models.PublicAPI;
+using server.Services.Admin;
 using System.Buffers.Binary;
 using System.Globalization;
 using System.Security.Cryptography;
-using server.Models.PublicAPI;
-using server.Services.Admin;
 
 namespace server.Services.WallPaper;
 
@@ -85,7 +85,12 @@ public sealed class CuratedWallpaper(SystemConfigService systemConfig, TimeProvi
         }
 
         string json = JsonSerializer.Serialize(normalized);
-        return await systemConfig.UpdateAsync(new() { [Keys.WallpaperTodayPool] = json }, userId).ConfigureAwait(false);
+        return await systemConfig.UpdateAsync(
+            new()
+            {
+                [Keys.WallpaperTodayPool] = json,
+            },
+            userId).ConfigureAwait(false);
     }
 
     private static bool IsHttpsUrl(string value)

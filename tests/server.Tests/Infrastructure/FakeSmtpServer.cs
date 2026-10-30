@@ -18,10 +18,10 @@ public sealed partial class FakeSmtpServer : IDisposable
         _ = Task.Run(AcceptLoopAsync);
     }
 
-    /// <summary>已收到的邮件正文（按接收顺序）。</summary>
+    /// <summary>已收到的邮件正文（按接收顺序）.</summary>
     public IReadOnlyCollection<string> Messages => messages;
 
-    /// <summary>等待一封包含验证码的邮件并返回其中的验证码。</summary>
+    /// <summary>等待一封包含验证码的邮件并返回其中的验证码.</summary>
     public async Task<string> WaitForVerifyCodeAsync(TimeSpan timeout)
     {
         DateTimeOffset deadline = DateTimeOffset.UtcNow + timeout;

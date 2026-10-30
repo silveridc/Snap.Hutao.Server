@@ -10,8 +10,8 @@ interface RuntimeConfig {
 }
 
 /**
- * 开发代理的目标站点。swagger.json 通常不带 CORS 头，本地直接跨域拉取会被浏览器拦截，
- * 所以按 config.json 里的相对路径前缀自动建代理规则，生产环境由 ASP.NET 同源托管。
+ * 开发代理的目标站点.swagger.json 通常不带 CORS 头，本地直接跨域拉取会被浏览器拦截，
+ * 所以按 config.json 里的相对路径前缀自动建代理规则，生产环境由 ASP.NET 同源托管.
  */
 function readDocsPrefixes(root: string): string[] {
   const file = path.join(root, 'public', 'config.json');

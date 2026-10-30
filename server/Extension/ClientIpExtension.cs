@@ -5,8 +5,8 @@ internal static class ClientIpExtension
     private const string _unknownIp = "unknown";
 
     /// <summary>
-    /// 取本次请求的客户端 IP 字符串。RemoteIpAddress 已由 ForwardedHeaders 按 App:RealIp 配置还原，
-    /// 反向代理后面拿到的是真实出口地址，而不是网关地址。
+    /// 取本次请求的客户端 IP 字符串.RemoteIpAddress 已由 ForwardedHeaders 按 App:RealIp 配置还原，
+    /// 反向代理后面拿到的是真实出口地址，而不是网关地址.
     /// </summary>
     public static string? GetClientIp(this HttpContext context)
     {

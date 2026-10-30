@@ -93,8 +93,8 @@ function scalarText(value: unknown): string {
 }
 
 /**
- * 把 schema 摊平成字段树。seen 记录当前展开链上的模型名，遇到回环就标成 recursive 并停止，
- * 这样 IdpResponse 里套 IdpResponse 也不会卡死。
+ * 把 schema 摊平成字段树.seen 记录当前展开链上的模型名，遇到回环就标成 recursive 并停止，
+ * 这样 IdpResponse 里套 IdpResponse 也不会卡死.
  */
 function toFields(
   schema: RawSchema,

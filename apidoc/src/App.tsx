@@ -277,7 +277,7 @@ export default function App() {
               <div className="section-title">文档加载失败</div>
               <div className="op-desc">{state.error}</div>
               <p className="dim" style={{ fontSize: 12 }}>
-                若这是跨域限制：把本站点部署到与接口同源（例如 ASP.NET 的 wwwroot/docs），或给 swagger.json 所在服务加 CORS 头。
+                若这是跨域限制：把本站点部署到与接口同源（例如 ASP.NET 的 wwwroot/docs），或给 swagger.json 所在服务加 CORS 头.
               </p>
             </div>
           )}

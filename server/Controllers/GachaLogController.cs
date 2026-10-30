@@ -1,4 +1,4 @@
-﻿using server.Filter;
+using server.Filter;
 using server.Models.Entity.GachaLog;
 using server.Models.GachaLog;
 using server.Models.Metadata;
@@ -11,9 +11,9 @@ namespace server.Controllers;
 public class GachaLogController(GachaLogService gachaLogService) : ControllerBase
 {
     /// <summary>
-    /// 获取当前祈愿活动的统计概览。
+    /// 获取当前祈愿活动的统计概览.
     /// </summary>
-    /// <returns>祈愿活动统计数据。</returns>
+    /// <returns>祈愿活动统计数据.</returns>
     [HttpGet("statistics/current-event")]
     public IActionResult CurrentEventStatistics()
     {
@@ -21,9 +21,9 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 获取角色活动祈愿的分布统计数据。
+    /// 获取角色活动祈愿的分布统计数据.
     /// </summary>
-    /// <returns>角色活动祈愿分布数据。</returns>
+    /// <returns>角色活动祈愿分布数据.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpGet("statistics/distributions/avatar-event")]
@@ -33,9 +33,9 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 获取武器活动祈愿的分布统计数据。
+    /// 获取武器活动祈愿的分布统计数据.
     /// </summary>
-    /// <returns>武器活动祈愿分布数据。</returns>
+    /// <returns>武器活动祈愿分布数据.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpGet("statistics/distributions/weapon-event")]
@@ -45,9 +45,9 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 获取集录祈愿的分布统计数据。
+    /// 获取集录祈愿的分布统计数据.
     /// </summary>
-    /// <returns>集录祈愿分布数据。</returns>
+    /// <returns>集录祈愿分布数据.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpGet("statistics/distributions/chronicled")]
@@ -57,9 +57,9 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 获取常驻祈愿的分布统计数据。
+    /// 获取常驻祈愿的分布统计数据.
     /// </summary>
-    /// <returns>常驻祈愿分布数据。</returns>
+    /// <returns>常驻祈愿分布数据.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpGet("statistics/distributions/standard")]
@@ -69,9 +69,9 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 获取当前用户的祈愿记录 Entry 列表。
+    /// 获取当前用户的祈愿记录 Entry 列表.
     /// </summary>
-    /// <returns>祈愿记录 Entry 列表。</returns>
+    /// <returns>祈愿记录 Entry 列表.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpGet("entries")]
@@ -82,10 +82,10 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 获取指定 Uid 最新的祈愿记录结束 ID。
+    /// 获取指定 Uid 最新的祈愿记录结束 ID.
     /// </summary>
-    /// <param name="uid">游戏 Uid。</param>
-    /// <returns>最新的 EndIds。</returns>
+    /// <param name="uid">游戏 Uid.</param>
+    /// <returns>最新的 EndIds.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpGet("end-ids")]
@@ -96,10 +96,10 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 根据 Uid 与 EndIds 获取更早的祈愿记录。
+    /// 根据 Uid 与 EndIds 获取更早的祈愿记录.
     /// </summary>
-    /// <param name="uidAndEndIds">包含 Uid 与 EndIds 的请求体。</param>
-    /// <returns>祈愿记录列表。</returns>
+    /// <param name="uidAndEndIds">包含 Uid 与 EndIds 的请求体.</param>
+    /// <returns>祈愿记录列表.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpPost("retrievals")]
@@ -111,13 +111,13 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 按条件有限获取更早的祈愿记录。
+    /// 按条件有限获取更早的祈愿记录.
     /// </summary>
-    /// <param name="uid">游戏 Uid。</param>
-    /// <param name="configType">祈愿记录配置类型。</param>
-    /// <param name="endId">起始结束 ID，默认为最大值。</param>
-    /// <param name="count">获取数量，默认 20。</param>
-    /// <returns>祈愿记录列表。</returns>
+    /// <param name="uid">游戏 Uid.</param>
+    /// <param name="configType">祈愿记录配置类型.</param>
+    /// <param name="endId">起始结束 ID，默认为最大值.</param>
+    /// <param name="count">获取数量，默认 20.</param>
+    /// <returns>祈愿记录列表.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpGet("limited-retrievals")]
@@ -129,10 +129,10 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 上传祈愿记录数据。
+    /// 上传祈愿记录数据.
     /// </summary>
-    /// <param name="uidAndItems">包含 Uid 与祈愿记录数据的请求体。</param>
-    /// <returns>上传保存结果。</returns>
+    /// <param name="uidAndItems">包含 Uid 与祈愿记录数据的请求体.</param>
+    /// <returns>上传保存结果.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpPost]
@@ -152,10 +152,10 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 删除指定 Uid 的祈愿记录。
+    /// 删除指定 Uid 的祈愿记录.
     /// </summary>
-    /// <param name="uid">游戏 Uid。</param>
-    /// <returns>删除的记录条数。</returns>
+    /// <param name="uid">游戏 Uid.</param>
+    /// <returns>删除的记录条数.</returns>
     [Authorize]
     [ServiceFilter(typeof(ValidateGachaLogPermission))]
     [HttpDelete("{uid}")]
@@ -166,11 +166,11 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     }
 
     /// <summary>
-    /// 根据名称获取指定类型的祈愿统计数据。
+    /// 根据名称获取指定类型的祈愿统计数据.
     /// </summary>
-    /// <typeparam name="T">统计数据类型。</typeparam>
-    /// <param name="name">统计数据缓存名称。</param>
-    /// <returns>统计数据。</returns>
+    /// <typeparam name="T">统计数据类型.</typeparam>
+    /// <param name="name">统计数据缓存名称.</param>
+    /// <returns>统计数据.</returns>
     private IActionResult GetGachaLogStatistics<T>(string name)
         where T : class
     {

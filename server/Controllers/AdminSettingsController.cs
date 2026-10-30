@@ -15,7 +15,7 @@ namespace server.Controllers;
 public sealed class AdminSettingsController(SystemConfigService systemConfigService, CuratedWallpaper curatedWallpaper) : ControllerBase
 {
     /// <summary>
-    /// 获取所有系统配置项（DB 覆盖值）。
+    /// 获取所有系统配置项（DB 覆盖值）.
     /// </summary>
     [HttpGet("settings")]
     public async Task<IActionResult> ConfigGetAsync()
@@ -27,7 +27,7 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
     }
 
     /// <summary>
-    /// 批量更新系统配置项。
+    /// 批量更新系统配置项.
     /// </summary>
     [HttpPatch("settings")]
     public async Task<IActionResult> ConfigUpdateAsync([FromBody] Dictionary<string, string?> settings)
@@ -44,7 +44,7 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
     }
 
     /// <summary>
-    /// 删除配置项，恢复为 appsettings.json 默认值。
+    /// 删除配置项，恢复为 appsettings.json 默认值.
     /// </summary>
     [HttpDelete("settings/{key}")]
     public async Task<IActionResult> ConfigResetAsync([FromRoute] string key)
@@ -61,7 +61,7 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
     }
 
     /// <summary>
-    /// 获取今日壁纸池，旧版单张配置会自动作为一条记录返回。
+    /// 获取今日壁纸池，旧版单张配置会自动作为一条记录返回.
     /// </summary>
     [HttpGet("wallpaper-pool")]
     public IActionResult WallpaperPoolGet()
@@ -70,7 +70,7 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
     }
 
     /// <summary>
-    /// 保存今日壁纸池，客户端每天从池中随机取一张。
+    /// 保存今日壁纸池，客户端每天从池中随机取一张.
     /// </summary>
     [HttpPut("wallpaper-pool")]
     public async Task<IActionResult> WallpaperPoolUpdateAsync([FromBody] List<WallpaperPoolItem>? items)

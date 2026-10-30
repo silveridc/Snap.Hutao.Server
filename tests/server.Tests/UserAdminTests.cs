@@ -28,7 +28,7 @@ public sealed class UserAdminTests
         users = factory.Users;
     }
 
-    /// <summary>把指定用户的 stamp 抹成给定值（null 或空串），模拟生产上手工插入/迁移来的历史行。</summary>
+    /// <summary>把指定用户的 stamp 抹成给定值（null 或空串），模拟生产上手工插入/迁移来的历史行.</summary>
     private static async Task SetStampAsync(HutaoServerFactory factory, int userId, string? stamp)
     {
         using IServiceScope scope = factory.Services.CreateScope();
@@ -51,8 +51,8 @@ public sealed class UserAdminTests
 
     private static async Task<bool> PasswordWorksAsync(HutaoServerFactory factory, int userId, string password)
     {
-        // CheckPasswordAsync 只做哈希比对，不读 stamp，不受被测行为影响。
-        // await 必须发生在 using 内：scope 释放后续跑的 EF 操作会撞 ObjectDisposedException。
+        // CheckPasswordAsync 只做哈希比对，不读 stamp，不受被测行为影响.
+        // await 必须发生在 using 内：scope 释放后续跑的 EF 操作会撞 ObjectDisposedException.
         using IServiceScope scope = factory.Services.CreateScope();
         UserManager<HutaoUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<HutaoUser>>();
         HutaoUser user = await userManager.Users.AsNoTracking().SingleAsync(u => u.Id == userId);
@@ -84,7 +84,7 @@ public sealed class UserAdminTests
         Assert.True((int)root["retcode"]! == 0, $"重置历史无 stamp 用户的密码不应 500：{root.ToJsonString()}");
     }
 
-    /// <summary>空串与 null 走同一个补盖分支：IsNullOrEmpty 而不是只判 null。</summary>
+    /// <summary>空串与 null 走同一个补盖分支：IsNullOrEmpty 而不是只判 null.</summary>
     [Fact]
     public async Task ResetPassword_ToleratesEmptyStringSecurityStamp()
     {
@@ -124,7 +124,7 @@ public sealed class UserAdminTests
         Assert.Equal(ServerKeys.ServerAdminUserNotFound, key);
     }
 
-    /// <summary>策略拒绝（最短 8 位）必须以失败返回而不是异常，且不能动到原密码。</summary>
+    /// <summary>策略拒绝（最短 8 位）必须以失败返回而不是异常，且不能动到原密码.</summary>
     [Fact]
     public async Task ResetPassword_WithTooShortPassword_FailsWithoutChangingThePassword()
     {
@@ -139,7 +139,7 @@ public sealed class UserAdminTests
         Assert.False(await PasswordWorksAsync(factory, victim.Id, "1qaz2ws"));
     }
 
-    /// <summary>第一次重置会把 stamp 轮换掉；第二次必须基于新 stamp 重新发令牌并继续成功。</summary>
+    /// <summary>第一次重置会把 stamp 轮换掉；第二次必须基于新 stamp 重新发令牌并继续成功.</summary>
     [Fact]
     public async Task ResetPassword_TwiceInARow_BothSucceed()
     {

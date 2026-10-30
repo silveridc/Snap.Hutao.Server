@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.Achievement;
+namespace server.Models.Entity.Achievement;
 
 public enum AchievementStatus /*: int*/
 {

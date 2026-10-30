@@ -11,21 +11,21 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using server.Controllers;
+using server.Filter;
 using server.Models.Admin;
 using server.Models.Context;
 using server.Models.Entity;
 using server.Models.Entity.Passport;
 using server.Models.Passport;
 using server.Models.Response;
-using server.Services.PublicAPI;
 using server.Options;
 using server.Services.Admin;
 using server.Services.Authorization;
+using server.Services.PublicAPI;
 using server.Tests.Infrastructure;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Security.Cryptography;
-using server.Filter;
 
 namespace server.Tests;
 
@@ -58,7 +58,7 @@ public sealed class SsoTests : IDisposable
 
     /// <summary>
     /// 建立 AdminSsoService，种子声明值固定为 <paramref name="bootstrapValue"/>；<paramref name="enabled"/> 控制 SSO 总开关，
-    /// <paramref name="clientRedirectUri"/> 非空时同时打开启动器侧的登录入口。
+    /// <paramref name="clientRedirectUri"/> 非空时同时打开启动器侧的登录入口.
     /// </summary>
     private AdminSsoService CreateService(string bootstrapValue, bool enabled = true, string? clientRedirectUri = null)
     {
@@ -109,7 +109,7 @@ public sealed class SsoTests : IDisposable
         await db.AdminAccounts.ExecuteDeleteAsync(cancellationToken);
     }
 
-    /// <summary>登记发现文档与 JWKS；令牌端点在具体用例里按需追加。</summary>
+    /// <summary>登记发现文档与 JWKS；令牌端点在具体用例里按需追加.</summary>
     private void RegisterIdentityProviderStubs()
     {
         RSAParameters parameters = idpRsa.ExportParameters(false);
@@ -125,7 +125,7 @@ public sealed class SsoTests : IDisposable
             .MapJson($"{Issuer}/jwks", jwks);
     }
 
-    /// <summary>用身份源的私钥签发一个 ID Token。</summary>
+    /// <summary>用身份源的私钥签发一个 ID Token.</summary>
     private string MintIdToken(string subject, string nonce)
     {
         RsaSecurityKey key = new(idpRsa) { KeyId = KeyId };
@@ -164,7 +164,7 @@ public sealed class SsoTests : IDisposable
 
     private static CancellationToken Token => TestContext.Current.CancellationToken;
 
-    /// <summary>造一个带指定身份声明、指定动词的动作执行上下文，用来直接驱动权限过滤器。</summary>
+    /// <summary>造一个带指定身份声明、指定动词的动作执行上下文，用来直接驱动权限过滤器.</summary>
     private static ActionExecutingContext BuildContext(string method, params System.Security.Claims.Claim[] claims)
     {
         DefaultHttpContext httpContext = new()
@@ -188,7 +188,7 @@ public sealed class SsoTests : IDisposable
             controller: null!);
     }
 
-    /// <summary>跑一次过滤器，返回「内层动作是否执行」与过滤器写入的响应。</summary>
+    /// <summary>跑一次过滤器，返回「内层动作是否执行」与过滤器写入的响应.</summary>
     private static async Task<(bool InnerRan, IActionResult? Result)> RunFilterAsync(IAsyncActionFilter filter, ActionExecutingContext context)
     {
         bool innerRan = false;
@@ -209,7 +209,7 @@ public sealed class SsoTests : IDisposable
         Assert.Equal(expected, Assert.IsType<Response<object?>>(json.Value).Code);
     }
 
-    /// <summary>走完一次「授权 → 回调 → 兑换票据」，返回后台令牌里的账号 ID。</summary>
+    /// <summary>走完一次「授权 → 回调 → 兑换票据」，返回后台令牌里的账号 ID.</summary>
     private async Task<int> SignInAsync(AdminSsoService service, string subject, CancellationToken token)
     {
         AdminSsoCallbackResult callback = await CompleteLoginAsync(service, subject, token);
@@ -385,8 +385,8 @@ public sealed class SsoTests : IDisposable
     }
 
     /// <summary>
-    /// 老账号只读、后台账号可写：这是「收紧老账号」的核心断言。
-    /// 未启用单点登录时门禁整体放行，配置没配好之前不会把自己关在门外。
+    /// 老账号只读、后台账号可写：这是「收紧老账号」的核心断言.
+    /// 未启用单点登录时门禁整体放行，配置没配好之前不会把自己关在门外.
     /// </summary>
     [Fact]
     public async Task WriteGate_KeepsLegacyAccountsReadOnly()
@@ -417,7 +417,7 @@ public sealed class SsoTests : IDisposable
         Assert.Null(inertResult);
     }
 
-    /// <summary>后台专属账号在只读门禁里等同于维护者，停用后连读也进不来。</summary>
+    /// <summary>后台专属账号在只读门禁里等同于维护者，停用后连读也进不来.</summary>
     [Fact]
     public async Task MaintainGate_AdmitsUsableAdminAccounts()
     {
@@ -448,7 +448,7 @@ public sealed class SsoTests : IDisposable
 
     /// <summary>
     /// 启动器侧的开关：总开关开着但客户端回调地址没配时，客户端能力仍然关闭，
-    /// 而且回调不会去访问身份源——客户端据此继续只显示邮箱密码登录。
+    /// 而且回调不会去访问身份源——客户端据此继续只显示邮箱密码登录.
     /// </summary>
     [Fact]
     public async Task ClientLogin_IsAdvertisedOnlyWithAClientRedirectUri()
@@ -464,7 +464,7 @@ public sealed class SsoTests : IDisposable
 
     /// <summary>
     /// 客户端链路的完整跑通：授权地址用的是客户端回调地址 → 回调换到一次性票据 →
-    /// 票据换来的是<b>主站令牌</b>（含 UserId 与刷新令牌，与邮箱密码登录同构），票据用第二次即失效。
+    /// 票据换来的是<b>主站令牌</b>（含 UserId 与刷新令牌，与邮箱密码登录同构），票据用第二次即失效.
     /// </summary>
     [Fact]
     public async Task ClientLogin_ExchangesTheTicketForAnOrdinaryUserToken()
@@ -505,7 +505,7 @@ public sealed class SsoTests : IDisposable
             log => log.Action == "/api/passport/sso/sessions" && log.Detail == bound.UserName);
     }
 
-    /// <summary>回跳只落到启动器拦截的哨兵地址：成功带 ticket，失败带 error 与回显的主体标识。</summary>
+    /// <summary>回跳只落到启动器拦截的哨兵地址：成功带 ticket，失败带 error 与回显的主体标识.</summary>
     [Fact]
     public async Task ClientCallback_RedirectsToTheLauncherSentinel()
     {
@@ -534,9 +534,9 @@ public sealed class SsoTests : IDisposable
     }
 
     /// <summary>
-    /// 换码请求（token endpoint）表单里的 redirect_uri 必须与授权时用的同一个回调地址。
+    /// 换码请求（token endpoint）表单里的 redirect_uri 必须与授权时用的同一个回调地址.
     /// 回归：曾经硬编码后台回调地址，客户端链路被身份源按 <c>invalid_grant redirect_uri mismatch</c>
-    /// 拒收，启动器 SSO 登录全灭——桩身份源原本不校验这个字段，只有真 IdP 能抓到。
+    /// 拒收，启动器 SSO 登录全灭——桩身份源原本不校验这个字段，只有真 IdP 能抓到.
     /// </summary>
     [Fact]
     public async Task TokenExchange_SendsTheRedirectUriUsedAtAuthorizeTime()
@@ -569,7 +569,7 @@ public sealed class SsoTests : IDisposable
             .Single(r => r.Url.Contains("/token", StringComparison.Ordinal)).Body!;
     }
 
-    /// <summary>身份有效但还没绑定主站账号时，客户端登录停在「未绑定」，签不出票据。</summary>
+    /// <summary>身份有效但还没绑定主站账号时，客户端登录停在「未绑定」，签不出票据.</summary>
     [Fact]
     public async Task ClientLogin_WithoutABoundHutaoAccount_IsRejected()
     {
@@ -584,7 +584,7 @@ public sealed class SsoTests : IDisposable
         Assert.Equal(subject, callback.Subject);
     }
 
-    /// <summary>这个身份连后台账号都没有，客户端登录停在「未开通」。</summary>
+    /// <summary>这个身份连后台账号都没有，客户端登录停在「未开通」.</summary>
     [Fact]
     public async Task ClientLogin_UnprovisionedSubject_IsRejectedButEchoesItsSubject()
     {
@@ -597,7 +597,7 @@ public sealed class SsoTests : IDisposable
         Assert.Equal(stranger, callback.Subject);
     }
 
-    /// <summary>后台账号被停用后，客户端登录停在「已停用」。</summary>
+    /// <summary>后台账号被停用后，客户端登录停在「已停用」.</summary>
     [Fact]
     public async Task ClientLogin_DisabledAccount_IsRejected()
     {
@@ -616,7 +616,7 @@ public sealed class SsoTests : IDisposable
 
     /// <summary>
     /// 票据与「还能不能登录」是分开判定的：回调之后被解绑或停用，先前签出的票据换不出令牌，
-    /// 免得拿着旧票据绕过已经收回的权限。
+    /// 免得拿着旧票据绕过已经收回的权限.
     /// </summary>
     [Fact]
     public async Task TicketTakenAfterBindingRevoked_DoesNotIssueAToken()
@@ -642,7 +642,7 @@ public sealed class SsoTests : IDisposable
 
     /// <summary>
     /// 「有权限的可以直接 SSO 登录」在写门禁里的落点：启动器只携带主站令牌，
-    /// 门禁按「这个用户是否绑定了可用的后台账号」放行；解绑后同一个令牌立刻回到只读。
+    /// 门禁按「这个用户是否绑定了可用的后台账号」放行；解绑后同一个令牌立刻回到只读.
     /// </summary>
     [Fact]
     public async Task WriteGate_AdmitsUsersBoundToAnAdminAccount()
@@ -667,7 +667,7 @@ public sealed class SsoTests : IDisposable
         AssertRetcode(unboundResult, ReturnCode.WriteRequiresSsoAdmin);
     }
 
-    /// <summary>绑定了后台账号的主站用户在只读门禁里也等同于维护者，否则启动器登录后读不到维护接口。</summary>
+    /// <summary>绑定了后台账号的主站用户在只读门禁里也等同于维护者，否则启动器登录后读不到维护接口.</summary>
     [Fact]
     public async Task MaintainGate_AdmitsUsersBoundToAnAdminAccount()
     {
@@ -692,7 +692,7 @@ public sealed class SsoTests : IDisposable
         AssertRetcode(revokedResult, ReturnCode.ServiceKeyInvalid);
     }
 
-    /// <summary>建一个后台账号并绑定到全新的主站账号，返回两边的 ID 与登录用的邮箱。</summary>
+    /// <summary>建一个后台账号并绑定到全新的主站账号，返回两边的 ID 与登录用的邮箱.</summary>
     private async Task<(int AccountId, TestUser User)> ProvisionBoundAccountAsync(AdminSsoService service, string subject, CancellationToken token)
     {
         TestUser user = await factory.Users.CreateUniqueAsync("sso-bind");
@@ -707,14 +707,14 @@ public sealed class SsoTests : IDisposable
         return (accountId, user);
     }
 
-    /// <summary>让桩身份源接受这次授权：按 state 里的 nonce 现签一个 ID Token。</summary>
+    /// <summary>让桩身份源接受这次授权：按 state 里的 nonce 现签一个 ID Token.</summary>
     private void StubIdTokenFor(string authorizeUrl, string subject)
     {
         string idToken = MintIdToken(subject, GetQuery(authorizeUrl, "nonce"));
         factory.StubHttp.MapJson($"{Issuer}/token", $$"""{"id_token":"{{idToken}}","token_type":"Bearer","access_token":"irrelevant"}""");
     }
 
-    /// <summary>构造一个带设备头的 PassportSsoController，直接驱动客户端的两个对外接口。</summary>
+    /// <summary>构造一个带设备头的 PassportSsoController，直接驱动客户端的两个对外接口.</summary>
     private PassportSsoController CreateController(AdminSsoService service)
     {
         DefaultHttpContext httpContext = new();
@@ -732,7 +732,7 @@ public sealed class SsoTests : IDisposable
         };
     }
 
-    /// <summary>走完一次客户端侧的「授权 → 回调」，返回回调结果；<paramref name="expect"/> 用于断言失败分支。</summary>
+    /// <summary>走完一次客户端侧的「授权 → 回调」，返回回调结果；<paramref name="expect"/> 用于断言失败分支.</summary>
     private async Task<PassportSsoCallbackResult> CompleteClientLoginAsync(AdminSsoService service, string subject, CancellationToken token, PassportSsoCallbackStatus expect = PassportSsoCallbackStatus.Success)
     {
         (string? authorizeUrl, _) = await service.CreateClientAuthorizeUrlAsync(token);
@@ -744,7 +744,7 @@ public sealed class SsoTests : IDisposable
         return result;
     }
 
-    /// <summary>后台是 hash 路由，回跳参数必须落在 '#' 之后，否则前端从路由里读不到凭证。</summary>
+    /// <summary>后台是 hash 路由，回跳参数必须落在 '#' 之后，否则前端从路由里读不到凭证.</summary>
     [Fact]
     public void CallbackUrl_PutsTheQueryInsideTheHashFragment()
     {
@@ -759,7 +759,7 @@ public sealed class SsoTests : IDisposable
         Assert.Equal("/metadata/index", parsed["return"].ToString());
     }
 
-    /// <summary>走完一次「授权 → 回调」，返回回调结果；<paramref name="expect"/> 用于断言失败分支。</summary>
+    /// <summary>走完一次「授权 → 回调」，返回回调结果；<paramref name="expect"/> 用于断言失败分支.</summary>
     private async Task<AdminSsoCallbackResult> CompleteLoginAsync(AdminSsoService service, string subject, CancellationToken token, AdminSsoCallbackStatus expect = AdminSsoCallbackStatus.Success)
     {
         (string? authorizeUrl, _) = await service.CreateAuthorizeUrlAsync(null, token);

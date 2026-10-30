@@ -8,7 +8,7 @@ namespace server.Tests;
 public sealed class FiniteNumberJsonConverterTests
 {
     /// <summary>与 SpiralAbyssStatisticsService/DistributedCacheExtension 一致的存储侧 options，
-    /// 模拟真实缓存往返环境：非有限值以带引号的字面量形态落库/落缓存。</summary>
+    /// 模拟真实缓存往返环境：非有限值以带引号的字面量形态落库/落缓存.</summary>
     private static readonly JsonSerializerOptions RoundTripOptions = CreateOptions();
 
     private static JsonSerializerOptions CreateOptions()
@@ -82,8 +82,8 @@ public sealed class FiniteNumberJsonConverterTests
     public void StorageOptions_QuoteNamedLiterals_OnWriteAndRead()
     {
         // 存储侧 options（AllowNamedFloatingPointLiterals）把非有限值写成带引号的字面量，
-        // 读回也只接受带引号形态——库行与缓存里的实际形态如此；裸 Infinity token 对 reader 从来不合法。
-        // 这条契约钉死「毒值长什么样」，免得以后有人按裸 token 的想象改坏读写两侧。
+        // 读回也只接受带引号形态——库行与缓存里的实际形态如此；裸 Infinity token 对 reader 从来不合法.
+        // 这条契约钉死「毒值长什么样」，免得以后有人按裸 token 的想象改坏读写两侧.
         JsonSerializerOptions storage = new() { NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals };
 
         Assert.Equal("\"Infinity\"", JsonSerializer.Serialize(double.PositiveInfinity, storage));

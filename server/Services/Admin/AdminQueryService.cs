@@ -9,7 +9,7 @@ namespace server.Services.Admin;
 // Scoped
 public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService ipRegionService)
 {
-    /// <summary>某张兑换码的使用者清单，按使用时间倒序。</summary>
+    /// <summary>某张兑换码的使用者清单，按使用时间倒序.</summary>
     public Task<List<RedeemCodeUsageItem>> GetRedeemCodeUsesAsync(uint id)
     {
         return appDbContext.RedeemCodeUseItems
@@ -243,7 +243,7 @@ public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService
         return new PagedResult<AuditLogItem> { Total = total, Page = page, PageSize = pageSize, Items = items };
     }
 
-    /// <summary>客户端登录日志：关键字匹配邮箱或 IP，可按结果、时间范围与用户过滤，IP 属地读取时现查。</summary>
+    /// <summary>客户端登录日志：关键字匹配邮箱或 IP，可按结果、时间范围与用户过滤，IP 属地读取时现查.</summary>
     public async Task<PagedResult<UserLoginLogItem>> GetLoginLogsAsync(int page, int pageSize, string? keyword, bool? success, long? from, long? to, int? userId = null)
     {
         page = page < 1 ? 1 : page;
@@ -317,27 +317,6 @@ public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService
         return new PagedResult<UserLoginLogItem> { Total = total, Page = page, PageSize = pageSize, Items = items };
     }
 
-    private sealed class AuditLogRow
-    {
-        public long Id { get; init; }
-
-        public int AdminUserId { get; init; }
-
-        public int? AdminAccountId { get; init; }
-
-        public string? AdminUserName { get; init; }
-
-        public string Action { get; init; } = default!;
-
-        public string? Detail { get; init; }
-
-        public string? Ip { get; init; }
-
-        public bool Success { get; init; }
-
-        public long Timestamp { get; init; }
-    }
-
     public async Task<UserDetail?> GetUserDetailAsync(int userId)
     {
         HutaoUser? user = await appDbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
@@ -366,5 +345,50 @@ public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService
             RedeemUsedCount = redeemUsed,
             GachaUids = gachaUids,
         };
+    }
+
+    private sealed class AuditLogRow
+    {
+        public long Id
+        {
+            get; init;
+        }
+
+        public int AdminUserId
+        {
+            get; init;
+        }
+
+        public int? AdminAccountId
+        {
+            get; init;
+        }
+
+        public string? AdminUserName
+        {
+            get; init;
+        }
+
+        public string Action { get; init; } = default!;
+
+        public string? Detail
+        {
+            get; init;
+        }
+
+        public string? Ip
+        {
+            get; init;
+        }
+
+        public bool Success
+        {
+            get; init;
+        }
+
+        public long Timestamp
+        {
+            get; init;
+        }
     }
 }

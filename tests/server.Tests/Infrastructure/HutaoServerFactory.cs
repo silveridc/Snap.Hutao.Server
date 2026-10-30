@@ -34,25 +34,25 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
     public int RedisPort { get; private set; }
 
     /// <summary>
-    /// 进程内共享的测试账号工厂。xUnit 会为每个测试方法新建测试类实例，
-    /// 把账号缓存在宿主上可以让「维护者」等固定账号只播种一次。
+    /// 进程内共享的测试账号工厂.xUnit 会为每个测试方法新建测试类实例，
+    /// 把账号缓存在宿主上可以让「维护者」等固定账号只播种一次.
     /// </summary>
     public TestUsers Users => users.Value;
 
-    /// <summary>测试使用的假 SMTP 服务。</summary>
+    /// <summary>测试使用的假 SMTP 服务.</summary>
     public FakeSmtpServer Smtp => smtp ?? throw new InvalidOperationException("Factory is not initialized.");
 
-    /// <summary>对外部 HTTP 调用的拦截器。</summary>
+    /// <summary>对外部 HTTP 调用的拦截器.</summary>
     public StubHttpMessageHandler StubHttp => stubHttp;
 
-    /// <summary>通过被测服务容器的 DI 解析一个服务。</summary>
+    /// <summary>通过被测服务容器的 DI 解析一个服务.</summary>
     public T GetService<T>()
         where T : notnull
     {
         return Services.GetRequiredService<T>();
     }
 
-    /// <summary>在独立作用域中解析一个服务。</summary>
+    /// <summary>在独立作用域中解析一个服务.</summary>
     public T GetScopedService<T>()
         where T : notnull
     {
@@ -80,8 +80,8 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
     }
 
     /// <summary>
-    /// 登记第三方接口的默认桩数据，保证接口在无外网环境下也能返回成功分支。
-    /// 需要断言失败分支的用例可自行 <see cref="StubHttpMessageHandler.Map"/> 覆盖（后登记优先）。
+    /// 登记第三方接口的默认桩数据，保证接口在无外网环境下也能返回成功分支.
+    /// 需要断言失败分支的用例可自行 <see cref="StubHttpMessageHandler.Map"/> 覆盖（后登记优先）.
     /// </summary>
     private void RegisterDefaultHttpStubs()
     {
@@ -126,7 +126,7 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         stubHttp.MapJson("hutao-cdn.test/get", """{"retcode":0,"message":"ok","data":{"mirrorName":"stub","url":"https://hutao-cdn.test/files/hutao.zip"}}""");
     }
 
-    /// <summary>应用 AppDbContext 的迁移。元数据表已并入主库迁移链，不再单独建表。</summary>
+    /// <summary>应用 AppDbContext 的迁移.元数据表已并入主库迁移链，不再单独建表.</summary>
     private async Task PrepareSchemaAsync()
     {
         using IServiceScope scope = Services.CreateScope();
@@ -152,7 +152,7 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         }
     }
 
-    /// <summary>删除并重建测试库，使每个测试进程从干净的 schema 开始。</summary>
+    /// <summary>删除并重建测试库，使每个测试进程从干净的 schema 开始.</summary>
     public async Task ResetDatabaseAsync()
     {
         (string user, string password) = TestEnvironment.AppCredentials;
@@ -177,7 +177,7 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         }
     }
 
-    /// <summary>创建不跟随重定向的客户端，便于断言 3xx 响应（OAuth 授权等）。</summary>
+    /// <summary>创建不跟随重定向的客户端，便于断言 3xx 响应（OAuth 授权等）.</summary>
     public HttpClient CreateApiClient()
     {
         return CreateClient(new WebApplicationFactoryClientOptions
@@ -230,7 +230,7 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
 
     /// <summary>
     /// Program.cs 里所有 Quartz 任务都是 <c>StartNow()</c> 调度的，宿主一启动就会并发跑统计刷新和
-    /// 记录清理，测试数据的读写时机无法预测。统计接口由用例显式触发，这里去掉调度器的后台服务。
+    /// 记录清理，测试数据的读写时机无法预测.统计接口由用例显式触发，这里去掉调度器的后台服务.
     /// </summary>
     private static void DisableQuartz(IServiceCollection services)
     {
@@ -247,11 +247,11 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
 
     /// <summary>
     /// 所有出网 HttpClient 都改走 <see cref="StubHttpMessageHandler"/>：
-    /// 未登记的地址一律返回 502，保证测试不依赖外网。
+    /// 未登记的地址一律返回 502，保证测试不依赖外网.
     /// <para>
     /// <c>AddHttpClient</c> 不会把 <see cref="HttpMessageHandler"/> 注册进容器，
     /// 主处理器由 <see cref="IHttpMessageHandlerBuilderFilter"/> 在构建管道时创建，
-    /// 因此这里插入一个过滤器替换主处理器。
+    /// 因此这里插入一个过滤器替换主处理器.
     /// </para>
     /// </summary>
     private void OverrideHttpClients(IServiceCollection services)
@@ -283,7 +283,7 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
 
     /// <summary>
     /// appsettings.json 缺少 OAuthStateEncryptKey（线上由环境变量注入），
-    /// 这里替换掉 Program.cs 注册的 AppOptions 单例，补上 32 字节的 AES 密钥。
+    /// 这里替换掉 Program.cs 注册的 AppOptions 单例，补上 32 字节的 AES 密钥.
     /// </summary>
     private static void OverrideAppOptions(IServiceCollection services)
     {
@@ -333,7 +333,7 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         }
     }
 
-    /// <summary>在独立作用域中执行一段数据库操作。</summary>
+    /// <summary>在独立作用域中执行一段数据库操作.</summary>
     public async Task WithDbContextAsync(Func<AppDbContext, Task> action)
     {
         using IServiceScope scope = Services.CreateScope();
@@ -341,7 +341,7 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         await action(appDbContext);
     }
 
-    /// <summary>在独立作用域中读取数据。</summary>
+    /// <summary>在独立作用域中读取数据.</summary>
     public async Task<T> WithDbContextAsync<T>(Func<AppDbContext, Task<T>> selector)
     {
         using IServiceScope scope = Services.CreateScope();

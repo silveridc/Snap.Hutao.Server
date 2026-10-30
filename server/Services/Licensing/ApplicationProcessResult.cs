@@ -1,4 +1,4 @@
-﻿namespace server.Services.Licensing;
+namespace server.Services.Licensing;
 
 public enum ApplicationProcessResult
 {

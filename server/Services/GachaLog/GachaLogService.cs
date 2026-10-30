@@ -1,7 +1,7 @@
-﻿using System.Runtime.InteropServices;
-using server.Models.Entity.GachaLog;
+﻿using server.Models.Entity.GachaLog;
 using server.Models.GachaLog;
 using server.Models.Metadata;
+using System.Runtime.InteropServices;
 
 namespace server.Services.GachaLog;
 

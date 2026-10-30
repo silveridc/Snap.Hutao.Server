@@ -1,4 +1,4 @@
-﻿using server.Models.Entity.SpiralAbyss;
+using server.Models.Entity.SpiralAbyss;
 using server.Models.Legacy;
 using server.Models.Upload;
 using StackExchange.Redis;
@@ -11,12 +11,12 @@ internal sealed class RankService(IServiceScopeFactory scopeFactory, AppOptions 
     private readonly ConnectionMultiplexer _redis = Connect(appOptions.RedisAddress, logger);
 
     /// <summary>
-    /// 将排行存入 Redis
+    /// 将排行存入 Redis.
     /// </summary>
-    /// <param name="uid">uid</param>
-    /// <param name="damage">造成伤害</param>
-    /// <param name="takeDamage">受到伤害</param>
-    /// <returns>任务</returns>
+    /// <param name="uid">uid.</param>
+    /// <param name="damage">造成伤害.</param>
+    /// <param name="takeDamage">受到伤害.</param>
+    /// <returns>任务.</returns>
     public async Task SaveRankAsync(string uid, SimpleRank damage, SimpleRank? takeDamage)
     {
         IDatabase db = _redis.GetDatabase(12);
@@ -40,10 +40,10 @@ internal sealed class RankService(IServiceScopeFactory scopeFactory, AppOptions 
     }
 
     /// <summary>
-    /// 异步获取排行
+    /// 异步获取排行.
     /// </summary>
-    /// <param name="uid">uid</param>
-    /// <returns>排行数据</returns>
+    /// <param name="uid">uid.</param>
+    /// <returns>排行数据.</returns>
     public async Task<Rank> RetriveRankAsync(string uid)
     {
         EntityDamageRank? damage;
@@ -95,9 +95,9 @@ internal sealed class RankService(IServiceScopeFactory scopeFactory, AppOptions 
     }
 
     /// <summary>
-    /// 异步清除排行
+    /// 异步清除排行.
     /// </summary>
-    /// <returns>任务</returns>
+    /// <returns>任务.</returns>
     public async Task<long> ClearRanksAsync()
     {
         IDatabase db = _redis.GetDatabase(12);

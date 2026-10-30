@@ -59,8 +59,8 @@ export const useUserStore = defineStore('user', {
         cdnExpireAt: info.CdnExpireAt,
       };
     },
-    // 单点登录回跳页用一次性票据换后台令牌。后台令牌不带刷新令牌，先清空旧令牌，
-    // 否则过期后会静默刷新回主站用户身份。
+    // 单点登录回跳页用一次性票据换后台令牌.后台令牌不带刷新令牌，先清空旧令牌，
+    // 否则过期后会静默刷新回主站用户身份.
     async loginWithTicket(ticket: string) {
       const res: any = await exchangeSsoTicket(ticket);
       clearTokens();

@@ -1,4 +1,4 @@
-﻿// API 冒烟测试。凭据从环境变量读取，不落盘。
+﻿// API 冒烟测试.凭据从环境变量读取，不落盘.
 //   BASE=https://snap-api.sliveridc1.cn EMAIL=... PASSWORD=... node scripts/api-smoke.mjs
 const BASE = process.env.BASE || 'https://snap-api.sliveridc1.cn'
 const EMAIL = process.env.EMAIL

@@ -1,25 +1,13 @@
-﻿namespace server.Models.Response;
-
-public class Response<T>(ReturnCode code, string message, T? data = default)
-{
-    [JsonPropertyName("retcode")]
-    public ReturnCode Code { get; set; } = code;
-
-    [JsonPropertyName("message")]
-    public string Message { get; set; } = message;
-
-    [JsonPropertyName("l10nKey")]
-    public string? LocalizationKey { get; set; }
-
-    [JsonPropertyName("data")]
-    public T? Data { get; set; } = data;
-}
+namespace server.Models.Response;
 
 public static class Response
 {
     public static Response<T> CreateSuccess<T>(string message, T? data = default, string? key = null)
     {
-        return new(ReturnCode.Success, message, data) { LocalizationKey = key };
+        return new(ReturnCode.Success, message, data)
+        {
+            LocalizationKey = key,
+        };
     }
 
     public static IActionResult Success<T>(string message, T? data = default, string? key = null)
@@ -34,7 +22,10 @@ public static class Response
 
     public static Response<T> CreateFail<T>(string message, ReturnCode code, T? data = default, string? key = null)
     {
-        return new(code, message, data) { LocalizationKey = key };
+        return new(code, message, data)
+        {
+            LocalizationKey = key,
+        };
     }
 
     public static IActionResult Fail<T>(string message, ReturnCode code, T? data = default, string? key = null)
@@ -46,4 +37,22 @@ public static class Response
     {
         return new JsonResult(CreateFail<object?>(message, code, null, key));
     }
+}
+
+public class Response<T>(ReturnCode code, string message, T? data = default)
+{
+    [JsonPropertyName("retcode")]
+    public ReturnCode Code { get; set; } = code;
+
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = message;
+
+    [JsonPropertyName("l10nKey")]
+    public string? LocalizationKey
+    {
+        get; set;
+    }
+
+    [JsonPropertyName("data")]
+    public T? Data { get; set; } = data;
 }

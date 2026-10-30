@@ -1,12 +1,18 @@
-﻿namespace server.Models.ReCaptcha;
+namespace server.Models.ReCaptcha;
 
 public class ReCaptchaResponse
 {
     [JsonPropertyName("success")]
-    public bool Success { get; set; }
+    public bool Success
+    {
+        get; set;
+    }
 
     [JsonPropertyName("score")]
-    public float Score { get; set; }
+    public float Score
+    {
+        get; set;
+    }
 
     [JsonPropertyName("action")]
     public string Action { get; set; } = default!;

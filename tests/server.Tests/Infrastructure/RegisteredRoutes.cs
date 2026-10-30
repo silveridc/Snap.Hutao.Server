@@ -42,7 +42,7 @@ public static class RegisteredRoutes
 
     /// <summary>
     /// 判断冒烟清单里的某个具体地址是否命中路由模板：模板参数段（<c>{uid}</c>）匹配任意一段
-    /// 具体路径，其余段落大小写不敏感相等；清单地址中的查询串不参与比较。
+    /// 具体路径，其余段落大小写不敏感相等；清单地址中的查询串不参与比较.
     /// </summary>
     public static bool Matches(string template, string url)
     {

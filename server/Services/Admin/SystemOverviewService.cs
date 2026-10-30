@@ -1,10 +1,10 @@
-﻿using System.Data.Common;
-using System.Globalization;
-using System.Runtime.InteropServices;
-using MySqlConnector;
+﻿using MySqlConnector;
 using Quartz;
 using server.Models.Admin;
 using StackExchange.Redis;
+using System.Data.Common;
+using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace server.Services.Admin;
 
@@ -18,10 +18,10 @@ public sealed class SystemOverviewService(
     private const int _cpuSampleMs = 150;
 
     /// <summary>
-    /// 采集服务端运行状态：进程与机器信息、资源占用、两套 MySQL 连接、Redis、Quartz 调度。
+    /// 采集服务端运行状态：进程与机器信息、资源占用、两套 MySQL 连接、Redis、Quartz 调度.
     /// </summary>
-    /// <param name="cancellationToken">请求取消令牌。</param>
-    /// <returns>系统概览数据。</returns>
+    /// <param name="cancellationToken">请求取消令牌.</param>
+    /// <returns>系统概览数据.</returns>
     public async Task<SystemOverview> GetOverviewAsync(CancellationToken cancellationToken)
     {
         using Process process = Process.GetCurrentProcess();

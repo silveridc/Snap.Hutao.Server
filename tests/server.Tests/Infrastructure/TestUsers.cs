@@ -15,26 +15,26 @@ public sealed class TestUsers(HutaoServerFactory factory)
     private readonly SemaphoreSlim gate = new(1, 1);
     private readonly Dictionary<string, TestUser> cache = [];
 
-    /// <summary>维护者，可访问 /Service/*。</summary>
+    /// <summary>维护者，可访问 /Service/*.</summary>
     public Task<TestUser> MaintainerAsync() => GetOrCreateAsync("maintainer", user =>
     {
         user.IsMaintainer = true;
         user.IsLicensedDeveloper = true;
     });
 
-    /// <summary>仅拥有开发者授权，可绕过各服务的时间限制。</summary>
+    /// <summary>仅拥有开发者授权，可绕过各服务的时间限制.</summary>
     public Task<TestUser> DeveloperAsync() => GetOrCreateAsync("developer", user => user.IsLicensedDeveloper = true);
 
-    /// <summary>祈愿记录服务在期。</summary>
+    /// <summary>祈愿记录服务在期.</summary>
     public Task<TestUser> GachaLogAsync() => GetOrCreateAsync("gachalog", user => user.GachaLogExpireAt = InDays(30));
 
-    /// <summary>CDN 服务在期。</summary>
+    /// <summary>CDN 服务在期.</summary>
     public Task<TestUser> CdnAsync() => GetOrCreateAsync("cdn", user => user.CdnExpireAt = InDays(30));
 
-    /// <summary>普通用户，未订阅任何服务。</summary>
+    /// <summary>普通用户，未订阅任何服务.</summary>
     public Task<TestUser> PlainAsync() => GetOrCreateAsync("plain", _ => { });
 
-    /// <summary>创建一个全新用户，避免与其他测试共享状态。</summary>
+    /// <summary>创建一个全新用户，避免与其他测试共享状态.</summary>
     public async Task<TestUser> CreateUniqueAsync(string prefix, Action<HutaoUser>? configure = null)
     {
         string userName = $"{prefix}-{Guid.NewGuid():N}@example.com";
@@ -54,7 +54,7 @@ public sealed class TestUsers(HutaoServerFactory factory)
         return new(user.Id, userName, Password, token.AccessToken, token.RefreshToken);
     }
 
-    /// <summary>为已有用户签发一对新的令牌（可指定设备）。</summary>
+    /// <summary>为已有用户签发一对新的令牌（可指定设备）.</summary>
     public async Task<TokenResponse> IssueTokenAsync(int userId, DeviceInfo? deviceInfo = null)
     {
         using IServiceScope scope = factory.Services.CreateScope();

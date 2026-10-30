@@ -3,7 +3,7 @@
     "add": {
       "title": "封禁 UID",
       "tipPre": "被封禁的 UID 将无法上传深渊/剧演记录，对应 ",
-      "tipSuf": "。",
+      "tipSuf": ".",
       "uidPlaceholder": "9-10 位数字 UID",
       "reasonLabel": "封禁原因（可选）",
       "reasonPlaceholder": "封禁原因",
@@ -11,7 +11,7 @@
     },
     "batch": {
       "title": "批量封禁",
-      "tip": "每行或用空格/逗号分隔多个 9-10 位数字 UID，已存在的会自动跳过。",
+      "tip": "每行或用空格/逗号分隔多个 9-10 位数字 UID，已存在的会自动跳过.",
       "uidListLabel": "UID 列表",
       "uidListPlaceholder": "多个 UID，换行或逗号分隔",
       "reasonLabel": "封禁原因（可选）",

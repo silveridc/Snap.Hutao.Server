@@ -97,9 +97,9 @@ public sealed class UserAdminService(AppDbContext appDbContext, IDistributedCach
     }
 
     /// <summary>
-    /// 更新指定用户的维护者/开发者授权标志，并失效相关缓存。
+    /// 更新指定用户的维护者/开发者授权标志，并失效相关缓存.
     /// </summary>
-    /// <returns>用户是否存在。</returns>
+    /// <returns>用户是否存在.</returns>
     public async Task<bool> UpdatePrivilegeAsync(int userId, bool? isMaintainer, bool? isLicensedDeveloper)
     {
         HutaoUser? user = await appDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
@@ -127,9 +127,9 @@ public sealed class UserAdminService(AppDbContext appDbContext, IDistributedCach
     }
 
     /// <summary>
-    /// 以管理员身份重置指定用户的密码。
+    /// 以管理员身份重置指定用户的密码.
     /// </summary>
-    /// <returns>是否成功，以及失败时的错误描述。</returns>
+    /// <returns>是否成功，以及失败时的错误描述.</returns>
     public async Task<(bool Ok, string? Error, string? LocalizationKey)> ResetPasswordAsync(int userId, string newPassword)
     {
         HutaoUser? user = await userManager.FindByIdAsync(userId.ToString()).ConfigureAwait(false);
@@ -138,7 +138,7 @@ public sealed class UserAdminService(AppDbContext appDbContext, IDistributedCach
             return (false, "User does not exist", ServerKeys.ServerAdminUserNotFound);
         }
 
-        // 手工 SQL 插入/迁移来的历史行可能没有 stamp，而下面的令牌路径读到 null 会直接抛（生产实测 500）。补盖后再继续。
+        // 手工 SQL 插入/迁移来的历史行可能没有 stamp，而下面的令牌路径读到 null 会直接抛（生产实测 500）.补盖后再继续.
         if (string.IsNullOrEmpty(user.SecurityStamp))
         {
             await userManager.UpdateSecurityStampAsync(user).ConfigureAwait(false);

@@ -1,15 +1,17 @@
-﻿using System.Web;
 using server.Models.Github;
+using System.Web;
 
 namespace server.Services.Github;
 
 // Scoped
-public class GithubService(IServiceProvider serviceProvider, TimeProvider timeProvider) : IOAuthProvider
+public class GithubService(
+    GithubApiService githubApiService,
+    PassportService passportService,
+    AppOptions appOptions,
+    AppDbContext appDbContext,
+    TimeProvider timeProvider) : IOAuthProvider
 {
-    private readonly GithubApiService _githubApiService = serviceProvider.GetRequiredService<GithubApiService>();
-    private readonly PassportService _passportService = serviceProvider.GetRequiredService<PassportService>();
-    private readonly GithubOptions _githubOptions = serviceProvider.GetRequiredService<AppOptions>().Github;
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
+    private readonly GithubOptions _githubOptions = appOptions.Github;
 
     public Task<string> RequestAuthUrlAsync(string state)
     {
@@ -18,7 +20,7 @@ public class GithubService(IServiceProvider serviceProvider, TimeProvider timePr
 
     public async Task<bool> RefreshTokenAsync(OAuthBindIdentity identity)
     {
-        GithubAccessTokenResponse? accessTokenResponse = await _githubApiService.GetAccessTokenByRefreshTokenAsync(identity.RefreshToken).ConfigureAwait(false);
+        GithubAccessTokenResponse? accessTokenResponse = await githubApiService.GetAccessTokenByRefreshTokenAsync(identity.RefreshToken).ConfigureAwait(false);
         if (accessTokenResponse is null)
         {
             return false;
@@ -27,25 +29,25 @@ public class GithubService(IServiceProvider serviceProvider, TimeProvider timePr
         identity.RefreshToken = accessTokenResponse.RefreshToken;
         identity.ExpiresAt = (timeProvider.GetLocalNow() + TimeSpan.FromSeconds(accessTokenResponse.RefreshTokenExpiresIn)).ToUnixTimeSeconds();
 
-        await _appDbContext.OAuthBindIdentities.UpdateAndSaveAsync(identity).ConfigureAwait(false);
+        await appDbContext.OAuthBindIdentities.UpdateAndSaveAsync(identity).ConfigureAwait(false);
         return true;
     }
 
     public async ValueTask<OAuthResult> HandleOAuthCallbackAsync(string code, OAuthBindState state)
     {
-        GithubAccessTokenResponse? accessTokenResponse = await _githubApiService.GetAccessTokenByCodeAsync(code).ConfigureAwait(false);
+        GithubAccessTokenResponse? accessTokenResponse = await githubApiService.GetAccessTokenByCodeAsync(code).ConfigureAwait(false);
         if (accessTokenResponse is null)
         {
             return OAuthResult.Fail("Failed to obtain an access token");
         }
 
-        GithubUserResponse? userResponse = await _githubApiService.GetUserInfoByAccessTokenAsync(accessTokenResponse.AccessToken).ConfigureAwait(false);
+        GithubUserResponse? userResponse = await githubApiService.GetUserInfoByAccessTokenAsync(accessTokenResponse.AccessToken).ConfigureAwait(false);
         if (userResponse is null)
         {
             return OAuthResult.Fail("Failed to retrieve GitHub user information");
         }
 
-        OAuthBindIdentity? identity = await _appDbContext.OAuthBindIdentities.SingleOrDefaultAsync(b => b.ProviderKind == OAuthProviderKind.Github && b.ProviderId == userResponse.NodeId);
+        OAuthBindIdentity? identity = await appDbContext.OAuthBindIdentities.SingleOrDefaultAsync(b => b.ProviderKind == OAuthProviderKind.Github && b.ProviderId == userResponse.NodeId);
         if (state.UserId is -1)
         {
             // Login mode
@@ -54,7 +56,7 @@ public class GithubService(IServiceProvider serviceProvider, TimeProvider timePr
                 return OAuthResult.Fail("This GitHub account is not linked to a Snap Hutao account");
             }
 
-            return OAuthResult.LoginSuccess(await _passportService.CreateTokenResponseAsync(identity.UserId, state.DeviceInfo).ConfigureAwait(false));
+            return OAuthResult.LoginSuccess(await passportService.CreateTokenResponseAsync(identity.UserId, state.DeviceInfo).ConfigureAwait(false));
         }
 
         if (identity is not null)
@@ -68,7 +70,7 @@ public class GithubService(IServiceProvider serviceProvider, TimeProvider timePr
             // Already bound to this user, update access token
             identity.RefreshToken = accessTokenResponse.RefreshToken;
             identity.ExpiresAt = (timeProvider.GetLocalNow() + TimeSpan.FromSeconds(accessTokenResponse.RefreshTokenExpiresIn)).ToUnixTimeSeconds();
-            await _appDbContext.OAuthBindIdentities.UpdateAndSaveAsync(identity).ConfigureAwait(false);
+            await appDbContext.OAuthBindIdentities.UpdateAndSaveAsync(identity).ConfigureAwait(false);
             return OAuthResult.BindSuccess();
         }
 
@@ -84,7 +86,7 @@ public class GithubService(IServiceProvider serviceProvider, TimeProvider timePr
             ExpiresAt = (timeProvider.GetLocalNow() + TimeSpan.FromSeconds(accessTokenResponse.RefreshTokenExpiresIn)).ToUnixTimeSeconds(),
         };
 
-        await _appDbContext.OAuthBindIdentities.AddAndSaveAsync(identity).ConfigureAwait(false);
+        await appDbContext.OAuthBindIdentities.AddAndSaveAsync(identity).ConfigureAwait(false);
         return OAuthResult.BindSuccess();
     }
 }

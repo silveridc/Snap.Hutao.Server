@@ -1,4 +1,4 @@
-﻿using server.Models.OpenSource;
+using server.Models.OpenSource;
 
 namespace server.Controllers;
 
@@ -8,10 +8,10 @@ namespace server.Controllers;
 public sealed class AccessionController(AccessionService accessionService) : ControllerBase
 {
     /// <summary>
-    /// 申请开源许可证。
+    /// 申请开源许可证.
     /// </summary>
-    /// <param name="info">许可证申请信息。</param>
-    /// <returns>申请处理结果。</returns>
+    /// <param name="info">许可证申请信息.</param>
+    /// <returns>申请处理结果.</returns>
     [HttpPost]
     public async Task<IActionResult> ApplyOpenSourceLicenseAsync([FromBody] LicenseApplication info)
     {

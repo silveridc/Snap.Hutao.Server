@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.Redeem;
+namespace server.Models.Entity.Redeem;
 
 public static class RedeemCodeTargetServiceTypeExtension
 {

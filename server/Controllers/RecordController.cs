@@ -1,4 +1,4 @@
-﻿using server.Models.Legacy;
+using server.Models.Legacy;
 using server.Models.Upload;
 
 namespace server.Controllers;
@@ -9,11 +9,11 @@ namespace server.Controllers;
 public class RecordController(RecordService recordService, IRankService rankService) : ControllerBase
 {
     /// <summary>
-    /// 上传深渊记录。
+    /// 上传深渊记录.
     /// </summary>
-    /// <param name="record">深渊记录数据。</param>
-    /// <param name="returningRank">是否返回排行数据。</param>
-    /// <returns>上传结果或排行数据。</returns>
+    /// <param name="record">深渊记录数据.</param>
+    /// <param name="returningRank">是否返回排行数据.</param>
+    /// <returns>上传结果或排行数据.</returns>
     [HttpPost("abyss")]
     public async Task<IActionResult> ProcessUploadRecordAsync([FromBody] SimpleRecord record, [FromQuery] bool returningRank = false)
     {
@@ -44,10 +44,10 @@ public class RecordController(RecordService recordService, IRankService rankServ
     }
 
     /// <summary>
-    /// 查询指定 Uid 是否已上传。
+    /// 查询指定 Uid 是否已上传.
     /// </summary>
-    /// <param name="uid">游戏 Uid。</param>
-    /// <returns>是否已上传。</returns>
+    /// <param name="uid">游戏 Uid.</param>
+    /// <returns>是否已上传.</returns>
     [HttpGet("abyss/{uid}/status")]
     public async Task<IActionResult> CheckUidUploadedAsync([FromRoute] string uid)
     {
@@ -66,10 +66,10 @@ public class RecordController(RecordService recordService, IRankService rankServ
     }
 
     /// <summary>
-    /// 获取指定 Uid 的排行数据。
+    /// 获取指定 Uid 的排行数据.
     /// </summary>
-    /// <param name="uid">游戏 Uid。</param>
-    /// <returns>排行数据。</returns>
+    /// <param name="uid">游戏 Uid.</param>
+    /// <returns>排行数据.</returns>
     [HttpGet("abyss/{uid}/rank")]
     public async Task<IActionResult> RankAsync([FromRoute] string uid)
     {

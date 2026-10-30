@@ -1,4 +1,4 @@
-﻿namespace server.Options;
+namespace server.Options;
 
 public sealed class GenshinPizzaHelperOptions
 {

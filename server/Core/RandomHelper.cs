@@ -1,4 +1,4 @@
-﻿namespace server.Core;
+namespace server.Core;
 
 public static class RandomHelper
 {

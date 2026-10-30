@@ -1,4 +1,4 @@
-﻿using server.Models.Metadata;
+using server.Models.Metadata;
 
 namespace server.Services.Yae;
 
@@ -8,8 +8,7 @@ public sealed class YaeMetadataService(
     AppOptions appOptions,
     IDistributedCache cache,
     ILogger<YaeMetadataService> logger,
-    TimeProvider timeProvider
-)
+    TimeProvider timeProvider)
 {
     // 注入配置是整包下发（可能几十 KB），每次启动都会拉；内容只在同步新版本时变
     private const string _payloadCacheKeyPrefix = "Yae:Payload:";
@@ -22,13 +21,11 @@ public sealed class YaeMetadataService(
         WriteIndented = false,
     };
 
-    public sealed record Summary(string Version, uint ChineseHash, uint OverseaHash, uint StoreCmdId, uint AchievementCmdId, uint ItemCount, uint GroupCount, DateTime SyncedAt);
-
     /// <summary>
-    /// 拉取一次 Yae bucket：解码出成就字段映射与版本号，按版本号新增或覆盖落库。
+    /// 拉取一次 Yae bucket：解码出成就字段映射与版本号，按版本号新增或覆盖落库.
     /// </summary>
-    /// <param name="chineseHash">本次同步强制指定的国服指纹，优先级高于配置；null 表示用配置里的集合。</param>
-    /// <param name="token">取消令牌。</param>
+    /// <param name="chineseHash">本次同步强制指定的国服指纹，优先级高于配置；null 表示用配置里的集合.</param>
+    /// <param name="token">取消令牌.</param>
     public async Task<YaeBucketDecoder.Result> SyncAsync(uint? chineseHash, CancellationToken token = default)
     {
         (byte[]? data, string? fetchError) = await FetchBucketAsync(token).ConfigureAwait(false);
@@ -67,7 +64,7 @@ public sealed class YaeMetadataService(
         return result;
     }
 
-    /// <summary>读取已同步的版本数据，返回原样吐给客户端的响应体；未同步过返回 null（调用方给 404）。</summary>
+    /// <summary>读取已同步的版本数据，返回原样吐给客户端的响应体；未同步过返回 null（调用方给 404）.</summary>
     public async Task<string?> GetPayloadAsync(string version, CancellationToken token = default)
     {
         string cacheKey = _payloadCacheKeyPrefix + version;
@@ -137,4 +134,6 @@ public sealed class YaeMetadataService(
 
         return (null, "All bucket mirrors failed: " + string.Join("; ", errors));
     }
+
+    public sealed record Summary(string Version, uint ChineseHash, uint OverseaHash, uint StoreCmdId, uint AchievementCmdId, uint ItemCount, uint GroupCount, DateTime SyncedAt);
 }

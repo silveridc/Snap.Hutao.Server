@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -42,7 +42,7 @@ public partial class AddAdminAccounts : Migration
                 IsEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
                 IsBootstrap = table.Column<bool>(type: "tinyint(1)", nullable: false),
                 CreatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
-                LastLoginAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true)
+                LastLoginAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
             },
             constraints: table =>
             {

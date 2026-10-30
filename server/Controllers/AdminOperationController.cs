@@ -1,8 +1,8 @@
-using System.Globalization;
 using server.Filter;
 using server.Models.Cache;
 using server.Services.Cache;
 using server.Services.Yae;
+using System.Globalization;
 
 namespace server.Controllers;
 
@@ -21,9 +21,9 @@ public sealed class AdminOperationController(
     YaeMetadataService yaeMetadataService) : ControllerBase
 {
     /// <summary>
-    /// 手动触发深渊统计数据刷新。
+    /// 手动触发深渊统计数据刷新.
     /// </summary>
-    /// <returns>操作结果。</returns>
+    /// <returns>操作结果.</returns>
     [HttpPost("statistics/refresh")]
     public async Task<IActionResult> RunStatisticsAsync()
     {
@@ -32,10 +32,10 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 为所有用户补偿祈愿记录服务时长。
+    /// 为所有用户补偿祈愿记录服务时长.
     /// </summary>
-    /// <param name="days">补偿天数。</param>
-    /// <returns>操作结果。</returns>
+    /// <param name="days">补偿天数.</param>
+    /// <returns>操作结果.</returns>
     [HttpPost("gacha-logs/compensations")]
     public async Task<IActionResult> GachaLogCompensationAsync([FromQuery] int days)
     {
@@ -44,11 +44,11 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 为指定用户补偿祈愿记录服务时长。
+    /// 为指定用户补偿祈愿记录服务时长.
     /// </summary>
-    /// <param name="userName">用户名。</param>
-    /// <param name="days">补偿天数。</param>
-    /// <returns>操作结果。</returns>
+    /// <param name="userName">用户名.</param>
+    /// <param name="days">补偿天数.</param>
+    /// <returns>操作结果.</returns>
     [HttpPost("gacha-logs/compensations/designation")]
     public async Task<IActionResult> GachaLogDesignationAsync([FromQuery] string userName, [FromQuery] int days)
     {
@@ -62,10 +62,10 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 为所有用户补偿 CDN 服务时长。
+    /// 为所有用户补偿 CDN 服务时长.
     /// </summary>
-    /// <param name="days">补偿天数。</param>
-    /// <returns>操作结果。</returns>
+    /// <param name="days">补偿天数.</param>
+    /// <returns>操作结果.</returns>
     [HttpPost("cdn/compensations")]
     public async Task<IActionResult> DistributionCompensationAsync([FromQuery] int days)
     {
@@ -74,11 +74,11 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 为指定用户补偿 CDN 服务时长。
+    /// 为指定用户补偿 CDN 服务时长.
     /// </summary>
-    /// <param name="userName">用户名。</param>
-    /// <param name="days">补偿天数。</param>
-    /// <returns>操作结果。</returns>
+    /// <param name="userName">用户名.</param>
+    /// <param name="days">补偿天数.</param>
+    /// <returns>操作结果.</returns>
     [HttpPost("cdn/compensations/designation")]
     public async Task<IActionResult> DistributionDesignationAsync([FromQuery] string userName, [FromQuery] int days)
     {
@@ -92,10 +92,10 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 批量将缓存标记为过期（按精确键与/或 glob 模式移除）。
+    /// 批量将缓存标记为过期（按精确键与/或 glob 模式移除）.
     /// </summary>
-    /// <param name="request">需要移除的缓存键与模式。</param>
-    /// <returns>移除结果。</returns>
+    /// <param name="request">需要移除的缓存键与模式.</param>
+    /// <returns>移除结果.</returns>
     [HttpDelete("cache")]
     public async Task<IActionResult> InvalidateCacheAsync([FromBody] CacheInvalidationRequest request)
     {
@@ -109,11 +109,11 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 列出匹配指定 glob 模式的缓存键，便于管理界面查看。
+    /// 列出匹配指定 glob 模式的缓存键，便于管理界面查看.
     /// </summary>
-    /// <param name="pattern">glob 模式，默认 <c>*</c>。</param>
-    /// <param name="limit">返回上限，默认 500。</param>
-    /// <returns>逻辑缓存键列表。</returns>
+    /// <param name="pattern">glob 模式，默认 <c>*</c>.</param>
+    /// <param name="limit">返回上限，默认 500.</param>
+    /// <returns>逻辑缓存键列表.</returns>
     [HttpGet("cache/keys")]
     public IActionResult ListCacheKeys([FromQuery] string pattern = "*", [FromQuery] int limit = 500)
     {
@@ -122,11 +122,11 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 从 Yae 的 metadata bucket 拉取 protobuf 并转换成就注入配置，落库后由 <c>/api/client/features/AchievementFieldId_{version}</c> 对外提供。
+    /// 从 Yae 的 metadata bucket 拉取 protobuf 并转换成就注入配置，落库后由 <c>/api/client/features/AchievementFieldId_{version}</c> 对外提供.
     /// </summary>
-    /// <param name="chineseHash">本次同步强制指定的国服 exe 指纹（十进制或 0x 十六进制）；省略时用 App:Yae:ChineseGameHashes 配置。新大版本第一次同步通常需要传。</param>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>同步结果，含识别出的两个指纹与条目数。</returns>
+    /// <param name="chineseHash">本次同步强制指定的国服 exe 指纹（十进制或 0x 十六进制）；省略时用 App:Yae:ChineseGameHashes 配置.新大版本第一次同步通常需要传.</param>
+    /// <param name="token">请求取消令牌.</param>
+    /// <returns>同步结果，含识别出的两个指纹与条目数.</returns>
     [HttpPost("yae/metadata")]
     public async Task<IActionResult> YaeSyncMetadataAsync([FromQuery] string? chineseHash = null, CancellationToken token = default)
     {
@@ -142,10 +142,10 @@ public sealed class AdminOperationController(
     }
 
     /// <summary>
-    /// 列出已同步的 Yae 成就注入配置版本。
+    /// 列出已同步的 Yae 成就注入配置版本.
     /// </summary>
-    /// <param name="token">请求取消令牌。</param>
-    /// <returns>版本与指纹列表。</returns>
+    /// <param name="token">请求取消令牌.</param>
+    /// <returns>版本与指纹列表.</returns>
     [HttpGet("yae/metadata")]
     public async Task<IActionResult> YaeMetadataListAsync(CancellationToken token)
     {

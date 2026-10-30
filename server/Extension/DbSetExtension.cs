@@ -1,5 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Runtime.CompilerServices;
 
 namespace server.Extension;
 

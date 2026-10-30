@@ -1,8 +1,8 @@
-﻿namespace server.Filter;
+namespace server.Filter;
 
 internal static class ExpirePermissionGate
 {
-    /// <summary>放行返回 null；拦截返回应写回的失败信封。</summary>
+    /// <summary>放行返回 null；拦截返回应写回的失败信封.</summary>
     public static async Task<IActionResult?> EvaluateAsync(
         ActionExecutingContext context,
         AppDbContext appDbContext,

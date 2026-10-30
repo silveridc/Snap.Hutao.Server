@@ -1,4 +1,4 @@
-﻿using server.Models.Legacy;
+using server.Models.Legacy;
 using server.Services.Legacy.Primitive;
 
 namespace server.Services.Legacy;

@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.Announcement;
+namespace server.Models.Entity.Announcement;
 
 public static class EntityAnnouncementExtension
 {

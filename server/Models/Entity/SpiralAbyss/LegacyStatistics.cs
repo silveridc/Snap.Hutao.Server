@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.SpiralAbyss;
+namespace server.Models.Entity.SpiralAbyss;
 
 [Table("spiral_abysses_statistics")]
 public class LegacyStatistics
@@ -13,9 +13,15 @@ public class LegacyStatistics
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long PrimaryId { get; set; }
+    public long PrimaryId
+    {
+        get; set;
+    }
 
-    public int ScheduleId { get; set; }
+    public int ScheduleId
+    {
+        get; set;
+    }
 
     public string Name { get; set; } = default!;
 

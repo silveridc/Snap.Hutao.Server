@@ -6,7 +6,7 @@ using server.Models.Entity.SpiralAbyss;
 namespace server.Services.Admin;
 
 /// <summary>
-/// 后台数据分析：全部走 MySQL 明细表聚合，不读 Redis 快照，避免缓存丢失导致图表空掉。
+/// 后台数据分析：全部走 MySQL 明细表聚合，不读 Redis 快照，避免缓存丢失导致图表空掉.
 /// </summary>
 public sealed class AnalyticsService(AppDbContext appDbContext, IDistributedCache cache, TimeProvider timeProvider)
 {
@@ -23,6 +23,17 @@ public sealed class AnalyticsService(AppDbContext appDbContext, IDistributedCach
     {
         days = Math.Clamp(days, 0, _maxDays);
         return (await cache.GetOrCreateAsync($"{_cacheKeyPrefix}Gacha:{days}", _cacheDuration, () => BuildGachaAsync(days)).ConfigureAwait(false))!;
+    }
+
+    public async Task<AbyssAnalytics> GetAbyssAsync()
+    {
+        return (await cache.GetOrCreateAsync($"{_cacheKeyPrefix}Abyss", _cacheDuration, BuildAbyssAsync).ConfigureAwait(false))!;
+    }
+
+    public async Task<DamageAnalytics> GetDamageAsync(int top = _maxTopAvatars)
+    {
+        top = Math.Clamp(top, 1, 50);
+        return (await cache.GetOrCreateAsync($"{_cacheKeyPrefix}Damage:{top}", _cacheDuration, () => BuildDamageAsync(top)).ConfigureAwait(false))!;
     }
 
     private async Task<GachaAnalytics> BuildGachaAsync(int days)
@@ -42,8 +53,8 @@ public sealed class AnalyticsService(AppDbContext appDbContext, IDistributedCach
             .LongCountAsync()
             .ConfigureAwait(false);
 
-        // 五星判定依赖 known_items 的品质表。Id 是 uint、GachaItem.ItemId 是 int，
-        // EF 翻不了这种跨类型联表，所以先把五星 id 取到内存再 Contains。
+        // 五星判定依赖 known_items 的品质表.Id 是 uint、GachaItem.ItemId 是 int，
+        // EF 翻不了这种跨类型联表，所以先把五星 id 取到内存再 Contains.
         HashSet<int> star5Ids = [.. (await appDbContext.KnownItems.AsNoTracking()
             .Where(known => known.Quality == 5)
             .Select(known => known.Id)
@@ -95,20 +106,9 @@ public sealed class AnalyticsService(AppDbContext appDbContext, IDistributedCach
         return new GachaAnalytics(totalPulls, totalStar5, untrustedPulls, days, pools, topStar5Items);
     }
 
-    public async Task<AbyssAnalytics> GetAbyssAsync()
-    {
-        return (await cache.GetOrCreateAsync($"{_cacheKeyPrefix}Abyss", _cacheDuration, BuildAbyssAsync).ConfigureAwait(false))!;
-    }
-
     private async Task<AbyssAnalytics> BuildAbyssAsync()
     {
         return new(await GetSpiralAbyssAsync().ConfigureAwait(false), await GetTheaterAsync().ConfigureAwait(false));
-    }
-
-    public async Task<DamageAnalytics> GetDamageAsync(int top = _maxTopAvatars)
-    {
-        top = Math.Clamp(top, 1, 50);
-        return (await cache.GetOrCreateAsync($"{_cacheKeyPrefix}Damage:{top}", _cacheDuration, () => BuildDamageAsync(top)).ConfigureAwait(false))!;
     }
 
     private async Task<DamageAnalytics> BuildDamageAsync(int top)

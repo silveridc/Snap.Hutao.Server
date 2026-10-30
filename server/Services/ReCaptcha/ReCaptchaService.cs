@@ -1,12 +1,10 @@
-﻿using server.Models.ReCaptcha;
+using server.Models.ReCaptcha;
 
 namespace server.Services.ReCaptcha;
 
-//Transient
-public sealed class ReCaptchaService(HttpClient httpClient, AppOptions appOptions, IServiceProvider serviceProvider)
+// Transient
+public sealed class ReCaptchaService(HttpClient httpClient, AppOptions appOptions, ILogger<ReCaptchaService> logger)
 {
-    private readonly ILogger<ReCaptchaService> _logger = serviceProvider.GetRequiredService<ILogger<ReCaptchaService>>();
-
     public async Task<ReCaptchaResponse?> VerifyAsync(string token, string? remoteIp = null)
     {
         Dictionary<string, string> parameters = new()
@@ -25,7 +23,7 @@ public sealed class ReCaptchaService(HttpClient httpClient, AppOptions appOption
 
         if (!message.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Recaptcha Verify Error");
+            logger.LogWarning("Recaptcha Verify Error");
         }
 
         return await message.Content.ReadFromJsonAsync<ReCaptchaResponse>().ConfigureAwait(false);

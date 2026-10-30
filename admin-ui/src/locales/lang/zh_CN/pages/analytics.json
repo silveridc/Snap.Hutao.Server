@@ -40,7 +40,7 @@
     },
     "damage": {
       "title": "伤害分布",
-      "tip": "直接聚合 damage_ranks 明细表（MySQL），不依赖 Redis 统计快照。",
+      "tip": "直接聚合 damage_ranks 明细表（MySQL），不依赖 Redis 统计快照.",
       "totalDamage": "总伤害",
       "samples": "样本记录数",
       "colRank": "排名",

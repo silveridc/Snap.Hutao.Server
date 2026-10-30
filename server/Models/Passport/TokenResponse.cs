@@ -1,4 +1,4 @@
-﻿namespace server.Models.Passport;
+namespace server.Models.Passport;
 
 public class TokenResponse
 {
@@ -6,5 +6,8 @@ public class TokenResponse
 
     public string RefreshToken { get; set; } = default!;
 
-    public int ExpiresIn { get; set; }
+    public int ExpiresIn
+    {
+        get; set;
+    }
 }

@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity.Passport;
+namespace server.Models.Entity.Passport;
 
 [Table("passport_verifications")]
 public class PassportVerification

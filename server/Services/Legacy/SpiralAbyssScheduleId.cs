@@ -1,4 +1,4 @@
-﻿namespace server.Services.Legacy;
+namespace server.Services.Legacy;
 
 public static class SpiralAbyssScheduleId
 {

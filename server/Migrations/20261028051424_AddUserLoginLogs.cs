@@ -33,7 +33,7 @@ public partial class AddUserLoginLogs : Migration
                     .Annotation("MySql:CharSet", "utf8mb4"),
                 OperatingSystem = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: true)
                     .Annotation("MySql:CharSet", "utf8mb4"),
-                LoginAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
+                LoginAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
             },
             constraints: table =>
             {

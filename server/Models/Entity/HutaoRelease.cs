@@ -9,7 +9,10 @@ public sealed class HutaoRelease
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
+    public long Id
+    {
+        get; set;
+    }
 
     [MaxLength(32)]
     public string Version { get; set; } = default!;
@@ -17,21 +20,36 @@ public sealed class HutaoRelease
     [MaxLength(64)]
     public string Validation { get; set; } = default!;
 
-    /// <summary>最低强制版本：客户端低于它时强制更新；null 为不强制。</summary>
+    /// <summary>Gets or sets 最低强制版本：客户端低于它时强制更新；null 为不强制.</summary>
     [MaxLength(32)]
-    public string? MinimumVersion { get; set; }
+    public string? MinimumVersion
+    {
+        get; set;
+    }
 
     [Column(TypeName = "longtext")]
     public string MirrorsJson { get; set; } = default!;
 
     [Column(TypeName = "longtext")]
-    public string? ReleaseNotes { get; set; }
+    public string? ReleaseNotes
+    {
+        get; set;
+    }
 
-    public bool IsActive { get; set; }
+    public bool IsActive
+    {
+        get; set;
+    }
 
-    public DateTimeOffset PublishedAt { get; set; }
+    public DateTimeOffset PublishedAt
+    {
+        get; set;
+    }
 
-    public int PublishedBy { get; set; }
+    public int PublishedBy
+    {
+        get; set;
+    }
 
     public HutaoPackageInformation ToPackageInformation()
     {

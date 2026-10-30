@@ -1,19 +1,18 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace server.Services.Expire;
 
-public abstract class ExpireServiceBase(IServiceProvider serviceProvider, TimeProvider timeProvider) : IExpireService
+public abstract class ExpireServiceBase(IServiceScopeFactory scopeFactory, TimeProvider timeProvider) : IExpireService
 {
-    /// <summary>EF 翻译用的到期字段选择器（如 u =&gt; u.CdnExpireAt）。</summary>
-    protected abstract Expression<Func<HutaoUser, long>> ExpireAtSelector { get; }
-
-    protected abstract long GetExpireAt(HutaoUser user);
-
-    protected abstract void SetExpireAt(HutaoUser user, long expireAt);
+    /// <summary>Gets eF 翻译用的到期字段选择器（如 u =&gt; u.CdnExpireAt）.</summary>
+    protected abstract Expression<Func<HutaoUser, long>> ExpireAtSelector
+    {
+        get;
+    }
 
     public async ValueTask<TermExtendResult> ExtendTermForUserNameAsync(string userName, int days)
     {
-        using IServiceScope scope = serviceProvider.CreateScope();
+        using IServiceScope scope = scopeFactory.CreateScope();
         UserManager<HutaoUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<HutaoUser>>();
 
         HutaoUser? user = await userManager.FindByNameAsync(userName).ConfigureAwait(false);
@@ -51,7 +50,7 @@ public abstract class ExpireServiceBase(IServiceProvider serviceProvider, TimePr
         Expression<Func<HutaoUser, long>> selector = ExpireAtSelector;
         ParameterExpression user = selector.Parameters[0];
 
-        using IServiceScope scope = serviceProvider.CreateScope();
+        using IServiceScope scope = scopeFactory.CreateScope();
         AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         // 过期的抬到当前时刻，随后统一加 days——与单用户路径的 max(expire, now) + days 同一语义
@@ -68,6 +67,10 @@ public abstract class ExpireServiceBase(IServiceProvider serviceProvider, TimePr
 
         return DateTimeOffset.FromUnixTimeSeconds(now + seconds);
     }
+
+    protected abstract long GetExpireAt(HutaoUser user);
+
+    protected abstract void SetExpireAt(HutaoUser user, long expireAt);
 
     private static long ExtendFrom(long now, long expireAt, int days)
     {

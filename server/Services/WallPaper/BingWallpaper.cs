@@ -1,4 +1,4 @@
-﻿using server.Models.PublicAPI;
+using server.Models.PublicAPI;
 
 namespace server.Services.WallPaper;
 
@@ -43,7 +43,10 @@ public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCac
 file class BingApiResponse
 {
     [JsonPropertyName("images")]
-    public List<BingImageItem>? Images { get; set; }
+    public List<BingImageItem>? Images
+    {
+        get; set;
+    }
 }
 
 file class BingImageItem

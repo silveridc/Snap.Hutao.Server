@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -19,7 +19,7 @@ public partial class AddClientVersions : Migration
                 Version = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false)
                     .Annotation("MySql:CharSet", "utf8mb4"),
                 FirstSeenAt = table.Column<long>(type: "bigint", nullable: false),
-                LastSeenAt = table.Column<long>(type: "bigint", nullable: false)
+                LastSeenAt = table.Column<long>(type: "bigint", nullable: false),
             },
             constraints: table =>
             {

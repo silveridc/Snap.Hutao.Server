@@ -1,7 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using server.Models.Passport;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using server.Models.Passport;
 
 namespace server.Services.Authorization;
 
@@ -31,7 +31,11 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
             return new(false, "This email address is already registered", ServerKeys.ServerPassportServiceEmailHasRegistered);
         }
 
-        HutaoUser newUser = new() { UserName = passport.UserName, CreatedAt = timeProvider.GetUnixTimeSeconds() };
+        HutaoUser newUser = new()
+        {
+            UserName = passport.UserName,
+            CreatedAt = timeProvider.GetUnixTimeSeconds(),
+        };
         IdentityResult result = await userManager.CreateAsync(newUser, passport.Password).ConfigureAwait(false);
 
         if (!result.Succeeded)
@@ -50,7 +54,10 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
 
         if (!await appDbContext.RegistrationRecords.AnyAsync(r => r.UserName == passport.UserName).ConfigureAwait(false))
         {
-            await appDbContext.RegistrationRecords.AddAndSaveAsync(new() { UserName = passport.UserName }).ConfigureAwait(false);
+            await appDbContext.RegistrationRecords.AddAndSaveAsync(new()
+            {
+                UserName = passport.UserName,
+            }).ConfigureAwait(false);
 
             // 注册赠送：CDN 与抽卡日志各 3 天，同一个到期时刻
             long giftExpireAt = timeProvider.GetUnixTimeSeconds() + (long)TimeSpan.FromDays(3).TotalSeconds;
@@ -95,7 +102,10 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
 
             if (!await appDbContext.RegistrationRecords.AnyAsync(r => r.UserName == passport.NewUserName).ConfigureAwait(false))
             {
-                await appDbContext.RegistrationRecords.AddAndSaveAsync(new() { UserName = passport.NewUserName }).ConfigureAwait(false);
+                await appDbContext.RegistrationRecords.AddAndSaveAsync(new()
+                {
+                    UserName = passport.NewUserName,
+                }).ConfigureAwait(false);
             }
 
             TokenResponse tokenResponse = await CreateTokenResponseAsync(user, deviceInfo).ConfigureAwait(false);

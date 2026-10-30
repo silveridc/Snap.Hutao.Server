@@ -38,7 +38,7 @@ public sealed class BanService(AppDbContext appDbContext, IDistributedCache cach
     }
 
     /// <summary>
-    /// 封禁指定 Uid。返回是否为新增（已存在则返回 false）。
+    /// 封禁指定 Uid.返回是否为新增（已存在则返回 false）.
     /// </summary>
     public async Task<bool> BanAsync(string uid, string? reason)
     {
@@ -59,7 +59,7 @@ public sealed class BanService(AppDbContext appDbContext, IDistributedCache cach
     }
 
     /// <summary>
-    /// 解封指定 Uid。返回是否有记录被删除。
+    /// 解封指定 Uid.返回是否有记录被删除.
     /// </summary>
     public async Task<bool> UnbanAsync(string uid)
     {
@@ -73,7 +73,7 @@ public sealed class BanService(AppDbContext appDbContext, IDistributedCache cach
     }
 
     /// <summary>
-    /// 批量封禁多个 Uid，返回新增封禁的数量。
+    /// 批量封禁多个 Uid，返回新增封禁的数量.
     /// </summary>
     public async Task<int> BatchBanAsync(IEnumerable<string> uids, string? reason)
     {

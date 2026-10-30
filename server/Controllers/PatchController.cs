@@ -9,9 +9,9 @@ namespace server.Controllers;
 public sealed class PatchController(ReleaseService releaseService) : ControllerBase
 {
     /// <summary>
-    /// 获取 Snap Hutao 客户端最新版本与下载镜像。
+    /// 获取 Snap Hutao 客户端最新版本与下载镜像.
     /// </summary>
-    /// <returns>更新信息。客户端以 HutaoRuntime.Version 与返回的 version 比较，较大才提示更新。</returns>
+    /// <returns>更新信息.客户端以 HutaoRuntime.Version 与返回的 version 比较，较大才提示更新.</returns>
     [HttpGet("hutao")]
     public async Task<IActionResult> SnapHutaoAsync()
     {

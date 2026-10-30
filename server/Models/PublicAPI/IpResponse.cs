@@ -1,4 +1,4 @@
-﻿namespace server.Models.PublicAPI;
+namespace server.Models.PublicAPI;
 
 public sealed record IpResponse(
     [property: JsonPropertyName("ip")] string Ip,

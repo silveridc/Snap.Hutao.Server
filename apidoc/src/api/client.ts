@@ -20,7 +20,7 @@ export async function loadSpec(url: string): Promise<LoadedSpec> {
     res = await fetch(url, { cache: 'no-store' });
   } catch (e) {
     throw new Error(
-      `无法请求 ${url}：${e instanceof Error ? e.message : '网络错误'}。跨域被拦截时请把文档部署到与接口同源，或给服务端加 CORS。`,
+      `无法请求 ${url}：${e instanceof Error ? e.message : '网络错误'}.跨域被拦截时请把文档部署到与接口同源，或给服务端加 CORS.`,
     );
   }
   const text = await readBody(res);

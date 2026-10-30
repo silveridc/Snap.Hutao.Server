@@ -6,7 +6,7 @@ namespace server.Tests;
 [Collection(HutaoServerCollection.Name)]
 public sealed class YaeTests
 {
-    /// <summary>appsettings.json 的 App:Yae:ChineseGameHashes 里配置的国服指纹。</summary>
+    /// <summary>appsettings.json 的 App:Yae:ChineseGameHashes 里配置的国服指纹.</summary>
     private const uint ConfiguredChineseHash = 3851921252U;
 
     private const uint OverseaHash = 0x77777777U;
@@ -164,7 +164,7 @@ public sealed class YaeTests
         return values;
     }
 
-    /// <summary>按 AchievementInfo.proto 编码一份字段齐全的 bucket 数据。</summary>
+    /// <summary>按 AchievementInfo.proto 编码一份字段齐全的 bucket 数据.</summary>
     private static byte[] Bucket(string version, params (uint Hash, uint[] Rva)[] methodRva)
     {
         ProtoBuilder nativeConfig = new();
@@ -192,7 +192,7 @@ public sealed class YaeTests
             .ToArray();
     }
 
-    /// <summary>让 bucket 地址返回指定内容；桩规则后登记者优先，所以每个用例都会覆盖前一个。</summary>
+    /// <summary>让 bucket 地址返回指定内容；桩规则后登记者优先，所以每个用例都会覆盖前一个.</summary>
     private void ServeBucket(byte[] payload)
     {
         factory.StubHttp.Map(
@@ -237,7 +237,7 @@ public sealed class YaeTests
             return Bytes(field, value.ToArray());
         }
 
-        /// <summary>map 字段的一个 entry：外层字段号里裹「键=1，值=2」。</summary>
+        /// <summary>map 字段的一个 entry：外层字段号里裹「键=1，值=2」.</summary>
         public ProtoBuilder MapEntry(int field, uint key, ProtoBuilder value)
         {
             return Bytes(field, new ProtoBuilder().Varint(1, key).Message(2, value).ToArray());

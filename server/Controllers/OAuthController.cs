@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 
 namespace server.Controllers;
 
@@ -8,14 +8,14 @@ namespace server.Controllers;
 public class OAuthController(IServiceProvider serviceProvider, AppDbContext appDbContext, AppOptions appOptions, GithubService githubService) : ControllerBase
 {
     /// <summary>
-    /// 发起第三方 OAuth 授权请求。
+    /// 发起第三方 OAuth 授权请求.
     /// </summary>
-    /// <param name="provider">OAuth 提供方类型。</param>
-    /// <param name="deviceId">设备 ID。</param>
-    /// <param name="deviceName">设备名称。</param>
-    /// <param name="deviceOs">设备操作系统。</param>
-    /// <param name="callbackUri">回调地址。</param>
-    /// <returns>重定向到授权页面。</returns>
+    /// <param name="provider">OAuth 提供方类型.</param>
+    /// <param name="deviceId">设备 ID.</param>
+    /// <param name="deviceName">设备名称.</param>
+    /// <param name="deviceOs">设备操作系统.</param>
+    /// <param name="callbackUri">回调地址.</param>
+    /// <returns>重定向到授权页面.</returns>
     [HttpGet("authorizations/{provider}")]
     public async Task<IActionResult> RequestAuthAsync(
         [FromRoute] OAuthProviderKind provider,
@@ -41,10 +41,10 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
     }
 
     /// <summary>
-    /// 解绑指定类型的 OAuth 账号。
+    /// 解绑指定类型的 OAuth 账号.
     /// </summary>
-    /// <param name="provider">OAuth 提供方类型。</param>
-    /// <returns>解绑结果。</returns>
+    /// <param name="provider">OAuth 提供方类型.</param>
+    /// <returns>解绑结果.</returns>
     [Authorize]
     [HttpDelete("bindings/{provider}")]
     public async Task<IActionResult> UnbindAsync([FromRoute] OAuthProviderKind provider)
@@ -58,10 +58,10 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
     }
 
     /// <summary>
-    /// 获取指定类型 OAuth 的绑定状态。
+    /// 获取指定类型 OAuth 的绑定状态.
     /// </summary>
-    /// <param name="provider">OAuth 提供方类型。</param>
-    /// <returns>绑定状态。</returns>
+    /// <param name="provider">OAuth 提供方类型.</param>
+    /// <returns>绑定状态.</returns>
     [Authorize]
     [HttpGet("bindings/{provider}")]
     public async Task<IActionResult> GetBindStatusAsync([FromRoute] OAuthProviderKind provider)
@@ -76,11 +76,11 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
     }
 
     /// <summary>
-    /// 处理 GitHub OAuth 回调并完成绑定或登录。
+    /// 处理 GitHub OAuth 回调并完成绑定或登录.
     /// </summary>
-    /// <param name="code">GitHub 返回的授权码。</param>
-    /// <param name="state">请求授权时携带的加密状态。</param>
-    /// <returns>重定向结果。</returns>
+    /// <param name="code">GitHub 返回的授权码.</param>
+    /// <param name="state">请求授权时携带的加密状态.</param>
+    /// <returns>重定向结果.</returns>
     [HttpGet("~/api/OAuth/Callback/GitHub")]
     public async Task<IActionResult> BindGitHubCallbackAsync(
         [FromQuery(Name = "code")][Required] string code,
@@ -114,10 +114,10 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
     }
 
     /// <summary>
-    /// 加密 OAuth 状态信息。
+    /// 加密 OAuth 状态信息.
     /// </summary>
-    /// <param name="state">待加密的状态字符串。</param>
-    /// <returns>Base64 编码的密文。</returns>
+    /// <param name="state">待加密的状态字符串.</param>
+    /// <returns>Base64 编码的密文.</returns>
     private string EncryptState(string state)
     {
         using Aes aes = Aes.Create();
@@ -143,10 +143,10 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
     }
 
     /// <summary>
-    /// 解密 OAuth 状态信息。
+    /// 解密 OAuth 状态信息.
     /// </summary>
-    /// <param name="state">Base64 编码的密文。</param>
-    /// <returns>解密后的状态字符串；参数是伪造/损坏的密文时为 <see langword="null"/>。</returns>
+    /// <param name="state">Base64 编码的密文.</param>
+    /// <returns>解密后的状态字符串；参数是伪造/损坏的密文时为 <see langword="null"/>.</returns>
     private string? DecryptState(string state)
     {
         try

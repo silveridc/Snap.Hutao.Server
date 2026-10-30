@@ -3,10 +3,9 @@ using server.Models.Github;
 namespace server.Services.Github;
 
 // Transient
-public class GithubApiService(IServiceProvider serviceProvider)
+public class GithubApiService(AppOptions appOptions, HttpClient httpClient)
 {
-    private readonly GithubOptions _githubOptions = serviceProvider.GetRequiredService<AppOptions>().Github;
-    private readonly HttpClient _httpClient = serviceProvider.GetRequiredService<HttpClient>();
+    private readonly GithubOptions _githubOptions = appOptions.Github;
 
     public async ValueTask<GithubUserResponse?> GetUserInfoByAccessTokenAsync(string accessToken)
     {
@@ -15,7 +14,7 @@ public class GithubApiService(IServiceProvider serviceProvider)
         requestMessage.Headers.UserAgent.ParseAdd("Snap Hutao Server/1.0");
         requestMessage.Headers.Authorization = new("Bearer", accessToken);
 
-        using HttpResponseMessage responseMessage = await _httpClient.SendAsync(requestMessage);
+        using HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage);
         if (!responseMessage.IsSuccessStatusCode)
         {
             return default;
@@ -42,7 +41,7 @@ public class GithubApiService(IServiceProvider serviceProvider)
         requestMessage.Headers.Accept.Add(new("application/json"));
         requestMessage.Headers.Authorization = new("token", token);
 
-        using HttpResponseMessage responseMessage = await _httpClient.SendAsync(requestMessage);
+        using HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage);
         if (!responseMessage.IsSuccessStatusCode)
         {
             return default;

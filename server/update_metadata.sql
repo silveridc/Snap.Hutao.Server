@@ -90,10 +90,10 @@ CREATE TABLE IF NOT EXISTS `metadata_translation` (
 -- ============================================================
 -- 派生读模型（对外 API 用）
 -- ============================================================
--- 上面两张表是「逐字节服务」的唯一真源：/metadata/Genshin/{locale}/{name}.json 直接吐 metadata_document.Doc。
+-- 上面两张表是「逐字节服务」的唯一真源：/metadata/Genshin/{locale}/{name}.json 直接吐 metadata_document.Doc.
 -- 下面 5 张表全部由 MetadataProjectionService 从 metadata_document 投影出来，随时可以 TRUNCATE 重建，
--- 服务一个字节都不依赖它们；它们存在的理由是把 28,340 个对象身份（CHS 单语言 26,538 个）摊成能过滤、能反查的关系表。
--- 投影口径由 upd-test 的三个探针实测决定，写在下面每张表的注释里，改设计前先重跑探针。
+-- 服务一个字节都不依赖它们；它们存在的理由是把 28,340 个对象身份（CHS 单语言 26,538 个）摊成能过滤、能反查的关系表.
+-- 投影口径由 upd-test 的三个探针实测决定，写在下面每张表的注释里，改设计前先重跑探针.
 
 -- 分类注册表：身份键怎么取、根形态是什么、这次投影有没有被后续的翻译改动弄脏
 CREATE TABLE IF NOT EXISTS `metadata_kind` (
@@ -119,8 +119,8 @@ CREATE TABLE IF NOT EXISTS `metadata_object` (
     `SourceLocale` varchar(8) CHARACTER SET utf8mb4 NOT NULL,
     `Ordinal` int unsigned NOT NULL,
     `Doc` mediumtext CHARACTER SET utf8mb4 NOT NULL,
-    -- 以下都是 Doc 上的生成列，只做过滤/排序，值永远以 Doc 为准。
-    -- NULL ON ERROR 是必须的：占位符是字符串，能转数的 JSON_VALUE 会静默给出错的值，转不了数的正好落成 NULL。
+    -- 以下都是 Doc 上的生成列，只做过滤/排序，值永远以 Doc 为准.
+    -- NULL ON ERROR 是必须的：占位符是字符串，能转数的 JSON_VALUE 会静默给出错的值，转不了数的正好落成 NULL.
     `Quality` int unsigned AS (JSON_VALUE(`Doc`, '$.Quality' RETURNING UNSIGNED INTEGER NULL ON EMPTY NULL ON ERROR)) STORED,
     `Rank` int unsigned AS (JSON_VALUE(`Doc`, '$.Rank' RETURNING UNSIGNED INTEGER NULL ON EMPTY NULL ON ERROR)) STORED,
     `RankLevel` int unsigned AS (JSON_VALUE(`Doc`, '$.RankLevel' RETURNING UNSIGNED INTEGER NULL ON EMPTY NULL ON ERROR)) STORED,

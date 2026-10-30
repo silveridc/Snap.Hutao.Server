@@ -14,7 +14,7 @@
     "quick": {
       "title": "快速失效",
       "tipPre": "按预设模式批量将缓存标记为过期，对应 ",
-      "tipSuf": "。",
+      "tipSuf": ".",
       "invalidateAll": "清空全部"
     },
     "custom": {
@@ -34,7 +34,7 @@
     },
     "dialog": {
       "clearAllHeader": "清空全部缓存",
-      "clearAllBody": "即将删除该应用命名空间下的所有缓存键（模式 *）。缓存会在下次访问时从数据库重建，确定继续？",
+      "clearAllBody": "即将删除该应用命名空间下的所有缓存键（模式 *）.缓存会在下次访问时从数据库重建，确定继续？",
       "clearAllConfirm": "确认清空"
     },
     "messages": {

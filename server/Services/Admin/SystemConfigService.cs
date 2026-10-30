@@ -1,5 +1,5 @@
-﻿using System.Collections.Concurrent;
-using server.Models.Entity;
+﻿using server.Models.Entity;
+using System.Collections.Concurrent;
 
 namespace server.Services.Admin;
 
@@ -8,6 +8,58 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 {
     private readonly ConcurrentDictionary<string, string?> _cache = new(StringComparer.OrdinalIgnoreCase);
     private volatile bool _initialized;
+
+    // Typed accessors with AppOptions fallback
+    public string PizzaHelperUidSalt => GetOrDefault(Keys.PizzaHelperUidSalt, appOptions.GenshinPizzaHelper?.UidSalt ?? string.Empty);
+
+    public string PizzaHelperApiSalt => GetOrDefault(Keys.PizzaHelperApiSalt, appOptions.GenshinPizzaHelper?.ApiSalt ?? string.Empty);
+
+    public string PizzaHelperAvatarHoldingEndpoint => GetOrDefault(Keys.PizzaHelperAvatarHoldingEndpoint, appOptions.GenshinPizzaHelper?.EndPoints?.AvatarHolding ?? string.Empty);
+
+    public string PizzaHelperSpiralAbyssEndpoint => GetOrDefault(Keys.PizzaHelperSpiralAbyssEndpoint, appOptions.GenshinPizzaHelper?.EndPoints?.SpiralAbyss ?? string.Empty);
+
+    public string AfdianSkuGachaLog => GetOrDefault(Keys.AfdianSkuGachaLog, appOptions.Afdian?.SkuGachaLogUploadService ?? string.Empty);
+
+    public string Afdian2SkuCdn => GetOrDefault(Keys.Afdian2SkuCdn, appOptions.Afdian2?.SkuCdnService ?? string.Empty);
+
+    public string SmtpDiagnosticEmail => GetOrDefault(Keys.SmtpDiagnosticEmail, appOptions.Smtp?.DiagnosticEmailAddress ?? string.Empty);
+
+    public bool MaintenanceMode => GetBool(Keys.MaintenanceMode, false);
+
+    public bool PatchDisableFpsUnlock => GetBool(Keys.PatchDisableFpsUnlock, false);
+
+    public bool PatchDisableIslandInjection => GetBool(Keys.PatchDisableIslandInjection, false);
+
+    public string PatchDisableFpsUnlockReason => GetOrDefault(Keys.PatchDisableFpsUnlockReason, string.Empty).Trim();
+
+    public string PatchDisableIslandInjectionReason => GetOrDefault(Keys.PatchDisableIslandInjectionReason, string.Empty).Trim();
+
+    public string PatchS3Host => GetOrDefault(Keys.PatchS3Host, string.Empty).Trim();
+
+    public bool IsPatchS3SigningEnabled =>
+        !string.IsNullOrWhiteSpace(PatchS3Host)
+        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3Region, string.Empty))
+        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty))
+        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty));
+
+    public bool RegistrationEnabled => GetBool(Keys.RegistrationEnabled, true);
+
+    public bool CaptchaEnabled => GetBool(Keys.CaptchaEnabled, !string.IsNullOrWhiteSpace(appOptions.ReCaptchaKey) && !string.IsNullOrWhiteSpace(appOptions.ReCaptchaSiteKey));
+
+    public OidcOptions Oidc => new()
+    {
+        Enabled = GetBool(Keys.OidcEnabled, appOptions.Oidc.Enabled),
+        Authority = GetOrDefault(Keys.OidcAuthority, appOptions.Oidc.Authority),
+        ClientId = GetOrDefault(Keys.OidcClientId, appOptions.Oidc.ClientId),
+        ClientSecret = GetOrDefault(Keys.OidcClientSecret, appOptions.Oidc.ClientSecret),
+        RedirectUri = GetOrDefault(Keys.OidcRedirectUri, appOptions.Oidc.RedirectUri),
+        ClientRedirectUri = GetOrDefault(Keys.OidcClientRedirectUri, appOptions.Oidc.ClientRedirectUri ?? string.Empty),
+        Scope = GetOrDefault(Keys.OidcScope, appOptions.Oidc.Scope),
+        DisplayName = GetOrDefault(Keys.OidcDisplayName, appOptions.Oidc.DisplayName ?? string.Empty),
+        BootstrapClaim = GetOrDefault(Keys.OidcBootstrapClaim, appOptions.Oidc.BootstrapClaim),
+        BootstrapValue = GetOrDefault(Keys.OidcBootstrapValue, appOptions.Oidc.BootstrapValue),
+        RequireHttpsMetadata = GetBool(Keys.OidcRequireHttpsMetadata, appOptions.Oidc.RequireHttpsMetadata),
+    };
 
     public async Task InitializeAsync()
     {
@@ -65,58 +117,6 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 
         return bool.TryParse(value, out bool result) ? result : defaultValue;
     }
-
-    // Typed accessors with AppOptions fallback
-    public string PizzaHelperUidSalt => GetOrDefault(Keys.PizzaHelperUidSalt, appOptions.GenshinPizzaHelper?.UidSalt ?? string.Empty);
-
-    public string PizzaHelperApiSalt => GetOrDefault(Keys.PizzaHelperApiSalt, appOptions.GenshinPizzaHelper?.ApiSalt ?? string.Empty);
-
-    public string PizzaHelperAvatarHoldingEndpoint => GetOrDefault(Keys.PizzaHelperAvatarHoldingEndpoint, appOptions.GenshinPizzaHelper?.EndPoints?.AvatarHolding ?? string.Empty);
-
-    public string PizzaHelperSpiralAbyssEndpoint => GetOrDefault(Keys.PizzaHelperSpiralAbyssEndpoint, appOptions.GenshinPizzaHelper?.EndPoints?.SpiralAbyss ?? string.Empty);
-
-    public string AfdianSkuGachaLog => GetOrDefault(Keys.AfdianSkuGachaLog, appOptions.Afdian?.SkuGachaLogUploadService ?? string.Empty);
-
-    public string Afdian2SkuCdn => GetOrDefault(Keys.Afdian2SkuCdn, appOptions.Afdian2?.SkuCdnService ?? string.Empty);
-
-    public string SmtpDiagnosticEmail => GetOrDefault(Keys.SmtpDiagnosticEmail, appOptions.Smtp?.DiagnosticEmailAddress ?? string.Empty);
-
-    public bool MaintenanceMode => GetBool(Keys.MaintenanceMode, false);
-
-    public bool PatchDisableFpsUnlock => GetBool(Keys.PatchDisableFpsUnlock, false);
-
-    public bool PatchDisableIslandInjection => GetBool(Keys.PatchDisableIslandInjection, false);
-
-    public string PatchDisableFpsUnlockReason => GetOrDefault(Keys.PatchDisableFpsUnlockReason, string.Empty).Trim();
-
-    public string PatchDisableIslandInjectionReason => GetOrDefault(Keys.PatchDisableIslandInjectionReason, string.Empty).Trim();
-
-    public string PatchS3Host => GetOrDefault(Keys.PatchS3Host, string.Empty).Trim();
-
-    public bool IsPatchS3SigningEnabled =>
-        !string.IsNullOrWhiteSpace(PatchS3Host)
-        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3Region, string.Empty))
-        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty))
-        && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty));
-
-    public bool RegistrationEnabled => GetBool(Keys.RegistrationEnabled, true);
-
-    public bool CaptchaEnabled => GetBool(Keys.CaptchaEnabled, !string.IsNullOrWhiteSpace(appOptions.ReCaptchaKey) && !string.IsNullOrWhiteSpace(appOptions.ReCaptchaSiteKey));
-
-    public OidcOptions Oidc => new()
-    {
-        Enabled = GetBool(Keys.OidcEnabled, appOptions.Oidc.Enabled),
-        Authority = GetOrDefault(Keys.OidcAuthority, appOptions.Oidc.Authority),
-        ClientId = GetOrDefault(Keys.OidcClientId, appOptions.Oidc.ClientId),
-        ClientSecret = GetOrDefault(Keys.OidcClientSecret, appOptions.Oidc.ClientSecret),
-        RedirectUri = GetOrDefault(Keys.OidcRedirectUri, appOptions.Oidc.RedirectUri),
-        ClientRedirectUri = GetOrDefault(Keys.OidcClientRedirectUri, appOptions.Oidc.ClientRedirectUri ?? string.Empty),
-        Scope = GetOrDefault(Keys.OidcScope, appOptions.Oidc.Scope),
-        DisplayName = GetOrDefault(Keys.OidcDisplayName, appOptions.Oidc.DisplayName ?? string.Empty),
-        BootstrapClaim = GetOrDefault(Keys.OidcBootstrapClaim, appOptions.Oidc.BootstrapClaim),
-        BootstrapValue = GetOrDefault(Keys.OidcBootstrapValue, appOptions.Oidc.BootstrapValue),
-        RequireHttpsMetadata = GetBool(Keys.OidcRequireHttpsMetadata, appOptions.Oidc.RequireHttpsMetadata),
-    };
 
     // Admin operations
     public async Task<Dictionary<string, string?>> GetAllAsync()

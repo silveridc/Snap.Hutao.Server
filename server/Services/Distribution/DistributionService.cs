@@ -1,12 +1,13 @@
-﻿namespace server.Services.Distribution;
+namespace server.Services.Distribution;
 
 // Scoped
-public sealed class DistributionService(IServiceProvider serviceProvider)
+public sealed class DistributionService(
+    ILogger<DistributionService> logger,
+    HttpClient httpClient,
+    AppOptions appOptions)
 {
-    private readonly ILogger<DistributionService> _logger = serviceProvider.GetRequiredService<ILogger<DistributionService>>();
-    private readonly HttpClient _httpClient = serviceProvider.GetRequiredService<HttpClient>();
-    private readonly string _cdnEndpoint = serviceProvider.GetRequiredService<AppOptions>().CdnEndpoint;
-    private readonly string _cdnToken = serviceProvider.GetRequiredService<AppOptions>().CdnToken;
+    private readonly string _cdnEndpoint = appOptions.CdnEndpoint;
+    private readonly string _cdnToken = appOptions.CdnToken;
 
     public async ValueTask<string?> GetDownloadTokenAsync()
     {
@@ -14,12 +15,12 @@ public sealed class DistributionService(IServiceProvider serviceProvider)
         req.Headers.UserAgent.ParseAdd("Snap Hutao Server/1.0");
         req.Headers.Authorization = new("Bearer", _cdnToken);
 
-        using HttpResponseMessage resp = await _httpClient.SendAsync(req);
+        using HttpResponseMessage resp = await httpClient.SendAsync(req);
         Response<string>? tokenResp = await resp.Content.ReadFromJsonAsync<Response<string>>();
         ArgumentNullException.ThrowIfNull(tokenResp);
         if (tokenResp is not { Code: ReturnCode.Success })
         {
-            _logger.LogWarning("Failed to get download token, raw message: {Message}", tokenResp.Message);
+            logger.LogWarning("Failed to get download token, raw message: {Message}", tokenResp.Message);
             return default;
         }
 
@@ -32,12 +33,12 @@ public sealed class DistributionService(IServiceProvider serviceProvider)
         req.Headers.UserAgent.ParseAdd("Snap Hutao Server/1.0");
         req.Headers.Authorization = new("Bearer", _cdnToken);
 
-        using HttpResponseMessage resp = await _httpClient.SendAsync(req);
+        using HttpResponseMessage resp = await httpClient.SendAsync(req);
         Response<HutaoPackageMirror>? mirrorResp = await resp.Content.ReadFromJsonAsync<Response<HutaoPackageMirror>>();
         ArgumentNullException.ThrowIfNull(mirrorResp);
         if (mirrorResp is not { Code: ReturnCode.Success })
         {
-            _logger.LogWarning("Failed to get accelerated mirror for {Filename}, raw message: {Message}", filename, mirrorResp.Message);
+            logger.LogWarning("Failed to get accelerated mirror for {Filename}, raw message: {Message}", filename, mirrorResp.Message);
             return default;
         }
 

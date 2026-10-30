@@ -1,4 +1,4 @@
-﻿using server.Models.PublicAPI;
+using server.Models.PublicAPI;
 using server.Services.PublicAPI;
 
 namespace server.Controllers;
@@ -9,7 +9,7 @@ namespace server.Controllers;
 public class PublicApiController(IpRegionService ipRegionService) : ControllerBase
 {
     /// <summary>
-    /// Return ip and region data
+    /// Return ip and region data.
     /// </summary>
     /// <returns>IP and region data.</returns>
     [HttpGet("ip")]

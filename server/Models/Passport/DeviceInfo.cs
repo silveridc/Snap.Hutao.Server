@@ -1,4 +1,4 @@
-﻿namespace server.Models.Passport;
+namespace server.Models.Passport;
 
 public class DeviceInfo(string deviceId, string? deviceName, string? operatingSystem)
 {

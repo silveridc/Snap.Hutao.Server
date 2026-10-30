@@ -23,7 +23,7 @@ public sealed class OAuthTests
     }
 
     /// <summary>
-    /// 把一个 GitHub 账号接到指定用户上（走真实的绑定回调），并返回该 GitHub 的 node_id。
+    /// 把一个 GitHub 账号接到指定用户上（走真实的绑定回调），并返回该 GitHub 的 node_id.
     /// </summary>
     private async Task<string> BindGitHubAsync(int userId, string deviceId)
     {
@@ -40,7 +40,7 @@ public sealed class OAuthTests
         return nodeId;
     }
 
-    /// <summary>登记 GitHub 令牌交换与用户信息的桩数据。</summary>
+    /// <summary>登记 GitHub 令牌交换与用户信息的桩数据.</summary>
     private void StubGitHub(string nodeId, string login)
     {
         factory.StubHttp.MapJson(

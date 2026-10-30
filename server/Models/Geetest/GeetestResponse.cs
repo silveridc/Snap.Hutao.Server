@@ -1,9 +1,12 @@
-﻿namespace server.Models.Geetest;
+namespace server.Models.Geetest;
 
 internal sealed class GeetestResponse
 {
     [JsonPropertyName("code")]
-    public int Code { get; set; }
+    public int Code
+    {
+        get; set;
+    }
 
     [JsonPropertyName("info")]
     public string Info { get; set; } = default!;

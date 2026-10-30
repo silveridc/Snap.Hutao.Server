@@ -1,4 +1,4 @@
-﻿namespace server.Options;
+namespace server.Options;
 
 internal static class AppOptionsExtension
 {

@@ -1,17 +1,17 @@
-﻿using server.Services.Admin;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using server.Extension;
-using Microsoft.Extensions.Caching.Distributed;
 using server.Models.Admin;
 using server.Models.Context;
 using server.Models.Entity;
 using server.Models.Patch;
 using server.Options;
+using server.Services.Admin;
 using server.Services.PublicAPI;
 using server.Tests.Infrastructure;
 using System.Net;
 using System.Security.Cryptography;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace server.Tests;
 
@@ -448,7 +448,7 @@ public sealed class ServiceTests
         Assert.Equal(ReturnCodes.ServiceKeyInvalid, parsed.Retcode);
     }
 
-    /// <summary>把默认管理员临时配成指定用户，用例结束还原，避免污染同集合的其他用例。</summary>
+    /// <summary>把默认管理员临时配成指定用户，用例结束还原，避免污染同集合的其他用例.</summary>
     private async Task WithDefaultAdminAsync(int userId, Func<Task> body)
     {
         AppOptions appOptions = factory.Services.GetRequiredService<AppOptions>();
@@ -480,7 +480,7 @@ public sealed class ServiceTests
         return parsed.DeserializeData<UserDetail>()!;
     }
 
-    /// <summary>别的维护者降级默认管理员：拒绝，并且库里的权限保持原样。</summary>
+    /// <summary>别的维护者降级默认管理员：拒绝，并且库里的权限保持原样.</summary>
     [Fact]
     public async Task UserPrivilege_DemotingDefaultAdmin_IsRejected()
     {
@@ -496,7 +496,7 @@ public sealed class ServiceTests
         });
     }
 
-    /// <summary>默认管理员降级自己时先命中「不能撤自己」，两条守卫各管各的。</summary>
+    /// <summary>默认管理员降级自己时先命中「不能撤自己」，两条守卫各管各的.</summary>
     [Fact]
     public async Task UserPrivilege_DefaultAdminDemotingSelf_ReportsSelfGuard()
     {
@@ -510,7 +510,7 @@ public sealed class ServiceTests
         });
     }
 
-    /// <summary>守卫只保护配置里的那一个账号，其他维护者照常可被降级。</summary>
+    /// <summary>守卫只保护配置里的那一个账号，其他维护者照常可被降级.</summary>
     [Fact]
     public async Task UserPrivilege_OtherMaintainer_IsStillDemotableWhileDefaultAdminConfigured()
     {
@@ -526,7 +526,7 @@ public sealed class ServiceTests
         });
     }
 
-    /// <summary>没配默认管理员（0）时，降级维护者的行为与加守卫之前完全一致。</summary>
+    /// <summary>没配默认管理员（0）时，降级维护者的行为与加守卫之前完全一致.</summary>
     [Fact]
     public async Task UserPrivilege_WithoutDefaultAdminConfigured_DemotionSucceeds()
     {
@@ -541,7 +541,7 @@ public sealed class ServiceTests
         });
     }
 
-    /// <summary>只拦 IsMaintainer=false：重新置为 true 或只改开发者授权都不受影响。</summary>
+    /// <summary>只拦 IsMaintainer=false：重新置为 true 或只改开发者授权都不受影响.</summary>
     [Fact]
     public async Task UserPrivilege_DefaultAdmin_KeepsEveryOtherPrivilegeWrite()
     {
@@ -559,7 +559,7 @@ public sealed class ServiceTests
         });
     }
 
-    /// <summary>配置里的 Uid 查不到人时守卫照样生效，拦截发生在查人之前。</summary>
+    /// <summary>配置里的 Uid 查不到人时守卫照样生效，拦截发生在查人之前.</summary>
     [Fact]
     public async Task UserPrivilege_DefaultAdminIdWithoutMatchingUser_BlocksBeforeTheLookup()
     {
@@ -576,7 +576,7 @@ public sealed class ServiceTests
         });
     }
 
-    /// <summary>appsettings.json 里必须真的有这个键，键名拼错会让整条守卫静默失效。</summary>
+    /// <summary>appsettings.json 里必须真的有这个键，键名拼错会让整条守卫静默失效.</summary>
     [Fact]
     public void DefaultAdminUserId_IsPresentInTheAppSection()
     {
@@ -730,7 +730,7 @@ public sealed class ServiceTests
 
     /// <summary>
     /// 最低强制版本链路：发布时携带 minimumVersion → /patch/hutao 原样下发（客户端据此强制更新）；
-    /// 不携带时字段省略（null 走 WhenWritingNull），大于 Version 的值被拒绝。
+    /// 不携带时字段省略（null 走 WhenWritingNull），大于 Version 的值被拒绝.
     /// </summary>
     [Fact]
     public async Task ReleasePublish_WithMinimumVersion_ServesItOnPatch()
@@ -764,7 +764,7 @@ public sealed class ServiceTests
 
     /// <summary>
     /// 功能熔断链路：后台开启 Patch.DisableFpsUnlock / Patch.DisableIslandInjection 后，
-    /// /patch/hutao 下发 true；关闭时字段省略（客户端视为 false，恢复用户本地设置）。
+    /// /patch/hutao 下发 true；关闭时字段省略（客户端视为 false，恢复用户本地设置）.
     /// </summary>
     [Fact]
     public async Task PatchKillSwitches_AreServedOnPatchEndpoint()
@@ -859,7 +859,7 @@ public sealed class ServiceTests
 
     /// <summary>
     /// 从存储桶发布的完整链路：列对象 → 服务端流式算 SHA-256 → 版本号取自对象键 → 组装 Direct 镜像 →
-    /// /patch/hutao 原样下发校验值与更新说明。桶本身由 StubHttpMessageHandler 冒充，不依赖外网。
+    /// /patch/hutao 原样下发校验值与更新说明.桶本身由 StubHttpMessageHandler 冒充，不依赖外网.
     /// </summary>
     [Fact]
     public async Task ReleasePublishFromBucket_HashesObjectAndServesItOnPatch()
@@ -1055,7 +1055,7 @@ public sealed class ServiceTests
         Assert.True(IPAddress.TryParse(entry.Ip, out _), $"记录的不是合法 IP：{entry.Ip}");
     }
 
-    /// <summary>回环地址在内置库里没有属地，落库时应当留空而不是写半截字符串。</summary>
+    /// <summary>回环地址在内置库里没有属地，落库时应当留空而不是写半截字符串.</summary>
     [Fact]
     public async Task AuditLog_LoopbackRequest_HasNoRegionButKeepsIp()
     {
@@ -1082,7 +1082,7 @@ public sealed class ServiceTests
         Assert.Null(entry.IpRegion);
     }
 
-    /// <summary>属地不落库：审计只存真实来源 IP，列表读取时按它现查出四段数组。</summary>
+    /// <summary>属地不落库：审计只存真实来源 IP，列表读取时按它现查出四段数组.</summary>
     [Fact]
     public async Task AuditLog_ResolvesRegionFromTheStoredIp()
     {
@@ -1110,7 +1110,7 @@ public sealed class ServiceTests
         Assert.Equal("中国/浙江省/杭州市/阿里", string.Join('/', entry.IpRegion!));
     }
 
-    /// <summary>现查的结果按 IP 缓存，审计翻页不重复算；非法地址直接算成没有属地。</summary>
+    /// <summary>现查的结果按 IP 缓存，审计翻页不重复算；非法地址直接算成没有属地.</summary>
     [Fact]
     public async Task IpRegion_IsCachedByIp()
     {

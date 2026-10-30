@@ -1,4 +1,4 @@
-﻿using server.Models.Admin;
+using server.Models.Admin;
 using server.Models.Legacy;
 using server.Models.Upload;
 
@@ -6,13 +6,13 @@ namespace server.Services.Ranking;
 
 public interface IRankService
 {
-    Task<long> ClearRanksAsync();
+    public Task<long> ClearRanksAsync();
 
-    Task<Rank> RetriveRankAsync(string uid);
+    public Task<Rank> RetriveRankAsync(string uid);
 
-    Task SaveRankAsync(string uid, SimpleRank damage, SimpleRank? takeDamage);
+    public Task SaveRankAsync(string uid, SimpleRank damage, SimpleRank? takeDamage);
 
-    Task<List<string>> GetRankKeysAsync();
+    public Task<List<string>> GetRankKeysAsync();
 
-    Task<List<RankEntry>> GetLeaderboardAsync(string key, int count);
+    public Task<List<RankEntry>> GetLeaderboardAsync(string key, int count);
 }

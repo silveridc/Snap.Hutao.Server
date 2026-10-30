@@ -2,7 +2,7 @@
 @import './reset.less';
 
 // 页面骨架：卡片之间的间距、卡片内边距、标题与正文的对齐都在这里统一定义，
-// 各页面不要再各自写一份 .hutao-card，否则间距会逐个页面漂移。
+// 各页面不要再各自写一份 .hutao-card，否则间距会逐个页面漂移.
 .hutao-page {
   > * {
     min-width: 0;
@@ -10,8 +10,8 @@
 }
 
 .hutao-card {
-  // 卡片可能被 t-loading 包一层，光靠父级 gap 排不出间距，所以间距落在卡片自己身上。
-  // 并排布局（t-row > t-col > t-card）里由行来负责间距，卡片自身不再叠加，否则同排卡片底边会被撑得不齐。
+  // 卡片可能被 t-loading 包一层，光靠父级 gap 排不出间距，所以间距落在卡片自己身上.
+  // 并排布局（t-row > t-col > t-card）里由行来负责间距，卡片自身不再叠加，否则同排卡片底边会被撑得不齐.
   margin-bottom: 16px;
 
   &:last-child {
@@ -38,8 +38,8 @@
   }
 }
 
-// 带 gutter 的行靠负外边距对齐列，嵌在卡片正文/表单里时会撑出横向滚动，统一收掉。
-// TDesign 用 .t-row--start 之类的高优先级规则给负 margin，所以要 !important。
+// 带 gutter 的行靠负外边距对齐列，嵌在卡片正文/表单里时会撑出横向滚动，统一收掉.
+// TDesign 用 .t-row--start 之类的高优先级规则给负 margin，所以要 !important.
 .t-card__body .t-row,
 .t-form .t-row,
 .t-form-item .t-row {

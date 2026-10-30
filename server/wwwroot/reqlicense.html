@@ -39,21 +39,21 @@
                             <div class="form-group">
                                 <label for="username">用户名 / 账号 <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="username" placeholder="请输入绑定的账户名" required>
-                                <div class="invalid-feedback">请输入有效的账号。</div>
+                                <div class="invalid-feedback">请输入有效的账号.</div>
                             </div>
 
                             <!-- 开源项目名称 -->
                             <div class="form-group">
                                 <label for="projectName">项目名称 <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="projectName" placeholder="例如：MyAwesomeProject" required>
-                                <div class="invalid-feedback">请输入开源项目名称。</div>
+                                <div class="invalid-feedback">请输入开源项目名称.</div>
                             </div>
 
                             <!-- 项目仓库 URL -->
                             <div class="form-group">
                                 <label for="repositoryUrl">开源仓库地址 <span class="text-danger">*</span></label>
                                 <input type="url" class="form-control" id="repositoryUrl" placeholder="https://github.com/org/repo" required>
-                                <div class="invalid-feedback">请输入合法的仓库 URL 地址。</div>
+                                <div class="invalid-feedback">请输入合法的仓库 URL 地址.</div>
                             </div>
 
                             <!-- 申请理由 / 备注 -->
@@ -147,13 +147,13 @@
                             });
                         })
                         .done(function (res) {
-                            const successMsg = res.message || res.msg || '申请已提交，请等待审核。';
+                            const successMsg = res.message || res.msg || '申请已提交，请等待审核.';
                             showAlert('success', successMsg);
                             $form[0].reset();
                             $form.removeClass('was-validated');
                         })
                         .fail(function (xhr) {
-                            let errorMsg = '网络或系统异常，请稍后重试。';
+                            let errorMsg = '网络或系统异常，请稍后重试.';
                             if (xhr.responseJSON) {
                                 errorMsg = xhr.responseJSON.message || xhr.responseJSON.msg || errorMsg;
                             }

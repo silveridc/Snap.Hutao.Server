@@ -1,4 +1,4 @@
-﻿namespace server.Models.Legacy;
+namespace server.Models.Legacy;
 
 public class Rank(RankValue? damage, RankValue? takeDamage)
 {

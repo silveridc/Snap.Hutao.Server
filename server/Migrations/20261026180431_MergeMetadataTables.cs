@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace server.Migrations;
 
 // 元数据三表原先由 MetadataDbContext 在启动时 CreateTablesAsync 建出（连接串与主库相同），
-// 存量库里可能已经存在，所以这里用 IF NOT EXISTS，升级时不会撞表。
+// 存量库里可能已经存在，所以这里用 IF NOT EXISTS，升级时不会撞表.
 /// <inheritdoc />
 public partial class MergeMetadataTables : Migration
 {

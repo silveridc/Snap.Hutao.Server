@@ -1,4 +1,4 @@
-﻿using MailKit.Net.Smtp;
+using MailKit.Net.Smtp;
 using MimeKit;
 using server.Models.Admin;
 using server.Models.Passport;
@@ -23,10 +23,10 @@ public class PassportV2Controller(
     AppOptions appOptions) : ControllerBase
 {
     /// <summary>
-    /// 申请邮箱验证码以完成注册、找回密码或账号安全操作；同一邮箱同一场景 60 秒内限一次。
+    /// 申请邮箱验证码以完成注册、找回密码或账号安全操作；同一邮箱同一场景 60 秒内限一次.
     /// </summary>
-    /// <param name="request">包含用户名与场景标记的请求体。</param>
-    /// <returns>验证码申请结果。</returns>
+    /// <param name="request">包含用户名与场景标记的请求体.</param>
+    /// <returns>验证码申请结果.</returns>
     [HttpPost("verification-codes")]
     public async Task<IActionResult> RequestVerifyCodeAsync([FromBody] PassportRequest request)
     {
@@ -59,10 +59,10 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 使用邮箱验证码注册账号并下发访问令牌。
+    /// 使用邮箱验证码注册账号并下发访问令牌.
     /// </summary>
-    /// <param name="request">包含用户名、密码（至少 8 位）与验证码的请求体。</param>
-    /// <returns>注册结果。</returns>
+    /// <param name="request">包含用户名、密码（至少 8 位）与验证码的请求体.</param>
+    /// <returns>注册结果.</returns>
     [HttpPost("accounts")]
     public async Task<IActionResult> RegisterAsync([FromBody] PassportRequest request)
     {
@@ -92,10 +92,10 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 注销现有账号并删除关联数据，操作不可逆。
+    /// 注销现有账号并删除关联数据，操作不可逆.
     /// </summary>
-    /// <param name="request">包含用户名、密码与验证码的请求体。</param>
-    /// <returns>注销结果。</returns>
+    /// <param name="request">包含用户名、密码与验证码的请求体.</param>
+    /// <returns>注销结果.</returns>
     [HttpDelete("accounts/me")]
     public async Task<IActionResult> CancelRegistrationAsync([FromBody] PassportRequest request)
     {
@@ -120,10 +120,10 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 通过邮箱验证码设置新的登录密码。
+    /// 通过邮箱验证码设置新的登录密码.
     /// </summary>
-    /// <param name="request">包含用户名、新密码与验证码的请求体。</param>
-    /// <returns>重置结果。</returns>
+    /// <param name="request">包含用户名、新密码与验证码的请求体.</param>
+    /// <returns>重置结果.</returns>
     [HttpPut("accounts/me/password")]
     public async Task<IActionResult> ResetPasswordAsync([FromBody] PassportRequest request)
     {
@@ -154,10 +154,10 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 修改绑定邮箱并重新签发访问令牌。
+    /// 修改绑定邮箱并重新签发访问令牌.
     /// </summary>
-    /// <param name="request">包含原邮箱、新邮箱及对应验证码的请求体。</param>
-    /// <returns>重置结果。</returns>
+    /// <param name="request">包含原邮箱、新邮箱及对应验证码的请求体.</param>
+    /// <returns>重置结果.</returns>
     [HttpPut("accounts/me/username")]
     public async Task<IActionResult> ResetUsernameAsync([FromBody] PassportRequest request)
     {
@@ -185,9 +185,9 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 获取登录页的人机验证配置（站点密钥是公开值）。
+    /// 获取登录页的人机验证配置（站点密钥是公开值）.
     /// </summary>
-    /// <returns>是否启用与 reCAPTCHA 站点密钥。</returns>
+    /// <returns>是否启用与 reCAPTCHA 站点密钥.</returns>
     [HttpGet("captcha")]
     public IActionResult GetCaptchaSettings()
     {
@@ -200,9 +200,9 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 启动器内置浏览器使用的 reCAPTCHA 页面，加载后自动执行 v3 并跳回哨兵地址。
+    /// 启动器内置浏览器使用的 reCAPTCHA 页面，加载后自动执行 v3 并跳回哨兵地址.
     /// </summary>
-    /// <returns>HTML 页面。</returns>
+    /// <returns>HTML 页面.</returns>
     [HttpGet("captcha/page")]
     public IActionResult GetCaptchaPage()
     {
@@ -244,10 +244,10 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 使用邮箱与密码登录并颁发访问令牌与刷新令牌。
+    /// 使用邮箱与密码登录并颁发访问令牌与刷新令牌.
     /// </summary>
-    /// <param name="request">包含用户名、密码与人机验证令牌的请求体。</param>
-    /// <returns>登录结果。</returns>
+    /// <param name="request">包含用户名、密码与人机验证令牌的请求体.</param>
+    /// <returns>登录结果.</returns>
     [HttpPost("sessions")]
     public async Task<IActionResult> LoginAsync([FromBody] PassportRequest request)
     {
@@ -286,9 +286,9 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 分页获取当前账号的登录日志，供客户端自助确认是否有异常登录。
+    /// 分页获取当前账号的登录日志，供客户端自助确认是否有异常登录.
     /// </summary>
-    /// <returns>登录记录（含 IP 属地）。</returns>
+    /// <returns>登录记录（含 IP 属地）.</returns>
     [Authorize]
     [HttpGet("me/login-logs")]
     public async Task<IActionResult> GetLoginLogsAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -306,9 +306,9 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 获取当前登录用户的基础资料与资源到期时间。
+    /// 获取当前登录用户的基础资料与资源到期时间.
     /// </summary>
-    /// <returns>用户信息。</returns>
+    /// <returns>用户信息.</returns>
     [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> GetUserInfoAsync()
@@ -361,9 +361,9 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 查询当前账号所有有效的登录设备。
+    /// 查询当前账号所有有效的登录设备.
     /// </summary>
-    /// <returns>已登录设备列表。</returns>
+    /// <returns>已登录设备列表.</returns>
     [Authorize]
     [HttpGet("sessions")]
     public async Task<IActionResult> GetLoggedInDevicesAsync()
@@ -375,10 +375,10 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 使用刷新令牌换取新的访问令牌。
+    /// 使用刷新令牌换取新的访问令牌.
     /// </summary>
-    /// <param name="request">包含刷新令牌的请求体。</param>
-    /// <returns>新的令牌。</returns>
+    /// <param name="request">包含刷新令牌的请求体.</param>
+    /// <returns>新的令牌.</returns>
     [HttpPost("sessions/refresh")]
     public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequest request)
     {
@@ -397,10 +397,10 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 撤销刷新令牌：携带 deviceId 只撤销该设备，缺省时撤销当前账号的全部设备。
+    /// 撤销刷新令牌：携带 deviceId 只撤销该设备，缺省时撤销当前账号的全部设备.
     /// </summary>
-    /// <param name="deviceId">加密后的设备 ID。</param>
-    /// <returns>撤销结果。</returns>
+    /// <param name="deviceId">加密后的设备 ID.</param>
+    /// <returns>撤销结果.</returns>
     [Authorize]
     [HttpDelete("sessions")]
     public async Task<IActionResult> RevokeSessionsAsync([FromQuery] string? deviceId)
@@ -417,14 +417,14 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 根据场景发送对应的验证码邮件。
+    /// 根据场景发送对应的验证码邮件.
     /// </summary>
-    /// <param name="request">验证码请求。</param>
-    /// <param name="normalizedUserName">标准化后的用户名。</param>
-    /// <param name="userName">原始用户名。</param>
-    /// <param name="userExists">用户是否存在。</param>
-    /// <param name="code">验证码。</param>
-    /// <returns>验证码发送结果。</returns>
+    /// <param name="request">验证码请求.</param>
+    /// <param name="normalizedUserName">标准化后的用户名.</param>
+    /// <param name="userName">原始用户名.</param>
+    /// <param name="userExists">用户是否存在.</param>
+    /// <param name="code">验证码.</param>
+    /// <returns>验证码发送结果.</returns>
     private async Task<IActionResult> PrivateRequestVerifyCodeAsync(PassportRequest request, string normalizedUserName, string userName, bool userExists, string code)
     {
         try

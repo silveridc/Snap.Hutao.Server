@@ -1,18 +1,33 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace server.Models.Upload;
 
 public sealed class SimpleRecord
 {
-    public string? Uid { get; set; }
+    public string? Uid
+    {
+        get; set;
+    }
 
-    public string? Identity { get; set; }
+    public string? Identity
+    {
+        get; set;
+    }
 
-    public SimpleSpiralAbyss? SpiralAbyss { get; set; }
+    public SimpleSpiralAbyss? SpiralAbyss
+    {
+        get; set;
+    }
 
-    public List<SimpleAvatar>? Avatars { get; set; }
+    public List<SimpleAvatar>? Avatars
+    {
+        get; set;
+    }
 
-    public string? ReservedUserName { get; set; }
+    public string? ReservedUserName
+    {
+        get; set;
+    }
 
     [MemberNotNullWhen(true, nameof(Identity), nameof(Uid), nameof(SpiralAbyss), nameof(Avatars))]
     public bool Validate()

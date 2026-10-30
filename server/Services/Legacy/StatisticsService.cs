@@ -1,14 +1,18 @@
-﻿using System.Runtime.InteropServices;
 using server.Core;
 using server.Models.Entity.SpiralAbyss;
+using System.Runtime.InteropServices;
 
 namespace server.Services.Legacy;
 
 // Transient
-public sealed class StatisticsService(IServiceProvider serviceProvider)
+public sealed class StatisticsService(
+    SpiralAbyssStatisticsService spiralAbyssStatisticsService,
+    ILogger<StatisticsService> logger,
+    AppDbContext appDbContext,
+    IDistributedCache cache)
 {
     /// <summary>
-    /// 统计服务正在工作
+    /// 统计服务正在工作.
     /// </summary>
     public const string Working = "StatisticsService.Working";
     private const int _partion = 512;
@@ -26,20 +30,15 @@ public sealed class StatisticsService(IServiceProvider serviceProvider)
     private static readonly Func<AppDbContext, long, IEnumerable<EntityFloor>> FloorQuery = EF.CompileQuery((AppDbContext context, long spiralAbyssId) =>
         context.SpiralAbyssFloors.AsNoTracking().Where(f => f.SpiralAbyssId == spiralAbyssId));
 
-    private readonly SpiralAbyssStatisticsService _spiralAbyssStatisticsService = serviceProvider.GetRequiredService<SpiralAbyssStatisticsService>();
-    private readonly ILogger<StatisticsService> _logger = serviceProvider.GetRequiredService<ILogger<StatisticsService>>();
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-    private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
-
     public async Task RunAsync()
     {
-        await _cache.RunExclusiveAsync(Working, async () =>
+        await cache.RunExclusiveAsync(Working, async () =>
         {
             StatisticsTracker tracker = new();
 
             ValueStopwatch stopwatch = ValueStopwatch.StartNew();
             await Task.Run(() => RunCore(tracker)).ConfigureAwait(false);
-            _ = tracker.CompleteTracking(_spiralAbyssStatisticsService, stopwatch);
+            _ = tracker.CompleteTracking(spiralAbyssStatisticsService, stopwatch);
         }).ConfigureAwait(false);
     }
 
@@ -48,15 +47,15 @@ public sealed class StatisticsService(IServiceProvider serviceProvider)
         int count = 0;
         while (true)
         {
-            _logger.LogInformation("StatisticsService: Processing {Count} records", count += _partion);
+            logger.LogInformation("StatisticsService: Processing {Count} records", count += _partion);
 
-            List<EntityRecord> partialRecords = [.. PartionQuery(_appDbContext, tracker.LastId)];
+            List<EntityRecord> partialRecords = [.. PartionQuery(appDbContext, tracker.LastId)];
             foreach (ref EntityRecord record in CollectionsMarshal.AsSpan(partialRecords))
             {
-                record.Avatars = [.. AvatarQuery(_appDbContext, record.PrimaryId)];
-                record.SpiralAbyss = SpiralAbyssQuery(_appDbContext, record.PrimaryId);
+                record.Avatars = [.. AvatarQuery(appDbContext, record.PrimaryId)];
+                record.SpiralAbyss = SpiralAbyssQuery(appDbContext, record.PrimaryId);
 
-                record.SpiralAbyss?.Floors = [.. FloorQuery(_appDbContext, record.SpiralAbyss.PrimaryId)];
+                record.SpiralAbyss?.Floors = [.. FloorQuery(appDbContext, record.SpiralAbyss.PrimaryId)];
 
                 tracker.Track(record);
             }

@@ -14,7 +14,7 @@ namespace server.Controllers;
 public sealed class AdminAuditController(AdminQueryService adminQueryService) : ControllerBase
 {
     /// <summary>
-    /// 分页获取后台操作审计日志。
+    /// 分页获取后台操作审计日志.
     /// </summary>
     [HttpGet("audit-logs")]
     public async Task<IActionResult> AuditListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -24,7 +24,7 @@ public sealed class AdminAuditController(AdminQueryService adminQueryService) : 
     }
 
     /// <summary>
-    /// 分页获取客户端登录日志，供审计使用。
+    /// 分页获取客户端登录日志，供审计使用.
     /// </summary>
     [HttpGet("login-logs")]
     public async Task<IActionResult> LoginLogListAsync(

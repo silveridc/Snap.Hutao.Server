@@ -18,10 +18,10 @@ public sealed class AdminRedeemCodeController(
     AppDbContext appDbContext) : ControllerBase
 {
     /// <summary>
-    /// 生成兑换码。
+    /// 生成兑换码.
     /// </summary>
-    /// <param name="req">兑换码生成请求。</param>
-    /// <returns>生成结果。</returns>
+    /// <param name="req">兑换码生成请求.</param>
+    /// <returns>生成结果.</returns>
     [HttpPost("redeem-codes/generation")]
     public async Task<IActionResult> GenerateRedeemCodesAsync([FromBody] RedeemGenerateRequest req)
     {
@@ -34,7 +34,7 @@ public sealed class AdminRedeemCodeController(
     }
 
     /// <summary>
-    /// 分页获取兑换码列表。
+    /// 分页获取兑换码列表.
     /// </summary>
     [HttpGet("redeem-codes")]
     public async Task<IActionResult> RedeemListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? keyword = null)
@@ -44,10 +44,10 @@ public sealed class AdminRedeemCodeController(
     }
 
     /// <summary>
-    /// 某张兑换码的使用者清单。
+    /// 某张兑换码的使用者清单.
     /// </summary>
-    /// <param name="id">兑换码主键。</param>
-    /// <returns>使用该兑换码的用户与时间。</returns>
+    /// <param name="id">兑换码主键.</param>
+    /// <returns>使用该兑换码的用户与时间.</returns>
     [HttpGet("redeem-codes/{id}/usages")]
     public async Task<IActionResult> RedeemUsesAsync([FromRoute] uint id)
     {
@@ -56,7 +56,7 @@ public sealed class AdminRedeemCodeController(
     }
 
     /// <summary>
-    /// 编辑兑换码（服务、时长、备注、过期时间、可用次数）。
+    /// 编辑兑换码（服务、时长、备注、过期时间、可用次数）.
     /// </summary>
     [HttpPut("redeem-codes/{id}")]
     public async Task<IActionResult> RedeemUpdateAsync([FromRoute] uint id, [FromBody] RedeemCodeUpdateRequest request)
@@ -70,7 +70,7 @@ public sealed class AdminRedeemCodeController(
     }
 
     /// <summary>
-    /// 删除兑换码（同时删除其使用记录）。
+    /// 删除兑换码（同时删除其使用记录）.
     /// </summary>
     [HttpDelete("redeem-codes/{id}")]
     public async Task<IActionResult> RedeemDeleteAsync([FromRoute] uint id)
@@ -82,7 +82,7 @@ public sealed class AdminRedeemCodeController(
     }
 
     /// <summary>
-    /// 批量删除兑换码。
+    /// 批量删除兑换码.
     /// </summary>
     [HttpPost("redeem-codes/batch-deletion")]
     public async Task<IActionResult> RedeemBatchDeleteAsync([FromBody] BatchIdRequest request)

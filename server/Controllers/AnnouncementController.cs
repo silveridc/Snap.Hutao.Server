@@ -1,4 +1,4 @@
-﻿using server.Models.Entity.Announcement;
+using server.Models.Entity.Announcement;
 
 namespace server.Controllers;
 
@@ -8,10 +8,10 @@ namespace server.Controllers;
 public sealed class AnnouncementController(AnnouncementService announcementService) : ControllerBase
 {
     /// <summary>
-    /// 获取公告列表。
+    /// 获取公告列表.
     /// </summary>
-    /// <param name="exclude">需要排除的公告 ID，逗号分隔。</param>
-    /// <returns>公告列表。</returns>
+    /// <param name="exclude">需要排除的公告 ID，逗号分隔.</param>
+    /// <returns>公告列表.</returns>
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] string? exclude)
     {

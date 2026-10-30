@@ -1,11 +1,14 @@
-﻿using System.Runtime.InteropServices;
 using server.Models.Entity.RoleCombat;
 using server.Models.RoleCombat;
 using server.Services.Legacy.Primitive;
+using System.Runtime.InteropServices;
 
 namespace server.Services.RoleCombat;
 
-public sealed class RoleCombatService(IServiceProvider serviceProvider, TimeProvider timeProvider)
+public sealed class RoleCombatService(
+    AppDbContext appDbContext,
+    IDistributedCache cache,
+    TimeProvider timeProvider)
 {
     public const string Working = "RoleCombatService.Working";
 
@@ -15,12 +18,9 @@ public sealed class RoleCombatService(IServiceProvider serviceProvider, TimeProv
     private static readonly Func<AppDbContext, long, IEnumerable<RoleCombatAvatar>> AvatarsQuery = EF.CompileQuery((AppDbContext context, long recordId) =>
         context.RoleCombatAvatars.AsNoTracking().Where(g => g.RecordId == recordId).AsQueryable());
 
-    private readonly AppDbContext _appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
-    private readonly IDistributedCache _cache = serviceProvider.GetRequiredService<IDistributedCache>();
-
     public async Task RunAsync()
     {
-        await _cache.RunExclusiveAsync(Working, async () =>
+        await cache.RunExclusiveAsync(Working, async () =>
         {
             Map<uint, int> resultMap = [];
 
@@ -34,7 +34,7 @@ public sealed class RoleCombatService(IServiceProvider serviceProvider, TimeProv
             };
 
             int scheduleId = RoleCombatScheduleId.GetForNow();
-            RoleCombatStatistics? statistics = _appDbContext.RoleCombatStatistics.SingleOrDefault(s => s.ScheduleId == scheduleId);
+            RoleCombatStatistics? statistics = appDbContext.RoleCombatStatistics.SingleOrDefault(s => s.ScheduleId == scheduleId);
 
             if (statistics == null)
             {
@@ -42,24 +42,24 @@ public sealed class RoleCombatService(IServiceProvider serviceProvider, TimeProv
                 {
                     ScheduleId = scheduleId,
                 };
-                _appDbContext.RoleCombatStatistics.Add(statistics);
+                appDbContext.RoleCombatStatistics.Add(statistics);
             }
 
-            _cache.Set($"RoleCombatStatistics:{scheduleId}", item);
+            cache.Set($"RoleCombatStatistics:{scheduleId}", item);
             statistics.Data = JsonSerializer.Serialize(item);
 
-            await _appDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await appDbContext.SaveChangesAsync().ConfigureAwait(false);
         }).ConfigureAwait(false);
     }
 
     private int RunCore(Map<uint, int> resultMap)
     {
         int count = 0;
-        List<RoleCombatRecord> reocrds = [.. RecordsQuery(_appDbContext)];
+        List<RoleCombatRecord> reocrds = [.. RecordsQuery(appDbContext)];
         foreach (ref readonly RoleCombatRecord record in CollectionsMarshal.AsSpan(reocrds))
         {
             count++;
-            List<RoleCombatAvatar> avatars = [.. AvatarsQuery(_appDbContext, record.PrimaryId)];
+            List<RoleCombatAvatar> avatars = [.. AvatarsQuery(appDbContext, record.PrimaryId)];
 
             foreach (ref readonly RoleCombatAvatar avatar in CollectionsMarshal.AsSpan(avatars))
             {

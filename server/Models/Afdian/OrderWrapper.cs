@@ -1,4 +1,4 @@
-﻿namespace server.Models.Afdian;
+namespace server.Models.Afdian;
 
 public sealed class OrderWrapper
 {

@@ -1,4 +1,4 @@
-﻿namespace server.Models.Legacy;
+namespace server.Models.Legacy;
 
 public class WeaponCollocation(int weaponId) : WeaponBuild(weaponId)
 {

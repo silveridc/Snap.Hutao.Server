@@ -6,7 +6,7 @@ public static class TestOAuthState
 {
     private static readonly byte[] Key = CreateKey();
 
-    /// <summary>加密任意 state 明文。</summary>
+    /// <summary>加密任意 state 明文.</summary>
     public static string Encrypt(string plainText)
     {
         using Aes aes = Aes.Create();
@@ -31,7 +31,7 @@ public static class TestOAuthState
         return Convert.ToBase64String(targetStream.ToArray());
     }
 
-    /// <summary>构造未绑定用户的登录态 state（<c>UserId = -1</c>）。</summary>
+    /// <summary>构造未绑定用户的登录态 state（<c>UserId = -1</c>）.</summary>
     public static string LoginState(string deviceId, string callbackUri)
     {
         return Encrypt($$"""
@@ -39,7 +39,7 @@ public static class TestOAuthState
             """);
     }
 
-    /// <summary>构造绑定到指定用户的绑定态 state。</summary>
+    /// <summary>构造绑定到指定用户的绑定态 state.</summary>
     public static string BindState(int userId, string deviceId, string callbackUri)
     {
         return Encrypt($$"""

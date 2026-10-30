@@ -1,4 +1,4 @@
-﻿namespace server.Services.Legacy.Primitive;
+namespace server.Services.Legacy.Primitive;
 
 public static class Maps
 {

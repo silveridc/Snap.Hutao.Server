@@ -1,7 +1,6 @@
 using server.Filter;
 using server.Models.Admin;
 using server.Services.Admin;
-using server.Services.Licensing;
 
 namespace server.Controllers;
 
@@ -15,7 +14,7 @@ namespace server.Controllers;
 public sealed class AdminLicenseController(AccessionService accessionService, AdminQueryService adminQueryService) : ControllerBase
 {
     /// <summary>
-    /// 分页获取开源许可证申请列表。
+    /// 分页获取开源许可证申请列表.
     /// </summary>
     [HttpGet("license-applications")]
     public async Task<IActionResult> LicenseApplicationsAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] bool onlyPending = false)
@@ -25,7 +24,7 @@ public sealed class AdminLicenseController(AccessionService accessionService, Ad
     }
 
     /// <summary>
-    /// 批准开源许可证申请（维护者鉴权，供后台使用）。
+    /// 批准开源许可证申请（维护者鉴权，供后台使用）.
     /// </summary>
     [HttpPost("license-applications/approval")]
     public async Task<IActionResult> LicenseApproveAsync([FromQuery] string userName, [FromQuery] string code)

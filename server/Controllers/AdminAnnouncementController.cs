@@ -15,10 +15,10 @@ namespace server.Controllers;
 public sealed class AdminAnnouncementController(AnnouncementService announcementService) : ControllerBase
 {
     /// <summary>
-    /// 上传公告。
+    /// 上传公告.
     /// </summary>
-    /// <param name="announcement">公告内容。</param>
-    /// <returns>操作结果。</returns>
+    /// <param name="announcement">公告内容.</param>
+    /// <returns>操作结果.</returns>
     [HttpPost("announcements")]
     public async Task<IActionResult> UploadAnnouncementAsync([FromBody] HutaoUploadAnnouncement announcement)
     {
@@ -27,7 +27,7 @@ public sealed class AdminAnnouncementController(AnnouncementService announcement
     }
 
     /// <summary>
-    /// 分页获取公告列表（含历史，不做版本过滤）。
+    /// 分页获取公告列表（含历史，不做版本过滤）.
     /// </summary>
     [HttpGet("announcements")]
     public async Task<IActionResult> AnnouncementListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -37,7 +37,7 @@ public sealed class AdminAnnouncementController(AnnouncementService announcement
     }
 
     /// <summary>
-    /// 删除指定公告。
+    /// 删除指定公告.
     /// </summary>
     [HttpDelete("announcements/{id}")]
     public async Task<IActionResult> AnnouncementDeleteAsync([FromRoute] long id, [FromQuery] string locale = "ALL")
@@ -49,7 +49,7 @@ public sealed class AdminAnnouncementController(AnnouncementService announcement
     }
 
     /// <summary>
-    /// 编辑公告。
+    /// 编辑公告.
     /// </summary>
     [HttpPut("announcements/{id}")]
     public async Task<IActionResult> AnnouncementUpdateAsync([FromRoute] long id, [FromBody] AnnouncementUpdateRequest request)
@@ -68,7 +68,7 @@ public sealed class AdminAnnouncementController(AnnouncementService announcement
     }
 
     /// <summary>
-    /// 上/下架公告。
+    /// 上/下架公告.
     /// </summary>
     [HttpPatch("announcements/{id}")]
     public async Task<IActionResult> AnnouncementSetEnabledAsync([FromRoute] long id, [FromQuery] bool enabled, [FromQuery] string locale = "ALL")

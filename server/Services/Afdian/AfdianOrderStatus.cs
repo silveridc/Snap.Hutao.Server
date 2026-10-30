@@ -1,4 +1,4 @@
-﻿namespace server.Services.Afdian;
+namespace server.Services.Afdian;
 
 public enum AfdianOrderStatus
 {

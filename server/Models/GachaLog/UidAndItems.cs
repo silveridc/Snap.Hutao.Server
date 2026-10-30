@@ -1,4 +1,4 @@
-﻿namespace server.Models.GachaLog;
+namespace server.Models.GachaLog;
 
 public class UidAndItems
 {

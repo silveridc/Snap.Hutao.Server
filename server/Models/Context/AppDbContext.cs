@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using server.Models.Context.Configuration;
 using server.Models.Entity;
 using server.Models.Entity.Achievement;
@@ -14,7 +14,6 @@ namespace server.Models.Context;
 
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<HutaoUser, IdentityRole<int>, int>(options)
 {
-    #region Infrastructure
     public DbSet<RequestStatistics> RequestStatistics { get; set; } = default!;
 
     public DbSet<AllowedVersion> AllowedVersions { get; set; } = default!;
@@ -41,22 +40,17 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
 
     public DbSet<SystemSetting> SystemSettings { get; set; } = default!;
 
-    /// <summary>祈愿卡池配置（原独立元数据库，连接串与主库相同，已并入）。</summary>
+    /// <summary>Gets or sets 祈愿卡池配置（原独立元数据库，连接串与主库相同，已并入）.</summary>
     public DbSet<GachaEventInfo> GachaEvents { get; set; } = default!;
 
     public DbSet<KnownItem> KnownItems { get; set; } = default!;
 
     public DbSet<YaeAchievementMetadata> YaeAchievementMetadata { get; set; } = default!;
 
-    #endregion
-
-    #region Telemetry
     public DbSet<HutaoLog> HutaoLogs { get; set; } = default!;
 
     public DbSet<HutaoLogSingleItem> HutaoLogSingleItems { get; set; } = default!;
-    #endregion
 
-    #region SpiralAbyss
     public DbSet<LegacyStatistics> Statistics { get; set; } = default!;
 
     public DbSet<Banned> BannedList { get; set; } = default!;
@@ -72,37 +66,28 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<EntityDamageRank> DamageRanks { get; set; } = default!;
 
     public DbSet<EntityTakeDamageRank> TakeDamageRanks { get; set; } = default!;
-    #endregion
 
-    #region GachaLog
     public DbSet<GachaStatistics> GachaStatistics { get; set; } = default!;
 
     public DbSet<InvalidGachaUid> InvalidGachaUids { get; set; } = default!;
 
     public DbSet<EntityGachaItem> GachaItems { get; set; } = default!;
-    #endregion
 
-    #region Achievement WIP
     public DbSet<EntityAchievementArchive> AchievementArchives { get; set; } = default!;
 
     public DbSet<EntityAchievement> Achievements { get; set; } = default!;
-    #endregion
 
-    #region RoleCombat
     public DbSet<RoleCombatRecord> RoleCombatRecords { get; set; } = default!;
 
     public DbSet<RoleCombatAvatar> RoleCombatAvatars { get; set; } = default!;
 
     public DbSet<RoleCombatStatistics> RoleCombatStatistics { get; set; } = default!;
-    #endregion
 
-    #region Passport
     public DbSet<RefreshToken> RefreshTokens { get; set; } = default!;
 
     public DbSet<OAuthBindIdentity> OAuthBindIdentities { get; set; } = default!;
 
     public DbSet<UserLoginLog> UserLoginLogs { get; set; } = default!;
-    #endregion
 
     /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)

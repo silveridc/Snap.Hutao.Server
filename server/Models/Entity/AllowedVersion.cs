@@ -1,4 +1,4 @@
-﻿namespace server.Models.Entity;
+namespace server.Models.Entity;
 
 [Table("allowed_versions")]
 public class AllowedVersion

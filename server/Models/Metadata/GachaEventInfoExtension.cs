@@ -1,4 +1,4 @@
-﻿using server.Models.Entity.GachaLog;
+using server.Models.Entity.GachaLog;
 
 namespace server.Models.Metadata;
 

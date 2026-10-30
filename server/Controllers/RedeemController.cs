@@ -1,4 +1,4 @@
-﻿using server.Models.Entity.Redeem;
+using server.Models.Entity.Redeem;
 using server.Models.Redeem;
 
 namespace server.Controllers;
@@ -9,10 +9,10 @@ namespace server.Controllers;
 public class RedeemController(RedeemService redeemService, AppDbContext appDbContext) : ControllerBase
 {
     /// <summary>
-    /// 使用兑换码。
+    /// 使用兑换码.
     /// </summary>
-    /// <param name="req">兑换请求。</param>
-    /// <returns>兑换结果。</returns>
+    /// <param name="req">兑换请求.</param>
+    /// <returns>兑换结果.</returns>
     [HttpPost("redemptions")]
     public async Task<IActionResult> UseRedeemCodeAsync([FromBody] RedeemUseRequest req)
     {

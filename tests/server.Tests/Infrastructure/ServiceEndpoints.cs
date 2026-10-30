@@ -12,28 +12,28 @@ public sealed record ServiceEndpoint(string Method, string Url, string? Json, in
 
 public static class ServiceEndpoints
 {
-    /// <summary>占位用的、不存在的账号名。</summary>
+    /// <summary>占位用的、不存在的账号名.</summary>
     public const string UnknownUser = "nobody@example.com";
 
-    /// <summary>占位用的、不存在的自增主键。</summary>
+    /// <summary>占位用的、不存在的自增主键.</summary>
     public const long UnknownId = long.MaxValue;
 
-    /// <summary>测试专用的封禁 Uid 号段，避免与其它用例相互影响。</summary>
+    /// <summary>测试专用的封禁 Uid 号段，避免与其它用例相互影响.</summary>
     public const string BanAddUid = "900000009";
 
     public const string BanRemoveUid = "900000008";
 
     public const string BanBatchUid = "900000010";
 
-    /// <summary>系统配置用例使用的键，避免污染 appsettings.json 中的真实配置项。</summary>
+    /// <summary>系统配置用例使用的键，避免污染 appsettings.json 中的真实配置项.</summary>
     public const string ConfigUpdateKey = "HutaoTest.Update";
 
     public const string ConfigResetKey = "HutaoTest.Reset";
 
-    /// <summary>版本放行用例使用的 Header。</summary>
+    /// <summary>版本放行用例使用的 Header.</summary>
     public const string AllowedVersionHeader = "Smoke Hutao/0.0.0.1";
 
-    /// <summary>客户端版本发布用例使用的版本号，与其它用例的版本号互不重叠。</summary>
+    /// <summary>客户端版本发布用例使用的版本号，与其它用例的版本号互不重叠.</summary>
     public const string PublishVersion = "1.17.2.0";
 
     public static IReadOnlyList<ServiceEndpoint> Rows { get; } =
@@ -153,9 +153,9 @@ public static class ServiceEndpoints
         // 两个分支由 YaeTests 断言，这里只要求它穿过维护者权限过滤器
         new("POST", "/api/admin/yae/metadata", null, null),
 
-        // 后台专属账号（SSO）：SSO 未启用的宿主里写门禁整体放行，维护者可到达业务逻辑。
+        // 后台专属账号（SSO）：SSO 未启用的宿主里写门禁整体放行，维护者可到达业务逻辑.
         // Add 有状态（唯一 subject，重复调用会走到「已存在」分支），只要求穿过权限过滤器；
-        // SetEnabled/Remove 用越界 accountId，稳定落在「账号不存在」分支。
+        // SetEnabled/Remove 用越界 accountId，稳定落在「账号不存在」分支.
         new("GET", "/api/admin/accounts", null, ReturnCodes.Success),
         new("POST", "/api/admin/accounts", JsonSerializer.Serialize(new AdminAccountAddRequest { Subject = AdminAccountSubject }), null),
         new("PATCH", $"/api/admin/accounts/{int.MaxValue}?enabled=false", null, ReturnCodes.NotFound),
@@ -165,10 +165,10 @@ public static class ServiceEndpoints
         new("DELETE", $"/api/admin/accounts/{int.MaxValue}/binding", null, ReturnCodes.NotFound),
     ];
 
-    /// <summary>后台账号用例使用的 subject，与真实身份源签发的好区分。</summary>
+    /// <summary>后台账号用例使用的 subject，与真实身份源签发的好区分.</summary>
     public const string AdminAccountSubject = "smoke-admin-subject";
 
-    /// <summary>xUnit <see cref="TheoryData{T1,T2,T3}"/> 形式，供 <c>[MemberData]</c> 直接引用。</summary>
+    /// <summary>xUnit <see cref="TheoryData{T1,T2,T3}"/> 形式，供 <c>[MemberData]</c> 直接引用.</summary>
     public static TheoryData<string, string, string?> TheoryData
     {
         get
