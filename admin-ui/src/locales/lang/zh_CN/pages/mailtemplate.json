@@ -1,0 +1,25 @@
+{
+  "mailtemplate": {
+    "title": "邮件模板",
+    "description": "通行证验证码、兑换码等全部邮件共用的 HTML 模板；保存后写入数据库并同步内存缓存，下一封邮件立即生效.",
+    "placeholders": "保存时必须保留以下占位符（TinyMCE 中已做保护处理）：",
+    "customized": "使用自定义模板",
+    "default": "使用内置默认模板",
+    "advanced": "源码模式",
+    "reload": "刷新",
+    "loadDefault": "载入默认模板",
+    "save": "保存",
+    "reset": "恢复默认",
+    "hint": "可视化模式只编辑 body 内容，head 与样式沿用当前模板；需要改样式时切到源码模式编辑完整 HTML.",
+    "messages": {
+      "loadFail": "获取邮件模板失败",
+      "saveSuccess": "邮件模板已保存",
+      "saveFail": "保存邮件模板失败",
+      "resetSuccess": "已恢复默认模板",
+      "resetFail": "恢复默认模板失败",
+      "resetConfirm": "删除自定义模板并恢复内置默认模板？",
+      "missingPlaceholder": "模板缺少占位符 {placeholder}，不能保存",
+      "loadDefaultSuccess": "已载入默认模板，记得点保存"
+    }
+  }
+}

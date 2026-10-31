@@ -36,6 +36,8 @@ public sealed class SystemConfigService(IServiceScopeFactory scopeFactory, AppOp
 
     public string PatchS3Host => GetOrDefault(Keys.PatchS3Host, string.Empty).Trim();
 
+    public string MailTemplateHtml => GetOrDefault(Keys.MailTemplateHtml, string.Empty);
+
     public bool IsPatchS3SigningEnabled =>
         !string.IsNullOrWhiteSpace(PatchS3Host)
         && !string.IsNullOrWhiteSpace(GetOrDefault(Keys.PatchS3Region, string.Empty))

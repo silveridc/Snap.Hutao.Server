@@ -1,4 +1,5 @@
 using server.Filter;
+using server.Models.Admin;
 using server.Models.PublicAPI;
 using server.Services.Admin;
 using server.Services.WallPaper;
@@ -15,8 +16,9 @@ namespace server.Controllers;
 public sealed class AdminSettingsController(SystemConfigService systemConfigService, CuratedWallpaper curatedWallpaper) : ControllerBase
 {
     /// <summary>
-    /// 获取所有系统配置项（DB 覆盖值）.
+    /// get system config from db.
     /// </summary>
+    /// <returns> config. </returns>
     [HttpGet("settings")]
     public async Task<IActionResult> ConfigGetAsync()
     {
@@ -27,8 +29,10 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
     }
 
     /// <summary>
-    /// 批量更新系统配置项.
+    /// patch update system config.
     /// </summary>
+    /// <param name="settings">settings data.</param>
+    /// <returns>data.</returns>
     [HttpPatch("settings")]
     public async Task<IActionResult> ConfigUpdateAsync([FromBody] Dictionary<string, string?> settings)
     {
@@ -44,8 +48,10 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
     }
 
     /// <summary>
-    /// 删除配置项，恢复为 appsettings.json 默认值.
+    /// delete settings.
     /// </summary>
+    /// <param name="key">settingsKey.</param>
+    /// <returns>data.</returns>
     [HttpDelete("settings/{key}")]
     public async Task<IActionResult> ConfigResetAsync([FromRoute] string key)
     {
@@ -58,6 +64,64 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
         return success
             ? Success(message, ServerKeys.ServerAdminConfigResetSucceed)
             : Fail(message, ReturnCode.NotFound, ServerKeys.ServerAdminConfigNotFound);
+    }
+
+    /// <summary>
+    /// get mail template.
+    /// </summary>
+    /// <returns>data.</returns>
+    [HttpGet("mail/template")]
+    public IActionResult MailTemplateGet()
+    {
+        string custom = systemConfigService.MailTemplateHtml;
+        bool customized = !string.IsNullOrWhiteSpace(custom);
+        return Success<MailTemplatePayload>(
+            "Mail template retrieved successfully",
+            new()
+            {
+                Template = customized ? custom : MailTemplates.DefaultHtml,
+                DefaultTemplate = MailTemplates.DefaultHtml,
+                Customized = customized,
+            },
+            ServerKeys.ServerAdminMailTemplateGetSucceed);
+    }
+
+    /// <summary>
+    /// 保存邮件模板，写入数据库后缓存同步更新，下一封邮件即生效.
+    /// </summary>
+    [HttpPut("mail/template")]
+    public async Task<IActionResult> MailTemplateUpdateAsync([FromBody] MailTemplateUpdateRequest request)
+    {
+        string template = request.Template?.Trim() ?? string.Empty;
+        if (template.Length is 0)
+        {
+            return Fail("Mail template must not be empty", ReturnCode.InvalidUploadData, ServerKeys.ServerAdminMailTemplateEmpty);
+        }
+
+        foreach (string placeholder in MailTemplates.Placeholders)
+        {
+            if (!template.Contains(placeholder, StringComparison.Ordinal))
+            {
+                return Fail($"Mail template must contain the placeholder {placeholder}", ReturnCode.InvalidUploadData, ServerKeys.ServerAdminMailTemplatePlaceholderRequired);
+            }
+        }
+
+        (bool success, string message) = await systemConfigService.UpdateAsync(new() { [Keys.MailTemplateHtml] = template }, this.GetUserIdOrZero()).ConfigureAwait(false);
+        return success
+            ? Success(message, ServerKeys.ServerAdminMailTemplateSaveSucceed)
+            : Fail(message, ReturnCode.InvalidUploadData);
+    }
+
+    /// <summary>
+    /// 删除自定义邮件模板，恢复内置默认模板.
+    /// </summary>
+    [HttpDelete("mail/template")]
+    public async Task<IActionResult> MailTemplateResetAsync()
+    {
+        (bool success, string message) = await systemConfigService.DeleteAsync(Keys.MailTemplateHtml).ConfigureAwait(false);
+        return success
+            ? Success(message, ServerKeys.ServerAdminMailTemplateResetSucceed)
+            : Fail(message, ReturnCode.NotFound, ServerKeys.ServerAdminMailTemplateNotFound);
     }
 
     /// <summary>

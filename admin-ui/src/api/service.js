@@ -1,4 +1,4 @@
-﻿import http from '@/api/request'
+import http from '@/api/request'
 
 // ===== 服务运维 (需维护者权限, /Service/*) =====
 
@@ -239,6 +239,28 @@ export function getWallpaperPool() {
 // 保存今日壁纸池 (payload: [{ Url, SourceUrl, Author, Uploader }])
 export function saveWallpaperPool(items) {
   return http.put('/api/admin/wallpaper-pool', items)
+}
+
+// 立即执行一个 Quartz 任务（不影响原定 cron 计划）
+export function runJob(name) {
+  return http.post(`/api/admin/jobs/${encodeURIComponent(name)}/run`)
+}
+
+// ===== 邮件模板 =====
+
+// 读取当前邮件模板与内置默认模板
+export function getMailTemplate() {
+  return http.get('/api/admin/mail/template')
+}
+
+// 保存邮件模板（必须包含 {{options.Title}}/{{options.RawContent}}/{{options.Footer}} 占位符）
+export function saveMailTemplate(template) {
+  return http.put('/api/admin/mail/template', { Template: template })
+}
+
+// 删除自定义模板，恢复内置默认模板
+export function resetMailTemplate() {
+  return http.delete('/api/admin/mail/template')
 }
 
 // ===== 系统配置 =====

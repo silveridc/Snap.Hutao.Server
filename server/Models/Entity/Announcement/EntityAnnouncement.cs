@@ -13,6 +13,7 @@ public sealed class EntityAnnouncement
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [StringLength(16)]
     public string Locale { get; set; } = default!;
 
     public long LastUpdateTime
@@ -20,6 +21,7 @@ public sealed class EntityAnnouncement
         get; set;
     }
 
+    [StringLength(256)]
     public string Title { get; set; } = default!;
 
     public string Content { get; set; } = default!;
@@ -36,6 +38,7 @@ public sealed class EntityAnnouncement
         get; set;
     }
 
+    [StringLength(32)]
     public string? MaxPresentVersion
     {
         get; set;

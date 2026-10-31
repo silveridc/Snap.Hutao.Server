@@ -22,10 +22,13 @@ public class OAuthBindIdentity
         get; set;
     }
 
+    [StringLength(256)]
     public string ProviderId { get; set; } = default!;
 
+    [StringLength(128)]
     public string DisplayName { get; set; } = default!;
 
+    [StringLength(1024)]
     public string RefreshToken { get; set; } = default!;
 
     public long CreatedAt

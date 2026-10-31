@@ -1,4 +1,4 @@
-﻿{
+{
   "server": {
     "ServerAdminAccountAddSucceed": "后台账号已添加",
     "ServerAdminAccountAlreadyExists": "该身份已有后台账号",
@@ -57,6 +57,14 @@
     "ServerAdminLicenseApproveUserNotFound": "批准失败，账户不存在",
     "ServerAdminLicenseListSucceed": "获取许可证申请列表成功",
     "ServerAdminLoginLogListSucceed": "获取登录日志成功",
+    "ServerAdminJobNotFound": "任务不存在",
+    "ServerAdminJobTriggered": "任务已触发",
+    "ServerAdminMailTemplateEmpty": "邮件模板不能为空",
+    "ServerAdminMailTemplateGetSucceed": "获取邮件模板成功",
+    "ServerAdminMailTemplateNotFound": "没有自定义邮件模板",
+    "ServerAdminMailTemplatePlaceholderRequired": "邮件模板缺少必要占位符，不允许保存",
+    "ServerAdminMailTemplateResetSucceed": "邮件模板已恢复默认",
+    "ServerAdminMailTemplateSaveSucceed": "邮件模板已保存",
     "ServerAdminOperationSucceed": "操作成功",
     "ServerAdminPasswordTooShort": "新密码至少 8 位",
     "ServerAdminRankKeyRequired": "缺少排行榜键",

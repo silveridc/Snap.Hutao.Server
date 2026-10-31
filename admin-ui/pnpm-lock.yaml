@@ -11,6 +11,9 @@ importers:
       '@sentry/vue':
         specifier: ^11.9.0
         version: 11.9.0(pinia@3.0.4(typescript@6.0.3)(vue@3.5.43(typescript@6.0.3)))(vue@3.5.43(typescript@6.0.3))
+      '@tinymce/tinymce-vue':
+        specifier: ^6.3.0
+        version: 6.3.0(tinymce@6.8.6)(vue@3.5.43(typescript@6.0.3))
       '@vueuse/core':
         specifier: ^14.3.0
         version: 14.4.0(vue@3.5.43(typescript@6.0.3))
@@ -41,6 +44,9 @@ importers:
       tdesign-vue-next:
         specifier: ^1.20.2
         version: 1.20.9(vue@3.5.43(typescript@6.0.3))
+      tinymce:
+        specifier: ^6.8.6
+        version: 6.8.6
       tvision-color:
         specifier: ^1.6.0
         version: 1.6.0
@@ -603,6 +609,15 @@ packages:
       '@tanstack/vue-router':
         optional: true
       pinia:
+        optional: true
+
+  '@tinymce/tinymce-vue@6.3.0':
+    resolution: {integrity: sha512-DSP8Jhd3XqCCliTnusfbmz3D8GqQ4iRzkc4aadYHDcJPVjkaqopJ61McOdH82CSy599vGLkPjGzqJYWJkRMiUA==}
+    peerDependencies:
+      tinymce: ^8.0.0 || ^7.0.0 || ^6.0.0 || ^5.5.1
+      vue: ^3.0.0
+    peerDependenciesMeta:
+      tinymce:
         optional: true
 
   '@types/esrecurse@4.3.1':
@@ -1613,6 +1628,9 @@ packages:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
 
+  tinymce@6.8.6:
+    resolution: {integrity: sha512-++XYEs8lKWvZxDCjrr8Baiw7KiikraZ5JkLMg6EdnUVNKJui0IsrAADj5MsyUeFkcEryfn2jd3p09H7REvewyg==}
+
   tvision-color@1.6.0:
     resolution: {integrity: sha512-pu8LkA4ZLBjbnmC9keqce4TLnExcQphKSoExauncSybmbqAhslXQvGdsI/FeWpxItGa4mcjGsHz5YE8bjpLjRw==}
 
@@ -2235,6 +2253,12 @@ snapshots:
       vue: 3.5.43(typescript@6.0.3)
     optionalDependencies:
       pinia: 3.0.4(typescript@6.0.3)(vue@3.5.43(typescript@6.0.3))
+
+  '@tinymce/tinymce-vue@6.3.0(tinymce@6.8.6)(vue@3.5.43(typescript@6.0.3))':
+    dependencies:
+      vue: 3.5.43(typescript@6.0.3)
+    optionalDependencies:
+      tinymce: 6.8.6
 
   '@types/esrecurse@4.3.1': {}
 
@@ -3290,6 +3314,8 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.7)
       picomatch: 4.0.7
+
+  tinymce@6.8.6: {}
 
   tvision-color@1.6.0:
     dependencies:

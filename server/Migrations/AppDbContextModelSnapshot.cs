@@ -26,231 +26,220 @@ namespace server.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("concurrency_stamp");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("name");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("normalized_name");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
+                        .HasDatabaseName("role_name_index");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("asp_net_roles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("claim_type");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("claim_value");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("role_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("ix_asp_net_role_claims_role_id");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("asp_net_role_claims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("claim_type");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("claim_value");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_asp_net_user_claims_user_id");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("asp_net_user_claims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("login_provider");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("provider_key");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("provider_display_name");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_asp_net_user_logins_user_id");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("asp_net_user_logins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("role_id");
 
                     b.HasKey("UserId", "RoleId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("ix_asp_net_user_roles_role_id");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("asp_net_user_roles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("login_provider");
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
 
                     b.Property<string>("Value")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("value");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("server.Models.Entity.Achievement.EntityAchievement", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
-
-                    b.Property<long>("ArchiveId")
-                        .HasColumnType("bigint");
-
-                    b.Property<uint>("Current")
-                        .HasColumnType("int unsigned");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArchiveId");
-
-                    b.ToTable("achievements");
-                });
-
-            modelBuilder.Entity("server.Models.Entity.Achievement.EntityAchievementArchive", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("achievement_archives");
+                    b.ToTable("asp_net_user_tokens", (string)null);
                 });
 
             modelBuilder.Entity("server.Models.Entity.AdminAccount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("email");
 
                     b.Property<bool>("IsBootstrap")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_bootstrap");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_enabled");
 
                     b.Property<DateTimeOffset?>("LastLoginAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_login_at");
 
                     b.Property<string>("Provider")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("provider");
 
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("subject");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("user_name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_admin_accounts_user_id");
 
                     b.HasIndex("Provider", "Subject")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_admin_accounts_provider_subject");
 
                     b.ToTable("admin_accounts");
                 });
@@ -259,36 +248,46 @@ namespace server.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Action")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("action");
 
                     b.Property<int?>("AdminAccountId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("admin_account_id");
 
                     b.Property<string>("AdminAccountName")
                         .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("admin_account_name");
 
                     b.Property<int>("AdminUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("admin_user_id");
 
                     b.Property<string>("Detail")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("detail");
 
                     b.Property<string>("Ip")
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("ip");
 
                     b.Property<bool>("Success")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("success");
 
                     b.Property<long>("Timestamp")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("timestamp");
 
                     b.HasKey("Id");
 
@@ -298,7 +297,9 @@ namespace server.Migrations
             modelBuilder.Entity("server.Models.Entity.AllowedVersion", b =>
                 {
                     b.Property<string>("Header")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("header");
 
                     b.HasKey("Header");
 
@@ -309,39 +310,52 @@ namespace server.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Locale")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("locale");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("content");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("enabled");
 
                     b.Property<int>("Kind")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("kind");
 
                     b.Property<long>("LastUpdateTime")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("last_update_time");
 
                     b.Property<string>("Link")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("link");
 
                     b.Property<string>("MaxPresentVersion")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("max_present_version");
 
                     b.Property<int>("Severity")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("severity");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("title");
 
                     b.HasKey("Id", "Locale");
 
@@ -352,18 +366,22 @@ namespace server.Migrations
                 {
                     b.Property<string>("DeviceId")
                         .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("device_id");
 
                     b.Property<long>("FirstSeenAt")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("first_seen_at");
 
                     b.Property<long>("LastSeenAt")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("last_seen_at");
 
                     b.Property<string>("Version")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("version");
 
                     b.HasKey("DeviceId");
 
@@ -374,32 +392,41 @@ namespace server.Migrations
                 {
                     b.Property<string>("Uid")
                         .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("uid");
 
                     b.Property<long>("Id")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     b.Property<int>("GachaType")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("gacha_type");
 
                     b.Property<bool>("IsTrusted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_trusted");
 
                     b.Property<int>("ItemId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("item_id");
 
                     b.Property<int>("QueryType")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("query_type");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("time");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Uid", "Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_gacha_items_user_id");
 
                     b.ToTable("gacha_items");
                 });
@@ -408,17 +435,21 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("data");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("name");
 
                     b.HasKey("PrimaryId");
 
@@ -429,7 +460,8 @@ namespace server.Migrations
                 {
                     b.Property<string>("Uid")
                         .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("uid");
 
                     b.HasKey("Uid");
 
@@ -440,46 +472,57 @@ namespace server.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
 
                     b.Property<string>("MinimumVersion")
                         .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("minimum_version");
 
                     b.Property<string>("MirrorsJson")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("mirrors_json");
 
                     b.Property<DateTimeOffset>("PublishedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("published_at");
 
                     b.Property<int>("PublishedBy")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("published_by");
 
                     b.Property<string>("ReleaseNotes")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("release_notes");
 
                     b.Property<string>("Validation")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("validation");
 
                     b.Property<string>("Version")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("version");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsActive");
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("ix_hutao_releases_is_active");
 
                     b.HasIndex("Version")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_hutao_releases_version");
 
                     b.ToTable("hutao_releases");
                 });
@@ -488,27 +531,35 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<string>("ApprovalCode")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("approval_code");
 
                     b.Property<bool>("IsApproved")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_approved");
 
                     b.Property<string>("ProjectUrl")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar(512)")
+                        .HasColumnName("project_url");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.HasKey("PrimaryId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_license_application_records_user_id");
 
                     b.ToTable("license_application_records");
                 });
@@ -517,186 +568,212 @@ namespace server.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("access_failed_count");
 
                     b.Property<long>("CdnExpireAt")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("cdn_expire_at");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("concurrency_stamp");
 
                     b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("email");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("email_confirmed");
 
                     b.Property<long>("GachaLogExpireAt")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("gacha_log_expire_at");
 
                     b.Property<bool>("IsLicensedDeveloper")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_licensed_developer");
 
                     b.Property<bool>("IsMaintainer")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_maintainer");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("lockout_enabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("lockout_end");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("normalized_email");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("normalized_user_name");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("password_hash");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("phone_number");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("phone_number_confirmed");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("security_stamp");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("two_factor_enabled");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("user_name");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
+                        .HasDatabaseName("email_index");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
+                        .HasDatabaseName("user_name_index");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("asp_net_users", (string)null);
                 });
 
             modelBuilder.Entity("server.Models.Entity.Passport.OAuthBindIdentity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("display_name");
 
                     b.Property<long>("ExpiresAt")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("expires_at");
 
                     b.Property<string>("ProviderId")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("provider_id");
 
                     b.Property<int>("ProviderKind")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("provider_kind");
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("refresh_token");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_oauth_bind_identities_user_id");
 
-                    b.ToTable("OAuthBindIdentities");
-                });
-
-            modelBuilder.Entity("server.Models.Entity.Passport.PassportVerification", b =>
-                {
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<long>("ExpireTimestamp")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("GeneratedTimestamp")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("VerifyCode")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("NormalizedUserName");
-
-                    b.ToTable("passport_verifications");
+                    b.ToTable("oauth_bind_identities");
                 });
 
             modelBuilder.Entity("server.Models.Entity.Passport.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("DeviceId")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("device_id");
 
                     b.Property<string>("DeviceName")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("device_name");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("expires_at");
 
                     b.Property<string>("OperatingSystem")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("operating_system");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("token");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_refresh_tokens_user_id");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("refresh_tokens");
                 });
 
             modelBuilder.Entity("server.Models.Entity.Passport.RegistrationRecord", b =>
                 {
                     b.Property<string>("UserName")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("user_name");
 
                     b.HasKey("UserName");
 
@@ -707,55 +784,69 @@ namespace server.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("DeviceId")
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("device_id");
 
                     b.Property<string>("DeviceName")
                         .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("device_name");
 
                     b.Property<string>("FailureKey")
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("failure_key");
 
                     b.Property<string>("Ip")
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("ip");
 
                     b.Property<DateTimeOffset>("LoginAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("login_at");
 
                     b.Property<string>("Method")
                         .IsRequired()
                         .HasMaxLength(16)
-                        .HasColumnType("varchar(16)");
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("method");
 
                     b.Property<string>("OperatingSystem")
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("operating_system");
 
                     b.Property<bool>("Success")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("success");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("user_name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Ip");
+                    b.HasIndex("Ip")
+                        .HasDatabaseName("ix_user_login_logs_ip");
 
-                    b.HasIndex("LoginAt");
+                    b.HasIndex("LoginAt")
+                        .HasDatabaseName("ix_user_login_logs_login_at");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_login_logs_user_id");
 
                     b.ToTable("user_login_logs");
                 });
@@ -764,40 +855,52 @@ namespace server.Migrations
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(24)
-                        .HasColumnType("varchar(24)");
+                        .HasColumnType("varchar(24)")
+                        .HasColumnName("code");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("create_time");
 
                     b.Property<string>("Creator")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("creator");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("description");
 
                     b.Property<DateTimeOffset>("ExpireTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("expire_time");
 
                     b.Property<uint>("ServiceType")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("service_type");
 
                     b.Property<uint>("TimesAllowed")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("times_allowed");
 
                     b.Property<uint>("Type")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("type");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("value");
 
                     b.HasKey("Id");
 
@@ -808,69 +911,55 @@ namespace server.Migrations
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
 
                     b.Property<uint>("RedeemCodeId")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("redeem_code_id");
 
                     b.Property<DateTimeOffset>("UseTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("use_time");
 
                     b.Property<int>("UsedBy")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("used_by");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RedeemCodeId");
+                    b.HasIndex("RedeemCodeId")
+                        .HasDatabaseName("ix_redeem_code_use_items_redeem_code_id");
 
-                    b.HasIndex("UsedBy");
+                    b.HasIndex("UsedBy")
+                        .HasDatabaseName("ix_redeem_code_use_items_used_by");
 
                     b.ToTable("redeem_code_use_items");
-                });
-
-            modelBuilder.Entity("server.Models.Entity.RequestStatistics", b =>
-                {
-                    b.Property<long>("PrimaryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
-
-                    b.Property<long>("Count")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserAgent")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("PrimaryId");
-
-                    b.ToTable("request_statistics");
                 });
 
             modelBuilder.Entity("server.Models.Entity.RoleCombat.RoleCombatAvatar", b =>
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<uint>("AvatarId")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("avatar_id");
 
                     b.Property<long>("RecordId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("record_id");
 
                     b.HasKey("PrimaryId");
 
-                    b.HasIndex("RecordId");
+                    b.HasIndex("RecordId")
+                        .HasDatabaseName("ix_role_combat_avatars_record_id");
 
                     b.ToTable("role_combat_avatars");
                 });
@@ -879,22 +968,26 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<string>("Uid")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("uid");
 
                     b.Property<long>("UploadTime")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("upload_time");
 
                     b.Property<string>("Uploader")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("uploader");
 
                     b.HasKey("PrimaryId");
 
@@ -905,16 +998,19 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("data");
 
                     b.Property<int>("ScheduleId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("schedule_id");
 
                     b.HasKey("PrimaryId");
 
@@ -925,13 +1021,17 @@ namespace server.Migrations
                 {
                     b.Property<string>("Uid")
                         .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("uid");
 
                     b.Property<long>("BanTime")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("ban_time");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar(512)")
+                        .HasColumnName("reason");
 
                     b.HasKey("Uid");
 
@@ -942,30 +1042,37 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<int>("ActivedConstellationNumber")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("actived_constellation_number");
 
                     b.Property<int>("AvatarId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("avatar_id");
 
                     b.Property<long>("RecordId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("record_id");
 
                     b.Property<string>("ReliquarySet")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("reliquary_set");
 
                     b.Property<int>("WeaponId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("weapon_id");
 
                     b.HasKey("PrimaryId");
 
-                    b.HasIndex("RecordId");
+                    b.HasIndex("RecordId")
+                        .HasDatabaseName("ix_avatars_record_id");
 
                     b.ToTable("avatars");
                 });
@@ -974,30 +1081,37 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<int>("AvatarId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("avatar_id");
 
                     b.Property<long>("SpiralAbyssId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("spiral_abyss_id");
 
                     b.Property<string>("Uid")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("uid");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("value");
 
                     b.HasKey("PrimaryId");
 
                     b.HasIndex("SpiralAbyssId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_damage_ranks_spiral_abyss_id");
 
-                    b.HasIndex("Value");
+                    b.HasIndex("Value")
+                        .HasDatabaseName("ix_damage_ranks_value");
 
                     b.ToTable("damage_ranks");
                 });
@@ -1006,26 +1120,32 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<int>("Index")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("index");
 
                     b.Property<string>("Levels")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("levels");
 
                     b.Property<long>("SpiralAbyssId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("spiral_abyss_id");
 
                     b.Property<int>("Star")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("star");
 
                     b.HasKey("PrimaryId");
 
-                    b.HasIndex("SpiralAbyssId");
+                    b.HasIndex("SpiralAbyssId")
+                        .HasDatabaseName("ix_spiral_abysses_floors_spiral_abyss_id");
 
                     b.ToTable("spiral_abysses_floors");
                 });
@@ -1034,22 +1154,26 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<string>("Uid")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("uid");
 
                     b.Property<long>("UploadTime")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("upload_time");
 
                     b.Property<string>("Uploader")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("uploader");
 
                     b.HasKey("PrimaryId");
 
@@ -1060,23 +1184,28 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<long>("RecordId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("record_id");
 
                     b.Property<int>("TotalBattleTimes")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("total_battle_times");
 
                     b.Property<int>("TotalWinTimes")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("total_win_times");
 
                     b.HasKey("PrimaryId");
 
                     b.HasIndex("RecordId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_spiral_abysses_record_id");
 
                     b.ToTable("spiral_abysses");
                 });
@@ -1085,30 +1214,37 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<int>("AvatarId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("avatar_id");
 
                     b.Property<long>("SpiralAbyssId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("spiral_abyss_id");
 
                     b.Property<string>("Uid")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("uid");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("value");
 
                     b.HasKey("PrimaryId");
 
                     b.HasIndex("SpiralAbyssId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_take_damage_ranks_spiral_abyss_id");
 
-                    b.HasIndex("Value");
+                    b.HasIndex("Value")
+                        .HasDatabaseName("ix_take_damage_ranks_value");
 
                     b.ToTable("take_damage_ranks");
                 });
@@ -1117,20 +1253,25 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("data");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("name");
 
                     b.Property<int>("ScheduleId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("schedule_id");
 
                     b.HasKey("PrimaryId");
 
@@ -1141,16 +1282,20 @@ namespace server.Migrations
                 {
                     b.Property<string>("Key")
                         .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("key");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UpdatedBy")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("updated_by");
 
                     b.Property<string>("Value")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("value");
 
                     b.HasKey("Key");
 
@@ -1161,23 +1306,29 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<int>("Count")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("count");
 
                     b.Property<string>("Info")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("info");
 
                     b.Property<bool>("Resolved")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("resolved");
 
                     b.Property<string>("Version")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("version");
 
                     b.HasKey("PrimaryId");
 
@@ -1188,24 +1339,29 @@ namespace server.Migrations
                 {
                     b.Property<long>("PrimaryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("primary_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("PrimaryId"));
 
                     b.Property<string>("DeviceId")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("device_id");
 
                     b.Property<long>("LogId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("log_id");
 
                     b.Property<long>("Time")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("time");
 
                     b.HasKey("PrimaryId");
 
-                    b.HasIndex("LogId");
+                    b.HasIndex("LogId")
+                        .HasDatabaseName("ix_hutao_log_items_log_id");
 
                     b.ToTable("hutao_log_items");
                 });
@@ -1213,91 +1369,123 @@ namespace server.Migrations
             modelBuilder.Entity("server.Models.Metadata.GachaEventInfo", b =>
                 {
                     b.Property<string>("Version")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("version");
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("name");
 
                     b.Property<string>("Locale")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("locale");
 
                     b.Property<uint>("Order")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("order");
 
                     b.Property<DateTime>("From")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime")
+                        .HasColumnName("from");
 
                     b.Property<DateTime>("To")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime")
+                        .HasColumnName("to");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("type");
 
                     b.Property<uint>("UpOrangeItem1")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item1");
 
                     b.Property<uint>("UpOrangeItem10")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item10");
 
                     b.Property<uint>("UpOrangeItem11")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item11");
 
                     b.Property<uint>("UpOrangeItem12")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item12");
 
                     b.Property<uint>("UpOrangeItem13")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item13");
 
                     b.Property<uint>("UpOrangeItem14")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item14");
 
                     b.Property<uint>("UpOrangeItem15")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item15");
 
                     b.Property<uint>("UpOrangeItem16")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item16");
 
                     b.Property<uint>("UpOrangeItem17")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item17");
 
                     b.Property<uint>("UpOrangeItem2")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item2");
 
                     b.Property<uint>("UpOrangeItem3")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item3");
 
                     b.Property<uint>("UpOrangeItem4")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item4");
 
                     b.Property<uint>("UpOrangeItem5")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item5");
 
                     b.Property<uint>("UpOrangeItem6")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item6");
 
                     b.Property<uint>("UpOrangeItem7")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item7");
 
                     b.Property<uint>("UpOrangeItem8")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item8");
 
                     b.Property<uint>("UpOrangeItem9")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_orange_item9");
 
                     b.Property<uint>("UpPurpleItem1")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_purple_item1");
 
                     b.Property<uint>("UpPurpleItem2")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_purple_item2");
 
                     b.Property<uint>("UpPurpleItem3")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_purple_item3");
 
                     b.Property<uint>("UpPurpleItem4")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_purple_item4");
 
                     b.Property<uint>("UpPurpleItem5")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("up_purple_item5");
 
                     b.HasKey("Version", "Name", "Locale", "Order");
 
@@ -1308,12 +1496,14 @@ namespace server.Migrations
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
 
                     b.Property<uint>("Quality")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("quality");
 
                     b.HasKey("Id");
 
@@ -1324,32 +1514,41 @@ namespace server.Migrations
                 {
                     b.Property<string>("Version")
                         .HasMaxLength(16)
-                        .HasColumnType("varchar(16)");
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("version");
 
                     b.Property<uint>("AchievementCmdId")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("achievement_cmd_id");
 
                     b.Property<uint>("ChineseHash")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("chinese_hash");
 
                     b.Property<uint>("GroupCount")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("group_count");
 
                     b.Property<uint>("ItemCount")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("item_count");
 
                     b.Property<uint>("OverseaHash")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("oversea_hash");
 
                     b.Property<string>("Payload")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("payload");
 
                     b.Property<uint>("StoreCmdId")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("store_cmd_id");
 
                     b.Property<DateTime>("SyncedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime")
+                        .HasColumnName("synced_at");
 
                     b.HasKey("Version");
 
@@ -1362,7 +1561,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_asp_net_role_claims_asp_net_roles_role_id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
@@ -1371,7 +1571,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_asp_net_user_claims_asp_net_users_user_id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
@@ -1380,7 +1581,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_asp_net_user_logins_asp_net_users_user_id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
@@ -1389,13 +1591,15 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_asp_net_user_roles_asp_net_roles_role_id");
 
                     b.HasOne("server.Models.Entity.Passport.HutaoUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_asp_net_user_roles_asp_net_users_user_id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -1404,36 +1608,16 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("server.Models.Entity.Achievement.EntityAchievement", b =>
-                {
-                    b.HasOne("server.Models.Entity.Achievement.EntityAchievementArchive", "Archive")
-                        .WithMany()
-                        .HasForeignKey("ArchiveId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Archive");
-                });
-
-            modelBuilder.Entity("server.Models.Entity.Achievement.EntityAchievementArchive", b =>
-                {
-                    b.HasOne("server.Models.Entity.Passport.HutaoUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
+                        .IsRequired()
+                        .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
                 });
 
             modelBuilder.Entity("server.Models.Entity.AdminAccount", b =>
                 {
                     b.HasOne("server.Models.Entity.Passport.HutaoUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_admin_accounts_asp_net_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -1444,7 +1628,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_gacha_items_asp_net_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -1455,7 +1640,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_license_application_records_asp_net_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -1466,7 +1652,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_oauth_bind_identities_asp_net_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -1477,7 +1664,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_refresh_tokens_asp_net_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -1488,13 +1676,15 @@ namespace server.Migrations
                         .WithMany("UseItems")
                         .HasForeignKey("RedeemCodeId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_redeem_code_use_items_redeem_codes_redeem_code_id");
 
                     b.HasOne("server.Models.Entity.Passport.HutaoUser", "User")
                         .WithMany("RedeemCodeUseItems")
                         .HasForeignKey("UsedBy")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_redeem_code_use_items_asp_net_users_used_by");
 
                     b.Navigation("RedeemCode");
 
@@ -1507,7 +1697,8 @@ namespace server.Migrations
                         .WithMany("Avatars")
                         .HasForeignKey("RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_role_combat_avatars_role_combat_records_record_id");
 
                     b.Navigation("Record");
                 });
@@ -1518,7 +1709,8 @@ namespace server.Migrations
                         .WithMany("Avatars")
                         .HasForeignKey("RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_avatars_records_record_id");
 
                     b.Navigation("Record");
                 });
@@ -1529,7 +1721,8 @@ namespace server.Migrations
                         .WithOne("Damage")
                         .HasForeignKey("server.Models.Entity.SpiralAbyss.EntityDamageRank", "SpiralAbyssId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_damage_ranks_spiral_abysses_spiral_abyss_id");
 
                     b.Navigation("SpiralAbyss");
                 });
@@ -1540,7 +1733,8 @@ namespace server.Migrations
                         .WithMany("Floors")
                         .HasForeignKey("SpiralAbyssId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_spiral_abysses_floors_spiral_abysses_spiral_abyss_id");
 
                     b.Navigation("SpiralAbyss");
                 });
@@ -1551,7 +1745,8 @@ namespace server.Migrations
                         .WithOne("SpiralAbyss")
                         .HasForeignKey("server.Models.Entity.SpiralAbyss.EntitySpiralAbyss", "RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_spiral_abysses_records_record_id");
 
                     b.Navigation("Record");
                 });
@@ -1562,7 +1757,8 @@ namespace server.Migrations
                         .WithOne("TakeDamage")
                         .HasForeignKey("server.Models.Entity.SpiralAbyss.EntityTakeDamageRank", "SpiralAbyssId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_take_damage_ranks_spiral_abysses_spiral_abyss_id");
 
                     b.Navigation("SpiralAbyss");
                 });
@@ -1573,7 +1769,8 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("LogId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_hutao_log_items_hutao_logs_log_id");
 
                     b.Navigation("Log");
                 });

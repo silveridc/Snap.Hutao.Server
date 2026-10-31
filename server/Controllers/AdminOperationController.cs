@@ -1,3 +1,4 @@
+using Quartz;
 using server.Filter;
 using server.Models.Cache;
 using server.Services.Cache;
@@ -18,8 +19,31 @@ public sealed class AdminOperationController(
     GachaLogExpireService gachaLogExpireService,
     CdnExpireService cdnExpireService,
     CacheService cacheService,
-    YaeMetadataService yaeMetadataService) : ControllerBase
+    YaeMetadataService yaeMetadataService,
+    ISchedulerFactory schedulerFactory) : ControllerBase
 {
+    /// <summary>
+    /// 立即执行一个 Quartz 任务，不等待原定的 cron 时间.
+    /// </summary>
+    /// <param name="name">任务名，即 Job 实现类的类名.</param>
+    /// <param name="cancellationToken">请求取消令牌.</param>
+    /// <returns>操作结果.</returns>
+    [HttpPost("jobs/{name}/run")]
+    public async Task<IActionResult> RunJobAsync([FromRoute] string name, CancellationToken cancellationToken)
+    {
+        IScheduler scheduler = await schedulerFactory.GetScheduler(cancellationToken).ConfigureAwait(false);
+        IReadOnlyCollection<JobKey> jobKeys = await scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup(), cancellationToken).ConfigureAwait(false);
+
+        JobKey? jobKey = jobKeys.FirstOrDefault(key => string.Equals(key.Name, name, StringComparison.Ordinal));
+        if (jobKey is null)
+        {
+            return Fail("Job does not exist", ReturnCode.NotFound, ServerKeys.ServerAdminJobNotFound);
+        }
+
+        await scheduler.TriggerJob(jobKey, null, cancellationToken).ConfigureAwait(false);
+        return Success($"Job {jobKey.Name} triggered", ServerKeys.ServerAdminJobTriggered);
+    }
+
     /// <summary>
     /// 手动触发深渊统计数据刷新.
     /// </summary>

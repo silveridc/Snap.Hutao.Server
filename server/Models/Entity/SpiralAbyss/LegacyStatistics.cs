@@ -23,6 +23,7 @@ public class LegacyStatistics
         get; set;
     }
 
+    [StringLength(64)]
     public string Name { get; set; } = default!;
 
     public string Data { get; set; } = default!;

@@ -4,5 +4,6 @@ namespace server.Models.Entity;
 public class AllowedVersion
 {
     [Key]
+    [StringLength(64)]
     public string Header { get; set; } = default!;
 }

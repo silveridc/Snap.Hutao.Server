@@ -27,8 +27,10 @@ public sealed class RedeemCode
         get; set;
     }
 
+    [StringLength(1024)]
     public string Description { get; set; } = default!;
 
+    [StringLength(128)]
     public string Creator { get; set; } = default!;
 
     public DateTimeOffset CreateTime

@@ -1,4 +1,4 @@
-﻿using server.Models.Admin;
+using server.Models.Admin;
 using server.Models.Cache;
 using server.Models.Entity.Announcement;
 using server.Models.Entity.Redeem;
@@ -39,6 +39,8 @@ public static class ServiceEndpoints
     public static IReadOnlyList<ServiceEndpoint> Rows { get; } =
     [
         new("POST", "/api/admin/statistics/refresh", null, ReturnCodes.Success),
+        // 任务名不存在，稳定落在 NotFound 分支，不会真的触发任务
+        new("POST", "/api/admin/jobs/NotExistingJob/run", null, ReturnCodes.NotFound),
 
         // 补偿接口用 days=0：只会把已过期账号的到期时间补到当前时刻，不会凭空发放时长
         new("POST", "/api/admin/gacha-logs/compensations?days=0", null, ReturnCodes.Success),
@@ -142,6 +144,12 @@ public static class ServiceEndpoints
         new("GET", "/api/admin/settings", null, ReturnCodes.Success),
         new("PATCH", "/api/admin/settings", JsonSerializer.Serialize(new Dictionary<string, string?> { [ConfigUpdateKey] = "1" }), ReturnCodes.Success),
         new("DELETE", $"/api/admin/settings/{ConfigResetKey}", null, ReturnCodes.NotFound),
+
+        new("GET", "/api/admin/mail/template", null, ReturnCodes.Success),
+        // 保存有状态：缺少占位符稳定落在校验失败分支，不覆盖测试库里的模板
+        new("PUT", "/api/admin/mail/template", JsonSerializer.Serialize(new MailTemplateUpdateRequest { Template = "<html>missing placeholders</html>" }), ReturnCodes.InvalidUploadData),
+        // 恢复默认有状态（是否自定义过取决于其它用例的执行顺序），只要求穿过权限过滤器
+        new("DELETE", "/api/admin/mail/template", null, null),
 
         new("GET", "/api/admin/wallpaper-pool", null, ReturnCodes.Success),
         // 保存有状态：用 http 直链稳定落在校验失败分支，不覆盖测试库里的壁纸池

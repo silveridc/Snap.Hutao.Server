@@ -108,7 +108,15 @@ public static class ServerKeys
     public const string ServerAdminLicenseApproveUserNotFound = "ServerAdminLicenseApproveUserNotFound";
     public const string ServerAdminLicenseListSucceed = "ServerAdminLicenseListSucceed";
     public const string ServerAdminLoginLogListSucceed = "ServerAdminLoginLogListSucceed";
+    public const string ServerAdminMailTemplateEmpty = "ServerAdminMailTemplateEmpty";
+    public const string ServerAdminMailTemplateGetSucceed = "ServerAdminMailTemplateGetSucceed";
+    public const string ServerAdminMailTemplateNotFound = "ServerAdminMailTemplateNotFound";
+    public const string ServerAdminMailTemplatePlaceholderRequired = "ServerAdminMailTemplatePlaceholderRequired";
+    public const string ServerAdminMailTemplateResetSucceed = "ServerAdminMailTemplateResetSucceed";
+    public const string ServerAdminMailTemplateSaveSucceed = "ServerAdminMailTemplateSaveSucceed";
     public const string ServerAdminOperationSucceed = "ServerAdminOperationSucceed";
+    public const string ServerAdminJobNotFound = "ServerAdminJobNotFound";
+    public const string ServerAdminJobTriggered = "ServerAdminJobTriggered";
     public const string ServerAdminPasswordTooShort = "ServerAdminPasswordTooShort";
     public const string ServerAdminRankKeyRequired = "ServerAdminRankKeyRequired";
     public const string ServerAdminRankKeysSucceed = "ServerAdminRankKeysSucceed";

@@ -7,6 +7,7 @@ public class Banned
     [StringLength(10, MinimumLength = 9)]
     public string Uid { get; set; } = default!;
 
+    [StringLength(512)]
     public string? Reason
     {
         get; set;

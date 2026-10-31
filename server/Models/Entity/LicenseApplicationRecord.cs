@@ -15,8 +15,10 @@ public sealed class LicenseApplicationRecord
     [ForeignKey(nameof(UserId))]
     public HutaoUser User { get; set; } = default!;
 
+    [StringLength(512)]
     public string ProjectUrl { get; set; } = default!;
 
+    [StringLength(64)]
     public string ApprovalCode { get; set; } = default!;
 
     public bool IsApproved

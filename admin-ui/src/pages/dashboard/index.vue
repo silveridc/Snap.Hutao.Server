@@ -3,13 +3,14 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { getSystemOverview, getUserStatistics } from '@/api/service';
+import { getSystemOverview, getUserStatistics, runJob } from '@/api/service';
 import { t } from '@/locales';
 import { useUserStore } from '@/store';
 
 const userStore = useUserStore();
 const router = useRouter();
 const refreshing = ref(false);
+const runningJob = ref('');
 
 const loading = ref(false);
 const overview = ref<any>(null);
@@ -119,6 +120,7 @@ const jobColumns = computed(() => [
   { colKey: 'State', title: t('pages.dashboard.scheduler.colState'), width: 120 },
   { colKey: 'NextFireAt', title: t('pages.dashboard.scheduler.colNext'), width: 180 },
   { colKey: 'PreviousFireAt', title: t('pages.dashboard.scheduler.colPrevious'), width: 180 },
+  { colKey: 'op', title: t('pages.dashboard.scheduler.colOp'), width: 110, fixed: 'right' },
 ]);
 
 // 任务实现类型是全限定名，列表里只留类名，完整名放到 tooltip
@@ -139,6 +141,20 @@ const schedulerFacts = computed(() => {
     { label: t('pages.dashboard.scheduler.instanceId'), value: s.InstanceId || '—', mono: true },
   ];
 });
+
+async function runJobNow(row: any) {
+  if (!row?.Name || runningJob.value) return;
+  runningJob.value = row.Name;
+  try {
+    const res: any = await runJob(row.Name);
+    MessagePlugin.success(res.message || t('pages.dashboard.scheduler.runSuccess', { name: row.Name }));
+    await load();
+  } catch (err) {
+    MessagePlugin.error((err as Error).message || t('pages.dashboard.scheduler.runFail'));
+  } finally {
+    runningJob.value = '';
+  }
+}
 
 async function load() {
   loading.value = true;
@@ -373,6 +389,18 @@ async function refresh() {
         </template>
         <template #NextFireAt="{ row }">{{ fmt(row?.NextFireAt) }}</template>
         <template #PreviousFireAt="{ row }">{{ fmt(row?.PreviousFireAt) }}</template>
+        <template #op="{ row }">
+          <t-button
+            theme="primary"
+            variant="text"
+            size="small"
+            :loading="runningJob === row?.Name"
+            :disabled="!!runningJob && runningJob !== row?.Name"
+            @click="runJobNow(row)"
+          >
+            {{ runningJob === row?.Name ? $t('pages.dashboard.scheduler.running') : $t('pages.dashboard.scheduler.runNow') }}
+          </t-button>
+        </template>
       </t-table>
       <t-alert v-if="scheduler && scheduler.Error" theme="warning" :message="scheduler.Error" class="probe-error" />
     </t-card>

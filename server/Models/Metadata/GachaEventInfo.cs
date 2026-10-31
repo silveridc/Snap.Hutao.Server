@@ -4,10 +4,13 @@ namespace server.Models.Metadata;
 [PrimaryKey(nameof(Version), nameof(Name), nameof(Locale), nameof(Order))]
 public sealed class GachaEventInfo
 {
+    [StringLength(32)]
     public string Version { get; set; } = default!;
 
+    [StringLength(256)]
     public string Name { get; set; } = default!;
 
+    [StringLength(16)]
     public string Locale { get; set; } = default!;
 
     public uint Order

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using server.Models.Context.Configuration;
 using server.Models.Entity;
-using server.Models.Entity.Achievement;
 using server.Models.Entity.Announcement;
 using server.Models.Entity.GachaLog;
 using server.Models.Entity.Redeem;
@@ -14,8 +13,6 @@ namespace server.Models.Context;
 
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<HutaoUser, IdentityRole<int>, int>(options)
 {
-    public DbSet<RequestStatistics> RequestStatistics { get; set; } = default!;
-
     public DbSet<AllowedVersion> AllowedVersions { get; set; } = default!;
 
     public DbSet<ClientVersion> ClientVersions { get; set; } = default!;
@@ -23,8 +20,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<LicenseApplicationRecord> Licenses { get; set; } = default!;
 
     public DbSet<EntityAnnouncement> Announcements { get; set; } = default!;
-
-    public DbSet<PassportVerification> PassportVerifications { get; set; } = default!;
 
     public DbSet<RegistrationRecord> RegistrationRecords { get; set; } = default!;
 
@@ -73,10 +68,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
 
     public DbSet<EntityGachaItem> GachaItems { get; set; } = default!;
 
-    public DbSet<EntityAchievementArchive> AchievementArchives { get; set; } = default!;
-
-    public DbSet<EntityAchievement> Achievements { get; set; } = default!;
-
     public DbSet<RoleCombatRecord> RoleCombatRecords { get; set; } = default!;
 
     public DbSet<RoleCombatAvatar> RoleCombatAvatars { get; set; } = default!;
@@ -94,5 +85,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new EntityFloorConfiguration());
+        SnakeCaseNamingConvention.Apply(modelBuilder);
     }
 }

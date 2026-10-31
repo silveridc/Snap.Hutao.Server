@@ -397,17 +397,17 @@ public sealed class ClientFlowTests
             """{"success":true,"score":0.9,"action":"ApplyOpenSourceLicense"}""",
             bodyFragment: $"response={token}");
 
-        TestResponse applied = await SendAsync("POST", "/api/license-applications", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
+        TestResponse applied = await SendAsync("POST", "/api/license/require", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
         Assert.Equal(ReturnCodes.Success, applied.Retcode);
         Assert.Equal(ServerKeys.ServerLicenseApplySucceed, applied.L10nKey);
 
-        TestResponse twice = await SendAsync("POST", "/api/license-applications", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
+        TestResponse twice = await SendAsync("POST", "/api/license/require", new { UserName = applicant.UserName, ProjectUrl = "https://github.com/example/repo", Token = token });
         Assert.Equal(ReturnCodes.AlreadyAppliedForLicense, twice.Retcode);
 
         // reCAPTCHA 通过但账号不存在
         string ghostToken = $"test-token-{Guid.NewGuid():N}";
         factory.StubHttp.MapJson("recaptcha/api/siteverify", """{"success":true,"score":0.9,"action":"ApplyOpenSourceLicense"}""", bodyFragment: $"response={ghostToken}");
-        TestResponse ghost = await SendAsync("POST", "/api/license-applications", new { UserName = $"ghost-{Guid.NewGuid():N}@example.com", ProjectUrl = "https://github.com/example/repo", Token = ghostToken });
+        TestResponse ghost = await SendAsync("POST", "/api/license/require", new { UserName = $"ghost-{Guid.NewGuid():N}@example.com", ProjectUrl = "https://github.com/example/repo", Token = ghostToken });
         Assert.Equal(ReturnCodes.UserNameNotExists, ghost.Retcode);
     }
 

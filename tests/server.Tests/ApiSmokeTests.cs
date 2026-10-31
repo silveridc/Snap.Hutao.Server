@@ -142,7 +142,7 @@ public sealed class ApiSmokeTests
         { "POST", "/api/redeem-codes/redemptions", """{"code":"000000000000000000"}""" },
 
         // 开源许可
-        { "POST", "/api/license-applications", """{"UserName":"a@example.com","ProjectUrl":"https://example.com","Token":"token"}""" },
+        { "POST", "/api/license/require", """{"UserName":"a@example.com","ProjectUrl":"https://example.com","Token":"token"}""" },
 
         // 遥测日志
         { "POST", "/api/telemetry-logs", """{"Id":"device-1","Time":1700000000,"Info":"{\"exception\":\"test\"}"}""" },

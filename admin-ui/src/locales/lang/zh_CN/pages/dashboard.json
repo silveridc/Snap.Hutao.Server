@@ -66,7 +66,12 @@
       "colCron": "Cron",
       "colState": "触发器状态",
       "colNext": "下次执行",
-      "colPrevious": "上次执行"
+      "colPrevious": "上次执行",
+      "colOp": "操作",
+      "runNow": "立即执行",
+      "running": "执行中…",
+      "runSuccess": "任务 {name} 已触发",
+      "runFail": "触发任务失败"
     },
     "duration": {
       "days": "天",

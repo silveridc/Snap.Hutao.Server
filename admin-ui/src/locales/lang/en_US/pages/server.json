@@ -1,4 +1,4 @@
-﻿{
+{
   "server": {
     "ServerAdminAccountAddSucceed": "Admin account added successfully",
     "ServerAdminAccountAlreadyExists": "An admin account for this identity already exists",
@@ -57,6 +57,14 @@
     "ServerAdminLicenseApproveUserNotFound": "Approval failed: account does not exist",
     "ServerAdminLicenseListSucceed": "License application list acquired successfully",
     "ServerAdminLoginLogListSucceed": "Login log acquired successfully",
+    "ServerAdminJobNotFound": "Job does not exist",
+    "ServerAdminJobTriggered": "Job triggered",
+    "ServerAdminMailTemplateEmpty": "Mail template must not be empty",
+    "ServerAdminMailTemplateGetSucceed": "Mail template retrieved successfully",
+    "ServerAdminMailTemplateNotFound": "No custom mail template",
+    "ServerAdminMailTemplatePlaceholderRequired": "Mail template is missing a required placeholder",
+    "ServerAdminMailTemplateResetSucceed": "Mail template restored to default",
+    "ServerAdminMailTemplateSaveSucceed": "Mail template saved",
     "ServerAdminOperationSucceed": "Operation succeeded",
     "ServerAdminPasswordTooShort": "New password must be at least 8 characters",
     "ServerAdminRankKeyRequired": "Leaderboard key is required",

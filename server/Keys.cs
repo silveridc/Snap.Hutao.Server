@@ -22,6 +22,7 @@ public static class Keys
     public const string PatchS3SecretAccessKey = "Patch.S3.SecretAccessKey";
     public const string PatchS3ExpiresHours = "Patch.S3.ExpiresHours";
     public const string WallpaperTodayPool = "Wallpaper.Today.Pool";
+    public const string MailTemplateHtml = "Mail.TemplateHtml";
 
     // 旧版单张配置，只作为壁纸池缺失时的回退，后台不再提供编辑入口
     public const string WallpaperTodayUrl = "Wallpaper.Today.Url";

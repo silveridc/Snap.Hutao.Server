@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Banner, Radio, RadioGroup, Spin, Tabs, Tag } from '@douyinfe/semi-ui';
+import { IconIndentLeft, IconIndentRight } from '@douyinfe/semi-icons';
 import type { DocEntry } from './lib/config';
 import { docUrl, loadExtraDocs, loadRuntimeConfig, saveExtraDocs, type RuntimeConfig } from './lib/config';
+import { applyTheme, loadThemeMode, saveThemeMode, type ThemeMode } from './lib/theme';
 import { loadSpec } from './api/client';
 import type { NormalizedDoc, Operation, RawDocument } from './openapi/types';
 import OpTree from './components/OpTree';
@@ -9,6 +11,8 @@ import OpDetail from './components/OpDetail';
 import SchemasView from './components/SchemasView';
 import TopBar from './components/TopBar';
 import SetupView from './components/SetupView';
+
+const SIDER_KEY = 'semi-swagger-doc:sider';
 
 interface LoadState {
   status: 'loading' | 'ready' | 'error';
@@ -30,6 +34,26 @@ export default function App() {
   const [view, setView] = useState<'ops' | 'models'>('ops');
   const [modelFocus, setModelFocus] = useState('');
   const [search, setSearch] = useState('');
+  const [theme, setTheme] = useState<ThemeMode>(() => loadThemeMode());
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(SIDER_KEY) === '1');
+
+  useEffect(() => {
+    applyTheme(theme);
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const sync = () => applyTheme(theme);
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, [theme]);
+
+  useEffect(() => {
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+    localStorage.setItem(SIDER_KEY, collapsed ? '1' : '0');
+  }, [collapsed]);
+
+  function changeTheme(next: ThemeMode) {
+    setTheme(next);
+    saveThemeMode(next);
+  }
 
   useEffect(() => {
     void loadRuntimeConfig().then(({ config: next, baseDocs: bases }) => {
@@ -174,6 +198,8 @@ export default function App() {
         baseDocs={baseDocs}
         activeDoc={activeDoc}
         search={search}
+        collapsed={collapsed}
+        theme={theme}
         onSearch={setSearch}
         onSwitch={(name) => {
           setActiveDoc(name);
@@ -184,6 +210,8 @@ export default function App() {
         onRefresh={() => entry && void fetchDoc(entry, config.base, true)}
         onAddDoc={addDoc}
         onRemoveDoc={removeDoc}
+        onToggleSider={() => setCollapsed((prev) => !prev)}
+        onThemeChange={changeTheme}
       />
 
       <div className="layout">
@@ -200,38 +228,47 @@ export default function App() {
             </RadioGroup>
           </div>
 
-          {state?.status === 'loading' && (
-            <div style={{ display: 'grid', placeItems: 'center', padding: 40 }}>
-              <Spin />
-            </div>
-          )}
+          <div className="sidebar-body">
+            {state?.status === 'loading' && (
+              <div style={{ display: 'grid', placeItems: 'center', padding: 40 }}>
+                <Spin />
+              </div>
+            )}
 
-          {state?.status === 'error' && (
-            <Banner
-              type="danger"
-              description={state.error}
-              fullMode={false}
-              style={{ margin: 8 }}
-              bordered
-            />
-          )}
+            {state?.status === 'error' && (
+              <Banner
+                type="danger"
+                description={state.error}
+                fullMode={false}
+                style={{ margin: 8 }}
+                bordered
+              />
+            )}
 
-          {doc && view === 'ops' && (
-            <OpTree doc={doc} activeId={activeOp?.id ?? ''} filter={search} onSelect={openOperation} />
-          )}
+            {doc && view === 'ops' && (
+              <OpTree doc={doc} activeId={activeOp?.id ?? ''} filter={search} onSelect={openOperation} />
+            )}
 
-          {doc && view === 'models' && (
-            <div style={{ padding: '6px 10px' }}>
-              {doc.models.map((model) => (
-                <div className="search-item" key={model.name} onClick={() => openModel(model.name)}>
-                  <span className="field-name">{model.name}</span>
-                  <span className="dim" style={{ marginLeft: 6, fontSize: 11 }}>
-                    {model.type}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+            {doc && view === 'models' && (
+              <div>
+                <div className="sidebar-group-label">Schema {doc.models.length}</div>
+                {doc.models.map((model) => (
+                  <div className="search-item" key={model.name} onClick={() => openModel(model.name)}>
+                    <span className="field-name">{model.name}</span>
+                    <span className="dim" style={{ marginLeft: 6, fontSize: 11 }}>
+                      {model.type}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-collapse" onClick={() => setCollapsed((prev) => !prev)}>
+            <span className="icon-button" style={{ display: 'inline-flex' }}>
+              {collapsed ? <IconIndentRight /> : <IconIndentLeft />}
+            </span>
+          </div>
         </aside>
 
         <main className="content">

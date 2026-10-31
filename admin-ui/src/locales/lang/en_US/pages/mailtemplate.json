@@ -1,0 +1,25 @@
+{
+  "mailtemplate": {
+    "title": "Mail Template",
+    "description": "Shared HTML template for passport verification codes and redeem codes; saved to the database with the in-memory cache refreshed immediately.",
+    "placeholders": "The following placeholders must be kept (TinyMCE protects them automatically):",
+    "customized": "Custom template in use",
+    "default": "Built-in default template",
+    "advanced": "Source mode",
+    "reload": "Reload",
+    "loadDefault": "Load default template",
+    "save": "Save",
+    "reset": "Reset to default",
+    "hint": "Visual mode only edits the body; head and styles stay untouched. Switch to source mode to edit the full HTML.",
+    "messages": {
+      "loadFail": "Failed to load the mail template",
+      "saveSuccess": "Mail template saved",
+      "saveFail": "Failed to save the mail template",
+      "resetSuccess": "Mail template restored to default",
+      "resetFail": "Failed to restore the default template",
+      "resetConfirm": "Delete the custom template and restore the built-in default?",
+      "missingPlaceholder": "The template is missing the placeholder {placeholder}",
+      "loadDefaultSuccess": "Default template loaded, remember to save"
+    }
+  }
+}

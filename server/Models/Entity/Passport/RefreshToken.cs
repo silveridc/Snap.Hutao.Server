@@ -27,13 +27,16 @@ public class RefreshToken
         get; set;
     }
 
+    [StringLength(64)]
     public string DeviceId { get; set; } = default!;
 
+    [StringLength(128)]
     public string? DeviceName
     {
         get; set;
     }
 
+    [StringLength(64)]
     public string? OperatingSystem
     {
         get; set;

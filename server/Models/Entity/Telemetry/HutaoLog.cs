@@ -19,6 +19,7 @@ public class HutaoLog
         get; set;
     }
 
+    [StringLength(32)]
     public string Version { get; set; } = default!;
 
     [NotMapped]

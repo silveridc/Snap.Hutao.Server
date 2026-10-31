@@ -1,1 +1,0 @@
-import{L as e,b as t,m as n}from"./runtime-core.esm-bundler-CDCPj5Mz.js";import{t as r}from"./index-C2y4mc9z.js";var i=t({name:`FrameBlank`});function a(t,r,i,a,o,s){return e(),n(`div`)}var o=r(i,[[`render`,a]]);export{o as default};

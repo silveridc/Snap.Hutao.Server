@@ -28,6 +28,7 @@ public sealed class AdminAuditLog
         get; set;
     }
 
+    [StringLength(128)]
     public string Action { get; set; } = default!;
 
     public string? Detail

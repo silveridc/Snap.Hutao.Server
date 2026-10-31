@@ -1,7 +1,18 @@
-import { useState } from 'react';
-import { Button, Input, Modal, Select, Tag, Toast } from '@douyinfe/semi-ui';
-import { IconSearch, IconPlus, IconRefresh, IconGlobe } from '@douyinfe/semi-icons';
+import { useState, type ReactNode } from 'react';
+import { Button, Dropdown, Input, Modal, Select, Tag, Toast } from '@douyinfe/semi-ui';
+import {
+  IconDesktop,
+  IconIndentLeft,
+  IconIndentRight,
+  IconMoon,
+  IconPlus,
+  IconRefresh,
+  IconSearch,
+  IconSun,
+  IconGlobe,
+} from '@douyinfe/semi-icons';
 import type { DocEntry } from '../lib/config';
+import type { ThemeMode } from '../lib/theme';
 
 interface Props {
   title: string;
@@ -12,12 +23,22 @@ interface Props {
   baseDocs: DocEntry[];
   activeDoc: string;
   search: string;
+  collapsed: boolean;
+  theme: ThemeMode;
   onSearch: (value: string) => void;
   onSwitch: (name: string) => void;
   onRefresh: () => void;
   onAddDoc: (entry: DocEntry) => void;
   onRemoveDoc: (url: string) => void;
+  onToggleSider: () => void;
+  onThemeChange: (mode: ThemeMode) => void;
 }
+
+const THEME_OPTIONS: { key: ThemeMode; label: string; description: string; icon: ReactNode }[] = [
+  { key: 'light', label: '浅色模式', description: '始终使用浅色主题', icon: <IconSun /> },
+  { key: 'dark', label: '深色模式', description: '始终使用深色主题', icon: <IconMoon /> },
+  { key: 'auto', label: '自动模式', description: '跟随系统主题设置', icon: <IconDesktop /> },
+];
 
 export default function TopBar({
   title,
@@ -27,11 +48,15 @@ export default function TopBar({
   baseDocs,
   activeDoc,
   search,
+  collapsed,
+  theme,
   onSearch,
   onSwitch,
   onRefresh,
   onAddDoc,
   onRemoveDoc,
+  onToggleSider,
+  onThemeChange,
 }: Props) {
   const [visible, setVisible] = useState(false);
   const [name, setName] = useState('');
@@ -49,9 +74,19 @@ export default function TopBar({
     Toast.success('已添加文档源，会记住在本浏览器');
   }
 
+  const currentIcon = THEME_OPTIONS.find((item) => item.key === theme)?.icon ?? <IconDesktop />;
+
   return (
     <header className="topbar">
       <div className="brand">
+        <Button
+          className="icon-button"
+          theme="borderless"
+          type="tertiary"
+          aria-label={collapsed ? '展开目录' : '收起目录'}
+          icon={collapsed ? <IconIndentRight /> : <IconIndentLeft />}
+          onClick={onToggleSider}
+        />
         <span className="brand-logo">
           <IconGlobe />
         </span>
@@ -77,19 +112,60 @@ export default function TopBar({
       </div>
 
       <div className="topbar-right">
+        {copyright && <span>{copyright}</span>}
         <Select
           value={activeDoc}
           onChange={(value) => onSwitch(String(value))}
-          style={{ minWidth: 170 }}
+          style={{ minWidth: 160 }}
           optionList={docs.map((doc) => ({ label: doc.name, value: doc.name }))}
         />
         <Button theme="light" size="small" icon={<IconPlus />} onClick={() => setVisible(true)}>
           文档源
         </Button>
-        <Button theme="light" size="small" icon={<IconRefresh />} onClick={onRefresh}>
-          刷新
-        </Button>
-        {copyright && <span>{copyright}</span>}
+        <Button
+          className="icon-button"
+          theme="borderless"
+          type="tertiary"
+          aria-label="重新拉取文档"
+          icon={<IconRefresh />}
+          onClick={onRefresh}
+        />
+        <Dropdown
+          position="bottomRight"
+          render={
+            <Dropdown.Menu>
+              {THEME_OPTIONS.map((option) => (
+                <Dropdown.Item
+                  key={option.key}
+                  icon={option.icon}
+                  onClick={() => onThemeChange(option.key)}
+                  style={
+                    theme === option.key
+                      ? { background: 'var(--semi-color-primary-light-default)', fontWeight: 600 }
+                      : undefined
+                  }
+                >
+                  <div>
+                    <div>{option.label}</div>
+                    <div className="dim" style={{ fontSize: 12 }}>
+                      {option.description}
+                    </div>
+                  </div>
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          }
+        >
+          <span style={{ display: 'inline-flex' }}>
+            <Button
+              className="icon-button"
+              theme="borderless"
+              type="tertiary"
+              aria-label="切换主题"
+              icon={currentIcon}
+            />
+          </span>
+        </Dropdown>
       </div>
 
       <Modal

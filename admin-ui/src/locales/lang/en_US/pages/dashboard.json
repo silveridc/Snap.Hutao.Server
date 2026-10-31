@@ -66,7 +66,12 @@
       "colCron": "Cron",
       "colState": "Trigger State",
       "colNext": "Next Fire",
-      "colPrevious": "Previous Fire"
+      "colPrevious": "Previous Fire",
+      "colOp": "Actions",
+      "runNow": "Run now",
+      "running": "Running…",
+      "runSuccess": "Job {name} triggered",
+      "runFail": "Failed to trigger the job"
     },
     "duration": {
       "days": "d",

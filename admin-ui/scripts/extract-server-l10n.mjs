@@ -76,6 +76,15 @@ const adminOnly = {
   ServerAdminCannotDemoteDefaultAdmin: ['默认管理员不能被降级', 'The default administrator cannot be demoted'],
   ServerAdminSystemOverviewSucceed: ['获取系统概览成功', 'System overview acquired successfully'],
   ServerAdminWallpaperPoolInvalid: ['今日壁纸池不合法：直链必须是 HTTPS 绝对地址，且最多 50 条', 'Invalid wallpaper pool: every URL must be an absolute HTTPS URL and the pool is limited to 50 entries'],
+  ServerAdminMailTemplateEmpty: ['邮件模板不能为空', 'Mail template must not be empty'],
+  ServerAdminMailTemplateGetSucceed: ['获取邮件模板成功', 'Mail template retrieved successfully'],
+  ServerAdminMailTemplateNotFound: ['没有自定义邮件模板', 'No custom mail template'],
+  ServerAdminMailTemplatePlaceholderRequired: ['邮件模板缺少必要占位符，不允许保存', 'Mail template is missing a required placeholder'],
+  ServerAdminMailTemplateResetSucceed: ['邮件模板已恢复默认', 'Mail template restored to default'],
+  ServerAdminMailTemplateSaveSucceed: ['邮件模板已保存', 'Mail template saved'],
+  ServerAdminJobNotFound: ['任务不存在', 'Job does not exist'],
+  ServerAdminJobTriggered: ['任务已触发', 'Job triggered'],
+
   ServerAdminWallpaperPoolSaveSucceed: ['今日壁纸池已保存', 'Wallpaper pool saved'],
 };
 for (const [key, [zhText, enText]] of Object.entries(adminOnly)) {
