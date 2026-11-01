@@ -1,0 +1,179 @@
+{
+  "settings": {
+    "header": {
+      "title": "系统设置",
+      "tip": "动态配置存储在数据库中，优先于 appsettings.json.留空表示使用配置文件默认值.",
+      "reload": "重新加载",
+      "saveBtn": "保存修改（{n}）"
+    },
+    "sections": {
+      "global": {
+        "title": "全局开关",
+        "description": "控制系统整体行为，修改后立即生效"
+      },
+      "pizzaHelper": {
+        "title": "Genshin Pizza Helper",
+        "description": "深渊数据同步上游配置，Cookie/Salt 过期时在此更新"
+      },
+      "afdian": {
+        "title": "爱发电 SKU 映射",
+        "description": "订单匹配用的商品 ID，商品变更时在此更新"
+      },
+      "mail": {
+        "title": "邮件通知",
+        "description": "系统诊断邮件收件人"
+      },
+      "sso": {
+        "title": "单点登录（SSO）",
+        "description": "外部 OIDC 身份源配置.留空的项跟随 appsettings/环境变量里的 App:Oidc；保存后立即生效，无需重启."
+      },
+      "killSwitch": {
+        "title": "功能熔断",
+        "description": "紧急关闭客户端的注入类功能，经 /Patch/hutao 下发，客户端下次启动生效；关闭开关后客户端自动恢复用户本地设置."
+      },
+      "s3Sign": {
+        "title": "更新包 S3 直链签名",
+        "description": "镜像地址匹配该主机名时，/Patch/hutao 下发前现场签发限时访问 URL，桶可保持私有.留空不启用."
+      }
+    },
+    "fields": {
+      "maintenanceMode": {
+        "label": "维护模式",
+        "hint": "开启后所有非管理接口返回维护中"
+      },
+      "registrationEnabled": {
+        "label": "允许注册",
+        "hint": "关闭后新用户无法注册通行证"
+      },
+      "captchaEnabled": {
+        "label": "启用验证码",
+        "hint": "关闭后登录不再校验 reCAPTCHA；需在 appsettings.json 的 App 段同时配置 ReCaptchaKey 与 ReCaptchaSiteKey"
+      },
+      "uidSalt": {
+        "label": "Uid Salt",
+        "hint": "用于 UID 混淆的盐值"
+      },
+      "apiSalt": {
+        "label": "Api Salt",
+        "hint": "用于请求签名的盐值"
+      },
+      "avatarHolding": {
+        "label": "角色持有端点",
+        "hint": "AvatarHolding API 地址"
+      },
+      "spiralAbyss": {
+        "label": "深渊端点",
+        "hint": "SpiralAbyss API 地址"
+      },
+      "skuGachaLog": {
+        "label": "祈愿记录 SKU",
+        "hint": "爱发电订单中对应祈愿记录服务的 SKU ID"
+      },
+      "skuCdn": {
+        "label": "CDN 服务 SKU",
+        "hint": "爱发电2订单中对应 CDN 服务的 SKU ID"
+      },
+      "diagnosticEmail": {
+        "label": "诊断邮箱",
+        "hint": "接收系统异常/订单诊断通知的邮箱地址"
+      },
+      "sso": {
+        "title": "单点登录（SSO）",
+        "description": "外部 OIDC 身份源配置.留空的项跟随 appsettings/环境变量里的 App:Oidc；保存后立即生效，无需重启."
+      },
+      "ssoEnabled": {
+        "label": "启用 SSO",
+        "hint": "关闭时后台沿用维护者账号登录，不做写操作门禁"
+      },
+      "ssoAuthority": {
+        "label": "身份源地址 (Authority)",
+        "hint": "Issuer 地址，需能访问 /.well-known/openid-configuration"
+      },
+      "ssoClientId": {
+        "label": "Client ID",
+        "hint": "在身份源里登记的客户端 ID"
+      },
+      "ssoClientSecret": {
+        "label": "Client Secret",
+        "hint": "保密凭据，仅服务端使用；更换后在身份源保持一致"
+      },
+      "ssoRedirectUri": {
+        "label": "后台回调地址",
+        "hint": "必须与身份源里登记的完全一致，如 https://api.example.com/Admin/Sso/Callback"
+      },
+      "ssoClientRedirectUri": {
+        "label": "启动器回调地址",
+        "hint": "启动器单点登录的回调地址，与后台回调是两个不同地址；留空则启动器不显示 SSO 入口"
+      },
+      "ssoScope": {
+        "label": "Scope",
+        "hint": "默认 openid profile email"
+      },
+      "ssoDisplayName": {
+        "label": "显示名称",
+        "hint": "登录按钮上显示的身份源名称，留空用前端默认文案"
+      },
+      "ssoBootstrapClaim": {
+        "label": "种子声明名",
+        "hint": "首个后台账号的声明名，如 sub / preferred_username / email"
+      },
+      "ssoBootstrapValue": {
+        "hint": "该声明值匹配的首次登录会建立种子账号",
+        "label": "种子声明值"
+      },
+      "ssoRequireHttps": {
+        "label": "要求 HTTPS 元数据",
+        "hint": "生产环境必须保持开启；仅本地 http 联调时关闭"
+      },
+      "disableFpsUnlock": {
+        "label": "禁用解锁帧率",
+        "hint": "强制所有客户端本次会话内不启用帧率解锁"
+      },
+      "disableFpsUnlockReason": {
+        "label": "帧率解锁熔断原因",
+        "hint": "功能被禁用时客户端展示给用户，留空则显示默认提示"
+      },
+      "disableIslandInjection": {
+        "label": "禁用 Island 注入",
+        "hint": "强制所有客户端本次会话内不启用 Island 注入"
+      },
+      "disableIslandInjectionReason": {
+        "label": "Island 注入熔断原因",
+        "hint": "功能被禁用时客户端展示给用户，留空则显示默认提示"
+      },
+      "s3Host": {
+        "label": "对象主机名",
+        "hint": "如 my-bucket.s3.us-east-1.amazonaws.com"
+      },
+      "s3Region": {
+        "label": "区域",
+        "hint": "签名区域，如 us-east-1"
+      },
+      "s3AccessKeyId": {
+        "label": "AccessKeyId",
+        "hint": "AWS/S3 兼容存储的 AccessKeyId"
+      },
+      "s3SecretAccessKey": {
+        "label": "SecretAccessKey",
+        "hint": "仅服务端使用（密码框）"
+      },
+      "s3ExpiresHours": {
+        "label": "有效期（小时）",
+        "hint": "1-168，建议 24"
+      }
+    },
+    "form": {
+      "emptyPlaceholder": "留空使用默认值",
+      "resetTooltip": "重置为默认值",
+      "reset": "重置"
+    },
+    "messages": {
+      "loadFail": "加载配置失败",
+      "noChanges": "没有修改",
+      "saveSuccess": "保存成功",
+      "saveFail": "保存失败",
+      "resetSuccess": "已重置",
+      "resetFail": "重置失败"
+    }
+  }
+}

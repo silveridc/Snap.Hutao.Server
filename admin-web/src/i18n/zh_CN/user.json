@@ -1,0 +1,72 @@
+{
+  "user": {
+    "stats": {
+      "title": "用户数据概览",
+      "totalUsers": "总用户数",
+      "maintainers": "维护者",
+      "licensedDevelopers": "开发者授权",
+      "activeGachaLogUsers": "祈愿服务在期",
+      "activeCdnUsers": "CDN 服务在期",
+      "bannedUids": "封禁 UID",
+      "gachaItemCount": "祈愿记录条数",
+      "abyssRecords": "深渊记录数",
+      "theaterRecords": "剧演记录数"
+    },
+    "list": {
+      "title": "用户列表",
+      "searchPlaceholder": "按用户名或邮箱搜索",
+      "allRoles": "全部角色",
+      "maintainersOnly": "仅维护者",
+      "developersOnly": "仅开发者",
+      "expiryAny": "不限到期",
+      "expiry7Days": "7 天内到期",
+      "expiry30Days": "30 天内到期",
+      "colUserName": "用户名 / 邮箱",
+      "colMaintainer": "维护者",
+      "colDeveloper": "开发者",
+      "colGachaExpireAt": "祈愿到期",
+      "colCdnExpireAt": "CDN 到期",
+      "colOperation": "操作",
+      "idSuffix": "#{id}",
+      "neverAuthorized": "未授权",
+      "expiringInDays": "{days} 天内到期",
+      "detail": "详情",
+      "adjustDuration": "调整时长",
+      "privilege": "权限",
+      "resetPassword": "重置密码"
+    },
+    "messages": {
+      "noUserName": "该用户缺少用户名/邮箱，无法操作",
+      "passwordTooShort": "新密码至少 8 位"
+    },
+    "duration": {
+      "title": "调整服务时长",
+      "targetUser": "目标用户",
+      "serviceType": "服务类型",
+      "gachaLog": "祈愿记录",
+      "cdn": "CDN / 胡桃云",
+      "days": "天数（可为负数用于扣减）",
+      "submit": "提交"
+    },
+    "privilege": {
+      "title": "用户权限",
+      "targetUser": "目标用户",
+      "maintainer": "维护者",
+      "licensedDeveloper": "开发者授权"
+    },
+    "password": {
+      "title": "重置用户密码",
+      "targetUser": "目标用户",
+      "newPassword": "新密码（至少 8 位）",
+      "newPasswordPlaceholder": "输入新密码",
+      "submit": "重置"
+    },
+    "detail": {
+      "title": "用户详情",
+      "redeemUsedCount": "兑换码使用次数",
+      "gachaUidTitle": "祈愿 UID（{n}）",
+      "colUid": "UID",
+      "colItemCount": "祈愿条数"
+    }
+  }
+}

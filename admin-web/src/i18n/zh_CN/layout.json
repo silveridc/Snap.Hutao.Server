@@ -1,0 +1,38 @@
+{
+  "layout": {
+    "slogan": "服务器运维控制台",
+    "collapse": "收起导航",
+    "expand": "展开导航",
+    "userMenu": {
+      "profile": "账号信息",
+      "settings": "系统设置"
+    },
+    "identity": {
+      "kindAdmin": "后台账号",
+      "kindUser": "主站用户"
+    },
+    "nav": {
+      "home": "首页",
+      "dashboard": "概览",
+      "user": "用户管理",
+      "ban": "封禁管理",
+      "statistics": "统计刷新",
+      "rank": "排行榜",
+      "compensation": "时长补偿",
+      "announcement": "公告管理",
+      "release": "版本发布",
+      "wallpaper": "今日壁纸",
+      "redeem": "兑换码",
+      "datatools": "数据维护",
+      "cache": "缓存管理",
+      "audit": "审计日志",
+      "loginlog": "登录日志",
+      "analytics": "数据分析",
+      "mailtemplate": "邮件模板",
+      "license": "开源许可证",
+      "adminaccount": "后台账号",
+      "clientversion": "版本统计",
+      "settings": "系统设置"
+    }
+  }
+}

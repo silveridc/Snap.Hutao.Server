@@ -1,0 +1,179 @@
+{
+  "settings": {
+    "header": {
+      "title": "System Settings",
+      "tip": "Dynamic configuration is stored in the database and takes precedence over appsettings.json. Leave a field empty to use the default value from the configuration file.",
+      "reload": "Reload",
+      "saveBtn": "Save Changes ({n})"
+    },
+    "sections": {
+      "global": {
+        "title": "Global Switches",
+        "description": "Controls overall system behavior. Changes take effect immediately."
+      },
+      "pizzaHelper": {
+        "title": "Genshin Pizza Helper",
+        "description": "Upstream configuration for Spiral Abyss data sync. Update here when the Cookie/Salt expires."
+      },
+      "afdian": {
+        "title": "Afdian SKU Mapping",
+        "description": "Product IDs used for order matching. Update here when products change."
+      },
+      "mail": {
+        "title": "Email Notifications",
+        "description": "Recipients of system diagnostic emails"
+      },
+      "sso": {
+        "title": "Single Sign-On (SSO)",
+        "description": "External OIDC identity provider. Empty fields follow App:Oidc in appsettings/environment variables; changes take effect immediately without a restart."
+      },
+      "killSwitch": {
+        "title": "Feature Kill Switches",
+        "description": "Emergency-disable injection features on clients, delivered via /Patch/hutao and applied on next client launch; turning a switch off restores user-local settings."
+      },
+      "s3Sign": {
+        "title": "Update Package S3 Presigned URLs",
+        "description": "When a mirror URL matches this host name, /Patch/hutao issues a time-limited presigned URL on the fly before delivery, so the bucket can stay private. Leave empty to disable."
+      }
+    },
+    "fields": {
+      "maintenanceMode": {
+        "label": "Maintenance Mode",
+        "hint": "When enabled, all non-admin endpoints return a maintenance response"
+      },
+      "registrationEnabled": {
+        "label": "Allow Registration",
+        "hint": "When disabled, new users cannot register passport accounts"
+      },
+      "captchaEnabled": {
+        "label": "Enable Captcha",
+        "hint": "When disabled, login no longer verifies reCAPTCHA; both ReCaptchaKey and ReCaptchaSiteKey must be set in the App section of appsettings.json"
+      },
+      "uidSalt": {
+        "label": "Uid Salt",
+        "hint": "Salt used for UID obfuscation"
+      },
+      "apiSalt": {
+        "label": "Api Salt",
+        "hint": "Salt used for request signing"
+      },
+      "avatarHolding": {
+        "label": "Avatar Holding Endpoint",
+        "hint": "AvatarHolding API address"
+      },
+      "spiralAbyss": {
+        "label": "Spiral Abyss Endpoint",
+        "hint": "SpiralAbyss API address"
+      },
+      "skuGachaLog": {
+        "label": "Wish Log SKU",
+        "hint": "SKU ID of the wish log service in Afdian orders"
+      },
+      "skuCdn": {
+        "label": "CDN Service SKU",
+        "hint": "SKU ID of the CDN service in Afdian 2 orders"
+      },
+      "diagnosticEmail": {
+        "label": "Diagnostic Email",
+        "hint": "Email address that receives system exception and order diagnostic notifications"
+      },
+      "sso": {
+        "title": "Single Sign-On (SSO)",
+        "description": "External OIDC identity provider. Empty fields follow App:Oidc in appsettings/environment variables; changes take effect immediately without a restart."
+      },
+      "ssoEnabled": {
+        "label": "Enable SSO",
+        "hint": "When off, the admin falls back to maintainer login and no write gate is enforced"
+      },
+      "ssoAuthority": {
+        "label": "Authority",
+        "hint": "Issuer address, must serve /.well-known/openid-configuration"
+      },
+      "ssoClientId": {
+        "label": "Client ID",
+        "hint": "The client ID registered at the identity provider"
+      },
+      "ssoClientSecret": {
+        "label": "Client Secret",
+        "hint": "Confidential credential, server-side only; keep it in sync with the identity provider"
+      },
+      "ssoRedirectUri": {
+        "label": "Admin redirect URI",
+        "hint": "Must match the registration exactly, e.g. https://api.example.com/Admin/Sso/Callback"
+      },
+      "ssoClientRedirectUri": {
+        "label": "Launcher redirect URI",
+        "hint": "Redirect URI for launcher SSO, a different address from the admin one; leave empty to hide the SSO entry in the launcher"
+      },
+      "ssoScope": {
+        "label": "Scope",
+        "hint": "Defaults to openid profile email"
+      },
+      "ssoDisplayName": {
+        "label": "Display name",
+        "hint": "Provider name shown on the login button; falls back to frontend copy when empty"
+      },
+      "ssoBootstrapClaim": {
+        "label": "Bootstrap claim",
+        "hint": "Claim name for the first admin account, e.g. sub / preferred_username / email"
+      },
+      "ssoBootstrapValue": {
+        "label": "Bootstrap value",
+        "hint": "The first login whose claim matches this value provisions the seed account"
+      },
+      "ssoRequireHttps": {
+        "label": "Require HTTPS",
+        "hint": "Keep enabled in production; only disable for local http testing"
+      },
+      "disableFpsUnlock": {
+        "label": "Disable FPS unlock",
+        "hint": "Force the FPS unlock off for all clients in the current session"
+      },
+      "disableFpsUnlockReason": {
+        "label": "FPS unlock reason",
+        "hint": "Shown to clients while disabled; leave empty for the default hint"
+      },
+      "disableIslandInjection": {
+        "label": "Disable Island injection",
+        "hint": "Force Island injection off for all clients in the current session"
+      },
+      "disableIslandInjectionReason": {
+        "label": "Island injection reason",
+        "hint": "Shown to clients while disabled; leave empty for the default hint"
+      },
+      "s3Host": {
+        "label": "Object host name",
+        "hint": "e.g. my-bucket.s3.us-east-1.amazonaws.com"
+      },
+      "s3Region": {
+        "label": "Region",
+        "hint": "Signing region, e.g. us-east-1"
+      },
+      "s3AccessKeyId": {
+        "label": "AccessKeyId",
+        "hint": "AccessKeyId of the AWS/S3-compatible storage"
+      },
+      "s3SecretAccessKey": {
+        "label": "SecretAccessKey",
+        "hint": "Server-side only (password input)"
+      },
+      "s3ExpiresHours": {
+        "label": "Expires (hours)",
+        "hint": "1-168, 24 recommended"
+      }
+    },
+    "form": {
+      "emptyPlaceholder": "Leave empty to use the default",
+      "resetTooltip": "Reset to default",
+      "reset": "Reset"
+    },
+    "messages": {
+      "loadFail": "Failed to load configuration",
+      "noChanges": "No changes",
+      "saveSuccess": "Saved successfully",
+      "saveFail": "Failed to save",
+      "resetSuccess": "Reset successfully",
+      "resetFail": "Failed to reset"
+    }
+  }
+}

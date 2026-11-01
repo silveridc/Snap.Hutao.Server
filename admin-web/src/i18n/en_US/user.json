@@ -1,0 +1,72 @@
+{
+  "user": {
+    "stats": {
+      "title": "User Overview",
+      "totalUsers": "Total Users",
+      "maintainers": "Maintainers",
+      "licensedDevelopers": "Licensed Developers",
+      "activeGachaLogUsers": "Active Gacha Log Users",
+      "activeCdnUsers": "Active CDN Users",
+      "bannedUids": "Banned UIDs",
+      "gachaItemCount": "Gacha Log Records",
+      "abyssRecords": "Spiral Abyss Records",
+      "theaterRecords": "Theater Mode Records"
+    },
+    "list": {
+      "title": "User List",
+      "searchPlaceholder": "Search by username or email",
+      "allRoles": "All Roles",
+      "maintainersOnly": "Maintainers Only",
+      "developersOnly": "Developers Only",
+      "expiryAny": "Any Expiry",
+      "expiry7Days": "Expiring in 7 Days",
+      "expiry30Days": "Expiring in 30 Days",
+      "colUserName": "Username / Email",
+      "colMaintainer": "Maintainer",
+      "colDeveloper": "Developer",
+      "colGachaExpireAt": "Gacha Log Expiry",
+      "colCdnExpireAt": "CDN Expiry",
+      "colOperation": "Actions",
+      "idSuffix": "#{id}",
+      "neverAuthorized": "Not granted",
+      "expiringInDays": "Expires in {days} days",
+      "detail": "Details",
+      "adjustDuration": "Adjust Duration",
+      "privilege": "Privileges",
+      "resetPassword": "Reset Password"
+    },
+    "messages": {
+      "noUserName": "This user has no username/email and cannot be modified",
+      "passwordTooShort": "New password must be at least 8 characters"
+    },
+    "duration": {
+      "title": "Adjust Service Duration",
+      "targetUser": "Target User",
+      "serviceType": "Service Type",
+      "gachaLog": "Gacha Log",
+      "cdn": "CDN / Hutao Cloud",
+      "days": "Days (negative values deduct time)",
+      "submit": "Submit"
+    },
+    "privilege": {
+      "title": "User Privileges",
+      "targetUser": "Target User",
+      "maintainer": "Maintainer",
+      "licensedDeveloper": "Licensed Developer"
+    },
+    "password": {
+      "title": "Reset User Password",
+      "targetUser": "Target User",
+      "newPassword": "New Password (at least 8 characters)",
+      "newPasswordPlaceholder": "Enter new password",
+      "submit": "Reset"
+    },
+    "detail": {
+      "title": "User Details",
+      "redeemUsedCount": "Redeem Code Redemptions",
+      "gachaUidTitle": "Gacha UIDs ({n})",
+      "colUid": "UID",
+      "colItemCount": "Gacha Log Items"
+    }
+  }
+}

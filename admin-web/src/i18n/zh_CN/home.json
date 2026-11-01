@@ -1,0 +1,82 @@
+{
+  "home": {
+    "greeting": {
+      "morning": "早上好，{name}",
+      "afternoon": "下午好，{name}",
+      "evening": "晚上好，{name}",
+      "night": "还没休息，{name}",
+      "sub": "今天是 {date}，下面是服务端的当前状态"
+    },
+    "updatedAt": "更新于 {time}",
+    "duration": {
+      "d": "{count} 天",
+      "h": "{count} 小时",
+      "m": "{count} 分",
+      "s": "{count} 秒"
+    },
+    "growth": {
+      "title": "用户与数据",
+      "total": "注册用户",
+      "today": "今日新增",
+      "last7": "近 7 日新增",
+      "last30": "近 30 日新增",
+      "maintainers": "维护者",
+      "developers": "授权开发者",
+      "banned": "封禁 UID",
+      "activeGacha": "祈愿服务中",
+      "activeCdn": "CDN 服务中",
+      "gachaItems": "祈愿记录条目",
+      "abyssRecords": "深境螺旋记录"
+    },
+    "health": {
+      "title": "服务健康",
+      "process": "进程",
+      "database": "数据库",
+      "redis": "Redis",
+      "scheduler": "定时任务",
+      "uptime": "已运行",
+      "version": "版本",
+      "cpu": "CPU 占用",
+      "memory": "工作集",
+      "ok": "正常",
+      "down": "异常",
+      "unknown": "未探测",
+      "jobsRunning": "{count} 个任务在调度",
+      "probeError": "{name}：{error}"
+    },
+    "release": {
+      "title": "当前发布版本",
+      "none": "尚未发布任何客户端版本",
+      "version": "版本号",
+      "publishedAt": "发布时间",
+      "publishedBy": "发布人",
+      "mirrors": "下载镜像",
+      "minimumVersion": "最低可升级版本",
+      "go": "前往版本发布"
+    },
+    "pending": {
+      "title": "待处理",
+      "license": "开源许可证待审批",
+      "licenseCount": "{count} 条",
+      "licenseNone": "没有待审批的申请",
+      "view": "查看",
+      "empty": "一切正常，没有待处理事项"
+    },
+    "audit": {
+      "title": "最近后台操作",
+      "operator": "操作人",
+      "action": "操作",
+      "result": "结果",
+      "time": "时间",
+      "success": "成功",
+      "failure": "失败",
+      "viewAll": "查看全部"
+    },
+    "quick": {
+      "title": "常用入口"
+    },
+    "errors": {
+      "partial": "部分数据加载失败：{names}"
+    }
+  }
+}

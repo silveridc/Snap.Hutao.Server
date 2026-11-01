@@ -744,16 +744,15 @@ public sealed class SsoTests : IDisposable
         return result;
     }
 
-    /// <summary>后台是 hash 路由，回跳参数必须落在 '#' 之后，否则前端从路由里读不到凭证.</summary>
+    /// <summary>后台是真实路径路由，回跳参数直接追加在 /admin/sso 之后.</summary>
     [Fact]
-    public void CallbackUrl_PutsTheQueryInsideTheHashFragment()
+    public void CallbackUrl_PutsTheQueryOnTheRealPath()
     {
         Dictionary<string, string?> query = new() { ["ticket"] = "T/s+K=", ["return"] = "/metadata/index" };
         string url = AdminSsoController.CallbackUrl(query);
-        int anchor = url.IndexOf('#');
 
-        Assert.StartsWith("/admin/#/sso?", url);
-        Assert.True(url.IndexOf('?') > anchor, $"查询串被放到了 '#' 之前：{url}");
+        Assert.StartsWith("/admin/sso?", url);
+        Assert.DoesNotContain("#", url);
         Dictionary<string, StringValues> parsed = QueryHelpers.ParseQuery(url[url.IndexOf('?')..]);
         Assert.Equal("T/s+K=", parsed["ticket"].ToString());
         Assert.Equal("/metadata/index", parsed["return"].ToString());

@@ -7,7 +7,6 @@ namespace server.Services.Announcement;
 // Scoped
 public sealed class AnnouncementService(AppDbContext appDbContext, IDistributedCache cache, TimeProvider timeProvider)
 {
-    private const string _snapHutaoClientHeaderPrefix = "Snap Hutao/";
     private const string _announcementCachePrefix = "Announcements:";
     private static readonly TimeSpan MinAnnouncementTimeThreshold = TimeSpan.FromDays(30);
     private static readonly TimeSpan AnnouncementCacheDuration = TimeSpan.FromMinutes(5);

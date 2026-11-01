@@ -1,0 +1,29 @@
+{
+  "loginlog": {
+    "title": "登录日志",
+    "tip": "记录客户端密码登录与单点登录的成功/失败，IP 属地按 IP 现查",
+    "filters": {
+      "keywordPlaceholder": "按邮箱或 IP 过滤",
+      "all": "全部",
+      "success": "成功",
+      "failure": "失败",
+      "search": "查询",
+      "reset": "重置"
+    },
+    "columns": {
+      "time": "时间",
+      "user": "用户",
+      "method": "方式",
+      "result": "结果",
+      "ip": "IP",
+      "region": "属地",
+      "device": "设备",
+      "reason": "失败原因"
+    },
+    "methods": {
+      "password": "密码",
+      "sso": "单点登录"
+    },
+    "empty": "暂无登录记录"
+  }
+}

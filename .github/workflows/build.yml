@@ -28,12 +28,12 @@ jobs:
         with:
           node-version: '22'
           cache: pnpm
-          cache-dependency-path: admin-ui/pnpm-lock.yaml
+          cache-dependency-path: admin-web/pnpm-lock.yaml
 
       # 产物写入 server/wwwroot/admin（emptyOutDir 会清掉仓库里已提交的旧哈希文件），
       # 必须在 dotnet publish 之前执行才会被打进发布包
-      - name: Build admin-ui
-        working-directory: admin-ui
+      - name: Build admin-web
+        working-directory: admin-web
         run: pnpm install --frozen-lockfile && pnpm run build
 
       - uses: actions/setup-dotnet@v4

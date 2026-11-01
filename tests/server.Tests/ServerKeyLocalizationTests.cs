@@ -10,7 +10,7 @@ public sealed class ServerKeyLocalizationTests
     private static readonly string[] ClientOnlyKeys = ["requestFailed", "httpError", "networkError"];
 
     /// <summary>
-    /// 契约：l10nKey 的值就是词条名，后台按 l10nKey 直接查 pages/server.json.
+    /// 契约：l10nKey 的值就是词条名，后台按 l10nKey 直接查 i18n 语言包.
     /// 常量名与取值不一致时这条链路会静默退化成服务端英文 message.
     /// </summary>
     [Fact]
@@ -36,7 +36,7 @@ public sealed class ServerKeyLocalizationTests
             .Where(value => !bundle.TryGetValue(value, out string? text) || string.IsNullOrWhiteSpace(text))
             .Order(StringComparer.Ordinal)];
 
-        Assert.True(missing.Length is 0, $"{locale} 的 pages/server.json 缺少 {missing.Length} 条 ServerKeys 词条：\n{string.Join('\n', missing)}");
+        Assert.True(missing.Length is 0, $"{locale} 的 i18n/server.json 缺少 {missing.Length} 条 ServerKeys 词条：\n{string.Join('\n', missing)}");
     }
 
     [Theory]
@@ -48,10 +48,10 @@ public sealed class ServerKeyLocalizationTests
         IReadOnlyDictionary<string, string?> bundle = ReadBundle(locale);
 
         string[] unknown = [.. bundle.Keys.Where(key => !known.Contains(key)).Order(StringComparer.Ordinal)];
-        Assert.True(unknown.Length is 0, $"{locale} 的 pages/server.json 含 ServerKeys 里没有的键（多半是改名后的残留）：\n{string.Join('\n', unknown)}");
+        Assert.True(unknown.Length is 0, $"{locale} 的 i18n/server.json 含 ServerKeys 里没有的键（多半是改名后的残留）：\n{string.Join('\n', unknown)}");
 
         string[] empty = [.. bundle.Where(pair => string.IsNullOrWhiteSpace(pair.Value)).Select(pair => pair.Key).Order(StringComparer.Ordinal)];
-        Assert.True(empty.Length is 0, $"{locale} 的 pages/server.json 有空词条：\n{string.Join('\n', empty)}");
+        Assert.True(empty.Length is 0, $"{locale} 的 i18n/server.json 有空词条：\n{string.Join('\n', empty)}");
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public sealed class ServerKeyLocalizationTests
 
     private static IReadOnlyDictionary<string, string?> ReadBundle(string locale)
     {
-        string path = Path.Combine(FindRepositoryRoot(), "admin-ui", "src", "locales", "lang", locale, "pages", "server.json");
+        string path = Path.Combine(FindRepositoryRoot(), "admin-web", "src", "i18n", locale, "server.json");
         using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
 
         return document.RootElement.GetProperty("server").EnumerateObject()
@@ -84,12 +84,12 @@ public sealed class ServerKeyLocalizationTests
     {
         for (string? directory = AppContext.BaseDirectory; directory is not null; directory = Path.GetDirectoryName(directory))
         {
-            if (Directory.Exists(Path.Combine(directory, "admin-ui")))
+            if (Directory.Exists(Path.Combine(directory, "admin-web")))
             {
                 return directory;
             }
         }
 
-        throw new InvalidOperationException($"从 {AppContext.BaseDirectory} 向上找不到含 admin-ui 的仓库根目录");
+        throw new InvalidOperationException($"从 {AppContext.BaseDirectory} 向上找不到含 admin-web 的仓库根目录");
     }
 }

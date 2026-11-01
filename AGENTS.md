@@ -3,7 +3,7 @@
 This is the self-hosted **Snap Hutao server**. The git root (`D:\projects\hutao\server`) nests two projects:
 
 - `server/` — ASP.NET Core (net10.0) Web API. The actual C# project is at `server/server/server.csproj`; the solution is `server.slnx` at the root.
-- `admin-ui/` — Vue 3 + TDesign Starter admin panel. Built output is emitted into `server/wwwroot/admin/` and served by the backend under `/admin/`.
+- `admin-web/` — React 18 + Semi Design admin panel (real path routing, no hash). Built output is emitted into `server/wwwroot/admin/` and served by the backend under `/admin/`.
 - `tests/server.Tests/` — xUnit v3 integration suite (~340 tests). It hosts the real `Program.cs` pipeline in-process via `WebApplicationFactory`; it is **not** part of `dotnet publish` and is not deployed.
 
 ## Commands
@@ -13,10 +13,10 @@ Backend (run from `server/server`):
 - Run (Development): `dotnet run` — uses `appsettings.Development.json` (local MySQL at 127.0.0.1, local Redis)
 - Add migration: `dotnet ef migrations add <Name> --context AppDbContext`
 
-Frontend (run from `admin-ui`, Node >= 22.12, package manager is **pnpm** — CI installs with `pnpm install --frozen-lockfile`):
-- Dev server: `pnpm dev` — port 5173, proxies backend API prefixes to the production host (`vite.config.ts`)
-- Build: `pnpm build` — outputs to `../server/wwwroot/admin`
-- API smoke test: `node scripts/api-smoke.mjs`
+Frontend (run from `admin-web`, Node >= 22.12, package manager is **pnpm** — CI installs with `pnpm install --frozen-lockfile`):
+- Dev server: `pnpm dev` — port 5174, `/api` proxied to the local backend (`https://localhost:7013`, override with `VITE_DEV_API_TARGET`)
+- Build: `pnpm build` — typecheck then output to `../server/wwwroot/admin`
+- Typecheck only: `pnpm typecheck`
 - Sentry: the panel reports to the self-hosted instance (`VITE_SENTRY_DSN` in `.env`, cleared in `.env.development`). The build emits **hidden** sourcemaps and, when `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` are all set in the environment, `@sentry/vite-plugin` uploads them and deletes them from the output — without those three the build skips the upload and leaves the maps on disk.
 
 Tests (~15s). `dotnet test` does **not** work on SDK 10.0.4xx: xunit.v3 ships Microsoft.Testing.Platform, which refuses the VSTest host (`Testing with VSTest target is no longer supported`). Build, then run the test binary directly:
@@ -34,9 +34,9 @@ Tests (~15s). `dotnet test` does **not** work on SDK 10.0.4xx: xunit.v3 ships Mi
 
 **Migrations are generated offline.** The production MySQL is not reachable from the dev/build environment, so `DesignTimeAppDbContextFactory` pins `MySqlServerVersion(8,0,32)` instead of `ServerVersion.AutoDetect` (runtime `Program.cs` still AutoDetects the real server). Migrations **auto-apply only in RELEASE builds** at startup (`Program.MigrateDatabase`, `[Conditional("RELEASE")]`) — there is no manual `database update` step. After generating a migration, open the `Up()`/`Down()` and confirm it contains only the intended schema ops before deploying.
 
-**Response envelope.** API responses use `Models/Response/Response.cs` with a `retcode` (`ReturnCode` enum), `message` (English), and optional `data`/`l10nKey`. Use `Response.Success(...)` / `Response.Fail(code, msg, key)` / `Response<T>.Success(...)` — static messages must pass an `l10nKey` from `server/ServerKeys.cs`; messages with runtime interpolation stay English without a key. The frontend axios client (`admin-ui/src/api/request.js`) unwraps this envelope, auto-refreshes tokens on `514002`, treats non-envelope bodies as pass-through third-party data, and rewrites `message` through `l10nKey` (namespace `pages.server.*`).
+**Response envelope.** API responses use `Models/Response/Response.cs` with a `retcode` (`ReturnCode` enum), `message` (English), and optional `data`/`l10nKey`. Use `Response.Success(...)` / `Response.Fail(code, msg, key)` / `Response<T>.Success(...)` — static messages must pass an `l10nKey` from `server/ServerKeys.cs`; messages with runtime interpolation stay English without a key. The frontend axios client (`admin-web/src/lib/http.ts`) unwraps this envelope, auto-refreshes tokens on `514002`, treats non-envelope bodies as pass-through third-party data, and rewrites `message` through `l10nKey` (namespace `server.*`).
 
-**Routing conventions (2026-10-30).** Internal APIs are REST-shaped: `/api/<resource>` for launcher/public resources and `/api/admin/<resource>` for admin-only ones; use the verb that matches the operation (GET read, POST create/action, PUT/PATCH update, DELETE remove) and keep verbs, `Get`, `Update`, `List` and `SetEnabled` out of path segments. Route parameters carry ids (`/users/{userId}`, `/bans/{uid}`); list filters stay in the query. Only external contracts are exempt: `/patch/hutao` (forced updates) and the third-party callbacks `/api/OAuth/Callback/GitHub`, `/Admin/Sso/Callback`, `/Passport/Sso/Callback`, `/api/Webhook/Incoming/Afdian`. The launcher and admin-ui are updated in the same change; do not add legacy route aliases.
+**Routing conventions (2026-10-30).** Internal APIs are REST-shaped: `/api/<resource>` for launcher/public resources and `/api/admin/<resource>` for admin-only ones; use the verb that matches the operation (GET read, POST create/action, PUT/PATCH update, DELETE remove) and keep verbs, `Get`, `Update`, `List` and `SetEnabled` out of path segments. Route parameters carry ids (`/users/{userId}`, `/bans/{uid}`); list filters stay in the query. Only external contracts are exempt: `/patch/hutao` (forced updates) and the third-party callbacks `/api/OAuth/Callback/GitHub`, `/Admin/Sso/Callback`, `/Passport/Sso/Callback`, `/api/Webhook/Incoming/Afdian`. The launcher and admin panel are updated in the same change; do not add legacy route aliases.
 
 **Auth.** JWT bearer (`Program.cs`) plus ASP.NET Identity (`HutaoUser`). Get the current user with the `GetUserId()` / `TryGetUserId()` extensions (`Controllers/UserAuthorizationExtension.cs`), which read the `PassportClaimTypes.UserId` claim. Login is via OAuth (GitHub) with AES-encrypted state, plus passport/password flows.
 
@@ -51,9 +51,9 @@ Tests (~15s). `dotnet test` does **not** work on SDK 10.0.4xx: xunit.v3 ships Mi
 - `ImplicitUsings` is **disabled**; common usings are centralized in `server/GlobalUsing.cs`. Add shared namespaces there rather than per-file.
 - `Nullable` is enabled. `SuppressImplicitRequiredAttributeForNonNullableReferenceTypes` is on, so non-nullable reference types are **not** treated as `[Required]`.
 - JSON uses original property names (no camelCase policy), ignores nulls when writing, and is case-insensitive on read.
-- Code comments remain Chinese; API response messages are English + `l10nKey` (see Response envelope above). Client-side translations live in the launcher's `SH.resx`/`SH.en.resx` and in `admin-ui/src/locales/lang/<locale>/pages/server.json` — after adding/changing keys in `ServerKeys.cs`, update the launcher resx and rerun `node scripts/extract-server-l10n.mjs` (from `admin-ui/`) to regenerate the admin panel's copy from the launcher resx.
+- Code comments remain Chinese; API response messages are English + `l10nKey` (see Response envelope above). Client-side translations live in the launcher's `SH.resx`/`SH.en.resx` and in `admin-web/src/i18n/<locale>/server.json` — after adding/changing keys in `ServerKeys.cs`, update the launcher resx and rerun `node scripts/extract-server-l10n.mjs` (from `admin-web/`) to regenerate the admin panel's copy from the launcher resx. The generator requires each `ServerKeys` constant name to equal its value, and `ServerKeyLocalizationTests` asserts both locales cover every key with no leftovers.
+- Frontend uses Semi Design components (`@douyinfe/semi-ui`) with Tailwind utilities for layout; the dark theme is Semi's `theme-mode="dark"` attribute on `<body>` plus a `dark` class on `<html>` (see `src/lib/theme.ts`). Backend calls go through the single axios client `@/lib/http`. Page UI strings are i18n'd via per-page fragments (`src/i18n/<locale>/<page>.json`, each file carrying its own top-level namespace; use `t`/`te` from `@/i18n`).
 - **DI lifetime markers are a bare keyword.** A class annotated with its lifetime gets exactly `// Singleton`, `// Scoped` or `// Transient` on the line above the type — no `：` explanation, no parenthetical rationale. If the "why" matters (e.g. it depends on a scoped service), write it next to the registration in `Program.cs` or in the commit message, not on the marker.
-- Frontend uses TDesign Vue Next components (keep the official TDesign starter look). Two API layers coexist: the starter's TS client (`@/utils/request`) and a purpose-built JS axios client (`@/api/request.js` + `@/api/service.js`) for the backend envelope — new backend calls go through the latter. Page UI strings are i18n'd via per-page locale fragments (`src/locales/lang/<locale>/pages/<page>.json`, use `$t` in templates / `t` from `@/locales` in scripts).
 
 ## Code style (StyleCop)
 

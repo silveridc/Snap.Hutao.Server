@@ -8,14 +8,13 @@ namespace server.Controllers;
 [ApiExplorerSettings(GroupName = "Services")]
 public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<AdminSsoController> logger) : ControllerBase
 {
-    private const string _callbackPage = "/admin/#/sso";
+    private const string _callbackPage = "/admin/sso";
 
     /// <summary>
-    /// 拼出带回跳参数的地址.后台是 hash 路由，参数必须写在 <c>#</c> 之后前端才读得到，
-    /// 而 QueryHelpers 会把查询串插到 <c>#</c> 之前，所以只取它编码好的那一段自己接上去.
+    /// 拼出带回跳参数的地址.后台是真实路径路由，查询串直接追加在路径后即可.
     /// </summary>
     /// <param name="query">要带给回跳页的参数.</param>
-    /// <returns>形如 <c>/admin/#/sso?ticket=...</c> 的地址.</returns>
+    /// <returns>形如 <c>/admin/sso?ticket=...</c> 的地址.</returns>
     public static string CallbackUrl(IDictionary<string, string?> query)
     {
         return $"{_callbackPage}{QueryString.Create(query).ToUriComponent()}";
@@ -61,7 +60,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     }
 
     /// <summary>
-    /// 身份源的回调入口.无论成功与否都只回跳后台页面，凭证只出现在 hash 片段里.
+    /// 身份源的回调入口.无论成功与否都只回跳后台页面，票据只出现在一次性查询串里.
     /// </summary>
     /// <param name="code">身份源返回的授权码.</param>
     /// <param name="state">身份源原样带回的 state.</param>

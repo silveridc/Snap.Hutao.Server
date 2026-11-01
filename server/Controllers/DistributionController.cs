@@ -17,12 +17,7 @@ public class DistributionController(DistributionService distributionService) : C
     public async Task<IActionResult> GetDownloadToken()
     {
         string? token = await distributionService.GetDownloadTokenAsync();
-        if (token is null)
-        {
-            return Fail("Failed to acquire download token", ReturnCode.CdnDispatcherException, ServerKeys.ServerCdnDownloadTokenFailed);
-        }
-
-        return Success<string>("Download token acquired successfully", token, ServerKeys.ServerCdnDownloadTokenSucceed);
+        return token is null ? Fail("Failed to acquire download token", ReturnCode.CdnDispatcherException, ServerKeys.ServerCdnDownloadTokenFailed) : Success<string>("Download token acquired successfully", token, ServerKeys.ServerCdnDownloadTokenSucceed);
     }
 
     /// <summary>
@@ -36,11 +31,6 @@ public class DistributionController(DistributionService distributionService) : C
     public async Task<IActionResult> GetAcceleratedMirror([FromQuery(Name = "filename")] string filename)
     {
         HutaoPackageMirror? mirror = await distributionService.GetAcceleratedMirrorAsync(filename);
-        if (mirror is null)
-        {
-            return Fail("Failed to acquire accelerated mirror", ReturnCode.CdnDispatcherException, ServerKeys.ServerCdnMirrorFailed);
-        }
-
-        return Success<HutaoPackageMirror?>("Accelerated mirror acquired successfully", mirror, ServerKeys.ServerCdnMirrorSucceed);
+        return mirror is null ? Fail("Failed to acquire accelerated mirror", ReturnCode.CdnDispatcherException, ServerKeys.ServerCdnMirrorFailed) : Success<HutaoPackageMirror?>("Accelerated mirror acquired successfully", mirror, ServerKeys.ServerCdnMirrorSucceed);
     }
 }

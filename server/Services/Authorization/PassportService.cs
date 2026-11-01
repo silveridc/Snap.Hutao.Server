@@ -243,6 +243,11 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
         return Convert.ToBase64String(randomBytes);
     }
 
+    private static string? Truncate(string? value, int maxLength)
+    {
+        return value is null || value.Length <= maxLength ? value : value[..maxLength];
+    }
+
     private string CreateAccessToken(int userId, DeviceInfo? deviceInfo)
     {
         JwtSecurityTokenHandler handler = new();
@@ -277,9 +282,9 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
             Token = GenerateRefreshToken(),
             ExpiresAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(_refreshTokenExpirationDays),
             CreatedAt = timeProvider.GetUtcNow().UtcDateTime,
-            DeviceId = deviceInfo.DeviceId,
-            DeviceName = deviceInfo.DeviceName,
-            OperatingSystem = deviceInfo.OperatingSystem,
+            DeviceId = Truncate(deviceInfo.DeviceId, 64)!,
+            DeviceName = Truncate(deviceInfo.DeviceName?.Trim(), 128),
+            OperatingSystem = Truncate(deviceInfo.OperatingSystem?.Trim(), 64),
         };
 
         await appDbContext.RefreshTokens.AddAndSaveAsync(refreshToken);

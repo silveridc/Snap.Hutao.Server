@@ -1,1 +1,0 @@
-import{L as e,V as t,m as n,y as r}from"./runtime-core.esm-bundler-CDCPj5Mz.js";import{t as i}from"./index-Boq6jWDD.js";var a={},o={class:`tdesign-wrapper`};function s(i,a){let s=t(`router-view`);return e(),n(`div`,o,[r(s)])}var c=i(a,[[`render`,s],[`__scopeId`,`data-v-267f85e0`]]);export{c as default};

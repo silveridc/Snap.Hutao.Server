@@ -16,8 +16,6 @@
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
-# admin-ui 的版本发布页和 Release 构建产物目录同名，单独放行
-!admin-ui/src/pages/release/
 x64/
 x86/
 bld/

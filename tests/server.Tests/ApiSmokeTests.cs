@@ -15,9 +15,10 @@ public sealed class ApiSmokeTests
         client = factory.CreateApiClient();
     }
 
-    /// <summary>不返回统一响应外壳的接口前缀（第三方透传、302 重定向、回调协议自有格式）.</summary>
+    /// <summary>不返回统一响应外壳的接口前缀（第三方透传、302 重定向、回调协议自有格式、后台静态页面）.</summary>
     private static readonly string[] RawEndpointPrefixes =
     [
+        "/admin/",
         "/api/Enka",
         "/api/oauth/authorizations",
         "/api/OAuth/Callback",
@@ -165,6 +166,10 @@ public sealed class ApiSmokeTests
         { "GET", "/api/admin/sso/challenge", null },
         { "GET", "/Admin/Sso/Callback?code=smoke&state=smoke", null },
         { "POST", "/api/admin/sso/sessions", """{"Ticket":"smoke"}""" },
+
+        // 后台 SPA 深链接回落到入口页（真实路径路由，回落端点同时注册 GET 与 HEAD）
+        { "GET", "/admin/sso", null },
+        { "HEAD", "/admin/sso", null },
 
         // 启动器单点登录：同样只跑拒绝分支，成功链路见 SsoTests 与 upd-test/sso-e2e
         { "GET", "/api/passport/sso/status", null },

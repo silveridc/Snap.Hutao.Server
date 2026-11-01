@@ -40,7 +40,7 @@ public class BingWallpaper(IHttpClientFactory httpClientFactory, IDistributedCac
     }
 }
 
-file class BingApiResponse
+file sealed class BingApiResponse
 {
     [JsonPropertyName("images")]
     public List<BingImageItem>? Images
@@ -49,7 +49,7 @@ file class BingApiResponse
     }
 }
 
-file class BingImageItem
+file sealed class BingImageItem
 {
     [JsonPropertyName("enddate")]
     public string EndDate { get; set; } = string.Empty;

@@ -27,7 +27,7 @@ public sealed class AdminAnnouncementController(AnnouncementService announcement
     }
 
     /// <summary>
-    /// 分页获取公告列表（含历史，不做版本过滤）.
+    /// 分页获取公告列表.
     /// </summary>
     [HttpGet("announcements")]
     public async Task<IActionResult> AnnouncementListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)

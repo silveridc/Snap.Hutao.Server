@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/Solution Items/" />
-  <Project Path="admin-ui/admin-ui.esproj">
+  <Project Path="admin-web/admin-web.esproj">
     <Build />
     <Deploy />
   </Project>

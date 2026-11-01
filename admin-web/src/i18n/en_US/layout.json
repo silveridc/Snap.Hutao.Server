@@ -1,0 +1,38 @@
+{
+  "layout": {
+    "slogan": "Server operations console",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "userMenu": {
+      "profile": "Account",
+      "settings": "Settings"
+    },
+    "identity": {
+      "kindAdmin": "Admin account",
+      "kindUser": "Site user"
+    },
+    "nav": {
+      "home": "Home",
+      "dashboard": "Overview",
+      "user": "Users",
+      "ban": "Bans",
+      "statistics": "Statistics",
+      "rank": "Leaderboard",
+      "compensation": "Compensation",
+      "announcement": "Announcements",
+      "release": "Releases",
+      "wallpaper": "Wallpaper",
+      "redeem": "Redeem codes",
+      "datatools": "Data tools",
+      "cache": "Cache",
+      "audit": "Audit log",
+      "loginlog": "Login log",
+      "analytics": "Analytics",
+      "mailtemplate": "Mail template",
+      "license": "Licenses",
+      "adminaccount": "Admin accounts",
+      "clientversion": "Client versions",
+      "settings": "Settings"
+    }
+  }
+}

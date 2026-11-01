@@ -5,7 +5,7 @@ namespace server.Controllers;
 
 [Route("api/wallpapers")]
 [ApiController]
-[ApiExplorerSettings(IgnoreApi = true)]
+[ApiExplorerSettings(GroupName = "Public")]
 
 public class WallpaperController(BingWallpaper bing, HoyoPlayWallpaper hyp, CuratedWallpaper curated) : Controller
 {

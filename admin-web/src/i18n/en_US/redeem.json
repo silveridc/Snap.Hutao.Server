@@ -1,0 +1,88 @@
+{
+  "redeem": {
+    "service": {
+      "gachalog": "Gacha Log",
+      "cdn": "CDN / Hutao Cloud"
+    },
+    "limit": {
+      "time": "Time-limited",
+      "times": "Use-limited",
+      "none": "No limit"
+    },
+    "gen": {
+      "title": "Generate Redeem Codes",
+      "tipPre": "Maps to ",
+      "tipSuf": ". Time and use limits can be combined.",
+      "serviceType": "Service Type",
+      "count": "Count",
+      "valueDays": "Duration (days)",
+      "limitMode": "Limits",
+      "limitModeHint": "Leave both unchecked for an expiry-free, use-free code",
+      "expireTime": "Expiration Time",
+      "times": "Allowed Uses",
+      "description": "Notes",
+      "descriptionPlaceholder": "Optional, describe what these codes are for",
+      "submit": "Generate",
+      "resultCount": "{n} redeem codes generated",
+      "copyAll": "Copy All",
+      "copied": "Copied to clipboard",
+      "copyFail": "Copy failed, please select and copy the text manually"
+    },
+    "use": {
+      "title": "Redeem on Behalf",
+      "tipPre": "Maps to ",
+      "tipSuf": ". Leave the user empty to redeem for the signed-in account.",
+      "code": "Redeem Code",
+      "codePlaceholder": "18-character redeem code",
+      "username": "Target User",
+      "usernamePlaceholder": "User name / email, empty means current account",
+      "submit": "Redeem",
+      "result": "Redeemed: {service} extended by {days} days, expires at {expire}"
+    },
+    "list": {
+      "title": "Redeem Codes",
+      "searchPlaceholder": "Search by code / notes / creator",
+      "colCode": "Code",
+      "colService": "Service",
+      "colValue": "Days",
+      "colLimit": "Limits",
+      "colExpire": "Expires At",
+      "colUsed": "Used / Cap",
+      "colDescription": "Notes",
+      "colCreator": "Creator",
+      "colCreateTime": "Created At",
+      "colOp": "Actions",
+      "batchDelete": "Batch Delete ({n})",
+      "exportCsv": "Export CSV"
+    },
+    "edit": {
+      "title": "Edit Redeem Code"
+    },
+    "actions": {
+      "uses": "Usages"
+    },
+    "dialog": {
+      "removeTitle": "Delete Redeem Code",
+      "removeBody": "Delete redeem code {code}? Its usage records will be deleted too.",
+      "batchRemoveTitle": "Batch Delete Redeem Codes",
+      "batchRemoveBody": "Delete the {n} selected redeem codes? Their usage records will be deleted too."
+    },
+    "messages": {
+      "countRequired": "Please enter how many codes to generate",
+      "codeRequired": "Please enter a redeem code",
+      "expireTimeRequired": "Time limit is checked, please pick the expiration time",
+      "timesRequired": "Use limit is checked, please enter the allowed uses",
+      "selectFirst": "Select the codes to delete first",
+      "batchDeleted": "Deleted {n} redeem codes",
+      "exportEmpty": "No redeem codes to export",
+      "exportLimited": "More than {max} codes exist, only the first {max} were exported"
+    },
+    "uses": {
+      "title": "Usages of {code}",
+      "colUser": "User",
+      "colUserId": "User ID",
+      "colTime": "Used At",
+      "empty": "Nobody has redeemed this code yet"
+    }
+  }
+}

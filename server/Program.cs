@@ -407,6 +407,10 @@ public static class Program
         // Endpoint
         app.MapControllers();
 
+        // 后台 SPA 是真实路径路由，深链接直接访问或刷新时回落到入口页
+        // nonfile 约束保证带扩展名的请求（js/css/map 等静态资源）不被回落到 index.html
+        app.MapFallbackToFile("admin/{*path:nonfile}", "admin/index.html");
+
         // Initialize dynamic config from DB
         await app.Services.GetRequiredService<SystemConfigService>().InitializeAsync();
         _logger.LogInformation($"Api Version:{applicationVersion}");

@@ -1,0 +1,81 @@
+@layer tailwind-base, semi, tailwind-components, tailwind-utils;
+
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-components {
+  @tailwind components;
+}
+
+@layer tailwind-utils {
+  @tailwind utilities;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Lato, 'Helvetica Neue', Arial, Helvetica, 'Microsoft YaHei', sans-serif;
+  color: var(--semi-color-text-0);
+  background-color: var(--semi-color-bg-0);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+/* 等宽数字与代码类文本，后台大量指标要靠它对齐 */
+.mono {
+  font-family: 'JetBrains Mono', 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 卡片内的「标签 / 值」两列行，替代原先一排 t-descriptions */
+.info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--semi-color-border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--semi-color-text-2);
+}
+
+.info-value {
+  min-width: 0;
+  text-align: right;
+  word-break: break-all;
+  font-size: 13px;
+  color: var(--semi-color-text-0);
+}
+
+/* 侧栏在窄屏收起后不要让导航文字换行 */
+.semi-navigation-item {
+  margin-bottom: 4px !important;
+  border-radius: 8px !important;
+}
+
+.semi-navigation-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
