@@ -1536,6 +1536,8 @@ public partial class NormalizeSchema : Migration
             table: "asp_net_role_claims",
             newName: "ix_asp_net_role_claims_role_id");
 
+        migrationBuilder.Sql("UPDATE `spiral_abysses_statistics` SET `name` = LEFT(`name`, 64) WHERE `name` IS NOT NULL AND CHAR_LENGTH(`name`) > 64;");
+
         migrationBuilder.AlterColumn<string>(
             name: "name",
             table: "spiral_abysses_statistics",
@@ -1558,6 +1560,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `redeem_codes` SET `description` = LEFT(`description`, 1024) WHERE `description` IS NOT NULL AND CHAR_LENGTH(`description`) > 1024;");
+
         migrationBuilder.AlterColumn<string>(
             name: "description",
             table: "redeem_codes",
@@ -1568,6 +1572,8 @@ public partial class NormalizeSchema : Migration
             oldType: "longtext")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `redeem_codes` SET `creator` = LEFT(`creator`, 128) WHERE `creator` IS NOT NULL AND CHAR_LENGTH(`creator`) > 128;");
 
         migrationBuilder.AlterColumn<string>(
             name: "creator",
@@ -1580,6 +1586,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `license_application_records` SET `project_url` = LEFT(`project_url`, 512) WHERE `project_url` IS NOT NULL AND CHAR_LENGTH(`project_url`) > 512;");
+
         migrationBuilder.AlterColumn<string>(
             name: "project_url",
             table: "license_application_records",
@@ -1590,6 +1598,8 @@ public partial class NormalizeSchema : Migration
             oldType: "longtext")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `license_application_records` SET `approval_code` = LEFT(`approval_code`, 64) WHERE `approval_code` IS NOT NULL AND CHAR_LENGTH(`approval_code`) > 64;");
 
         migrationBuilder.AlterColumn<string>(
             name: "approval_code",
@@ -1602,6 +1612,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `hutao_logs` SET `version` = LEFT(`version`, 32) WHERE `version` IS NOT NULL AND CHAR_LENGTH(`version`) > 32;");
+
         migrationBuilder.AlterColumn<string>(
             name: "version",
             table: "hutao_logs",
@@ -1613,6 +1625,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `gacha_statistics` SET `name` = LEFT(`name`, 64) WHERE `name` IS NOT NULL AND CHAR_LENGTH(`name`) > 64;");
+
         migrationBuilder.AlterColumn<string>(
             name: "name",
             table: "gacha_statistics",
@@ -1623,6 +1637,8 @@ public partial class NormalizeSchema : Migration
             oldType: "longtext")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `gacha_events` SET `locale` = LEFT(`locale`, 16) WHERE `locale` IS NOT NULL AND CHAR_LENGTH(`locale`) > 16;");
 
         migrationBuilder.AlterColumn<string>(
             name: "locale",
@@ -1646,6 +1662,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `gacha_events` SET `version` = LEFT(`version`, 32) WHERE `version` IS NOT NULL AND CHAR_LENGTH(`version`) > 32;");
+
         migrationBuilder.AlterColumn<string>(
             name: "version",
             table: "gacha_events",
@@ -1656,6 +1674,8 @@ public partial class NormalizeSchema : Migration
             oldType: "varchar(255)")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `banned` SET `reason` = LEFT(`reason`, 512) WHERE `reason` IS NOT NULL AND CHAR_LENGTH(`reason`) > 512;");
 
         migrationBuilder.AlterColumn<string>(
             name: "reason",
@@ -1669,6 +1689,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `announcements` SET `title` = LEFT(`title`, 256) WHERE `title` IS NOT NULL AND CHAR_LENGTH(`title`) > 256;");
+
         migrationBuilder.AlterColumn<string>(
             name: "title",
             table: "announcements",
@@ -1680,6 +1702,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `announcements` SET `locale` = LEFT(`locale`, 16) WHERE `locale` IS NOT NULL AND CHAR_LENGTH(`locale`) > 16;");
+
         migrationBuilder.AlterColumn<string>(
             name: "locale",
             table: "announcements",
@@ -1690,6 +1714,8 @@ public partial class NormalizeSchema : Migration
             oldType: "varchar(255)")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `announcements` SET `max_present_version` = LEFT(`max_present_version`, 32) WHERE `max_present_version` IS NOT NULL AND CHAR_LENGTH(`max_present_version`) > 32;");
 
         migrationBuilder.AlterColumn<string>(
             name: "max_present_version",
@@ -1703,6 +1729,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `allowed_versions` SET `header` = LEFT(`header`, 64) WHERE `header` IS NOT NULL AND CHAR_LENGTH(`header`) > 64;");
+
         migrationBuilder.AlterColumn<string>(
             name: "header",
             table: "allowed_versions",
@@ -1714,6 +1742,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `admin_audit_logs` SET `action` = LEFT(`action`, 128) WHERE `action` IS NOT NULL AND CHAR_LENGTH(`action`) > 128;");
+
         migrationBuilder.AlterColumn<string>(
             name: "action",
             table: "admin_audit_logs",
@@ -1724,6 +1754,8 @@ public partial class NormalizeSchema : Migration
             oldType: "longtext")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `refresh_tokens` SET `operating_system` = LEFT(`operating_system`, 64) WHERE `operating_system` IS NOT NULL AND CHAR_LENGTH(`operating_system`) > 64;");
 
         migrationBuilder.AlterColumn<string>(
             name: "operating_system",
@@ -1737,6 +1769,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `refresh_tokens` SET `device_name` = LEFT(`device_name`, 128) WHERE `device_name` IS NOT NULL AND CHAR_LENGTH(`device_name`) > 128;");
+
         migrationBuilder.AlterColumn<string>(
             name: "device_name",
             table: "refresh_tokens",
@@ -1749,6 +1783,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `refresh_tokens` SET `device_id` = LEFT(`device_id`, 64) WHERE `device_id` IS NOT NULL AND CHAR_LENGTH(`device_id`) > 64;");
+
         migrationBuilder.AlterColumn<string>(
             name: "device_id",
             table: "refresh_tokens",
@@ -1759,6 +1795,8 @@ public partial class NormalizeSchema : Migration
             oldType: "longtext")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `oauth_bind_identities` SET `refresh_token` = LEFT(`refresh_token`, 1024) WHERE `refresh_token` IS NOT NULL AND CHAR_LENGTH(`refresh_token`) > 1024;");
 
         migrationBuilder.AlterColumn<string>(
             name: "refresh_token",
@@ -1771,6 +1809,8 @@ public partial class NormalizeSchema : Migration
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+        migrationBuilder.Sql("UPDATE `oauth_bind_identities` SET `provider_id` = LEFT(`provider_id`, 256) WHERE `provider_id` IS NOT NULL AND CHAR_LENGTH(`provider_id`) > 256;");
+
         migrationBuilder.AlterColumn<string>(
             name: "provider_id",
             table: "oauth_bind_identities",
@@ -1781,6 +1821,8 @@ public partial class NormalizeSchema : Migration
             oldType: "longtext")
             .Annotation("MySql:CharSet", "utf8mb4")
             .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+        migrationBuilder.Sql("UPDATE `oauth_bind_identities` SET `display_name` = LEFT(`display_name`, 128) WHERE `display_name` IS NOT NULL AND CHAR_LENGTH(`display_name`) > 128;");
 
         migrationBuilder.AlterColumn<string>(
             name: "display_name",
