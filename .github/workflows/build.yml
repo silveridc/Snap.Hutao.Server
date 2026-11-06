@@ -27,12 +27,11 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: ci-root-pwd
-          # 默认只允许 root@localhost，而容器里看到的客户端是 docker 网关地址
           MYSQL_ROOT_HOST: '%'
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+          MYSQL_OPTIONS: --local-infile=1
         ports: ['3306:3306']
         options: >-
-          --default-authentication-plugin=mysql_native_password
-          --local-infile=1
           --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci-root-pwd"
           --health-interval=10s
           --health-timeout=5s
