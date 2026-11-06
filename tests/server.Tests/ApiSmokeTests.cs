@@ -33,7 +33,7 @@ public sealed class ApiSmokeTests
     private static string UniqueUser(string tag) => $"smoke-{tag}-{Guid.NewGuid():N}@example.com";
 
     /// <summary>
-    /// 构造 PassportRequest 请求体.UserName / Password / VerifyCode 等字段
+    /// 构造 PassportRequest 请求体.UserName / Password / VerifyCode / Token 等字段
     /// 在客户端均以 RSA-OAEP-SHA1 加密后提交，这里按同样规则构造.
     /// </summary>
     private static string PassportBody(
@@ -41,7 +41,8 @@ public sealed class ApiSmokeTests
         string? password = null,
         string? verifyCode = null,
         string? newUserName = null,
-        string? newVerifyCode = null)
+        string? newVerifyCode = null,
+        string? token = null)
     {
         List<string> fields = [];
         if (userName is not null)
@@ -67,6 +68,11 @@ public sealed class ApiSmokeTests
         if (newVerifyCode is not null)
         {
             fields.Add($"\"NewVerifyCode\":\"{RsaPayload.Encrypt(newVerifyCode)}\"");
+        }
+
+        if (token is not null)
+        {
+            fields.Add($"\"Token\":\"{RsaPayload.Encrypt(token)}\"");
         }
 
         return "{" + string.Join(',', fields) + "}";
@@ -131,7 +137,8 @@ public sealed class ApiSmokeTests
         { "POST", "/api/passport/v2/verification-codes", PassportBody(userName: UniqueUser("v2-verify")) },
         { "POST", "/api/passport/v2/accounts", PassportBody(userName: UniqueUser("v2-register"), password: "TestPassword123", verifyCode: "INVALID0") },
         { "DELETE", "/api/passport/v2/accounts/me", PassportBody(userName: UniqueUser("v2-cancel"), password: "TestPassword123", verifyCode: "INVALID0") },
-        { "PUT", "/api/passport/v2/accounts/me/password", PassportBody(userName: UniqueUser("v2-resetpwd"), password: "TestPassword123", verifyCode: "INVALID0") },
+        { "PUT", "/api/passport/v2/password/reset", PassportBody(password: "TestPassword123", token: "INVALIDTOKEN") },
+        { "GET", "/api/passport/v2/password/reset/00000000000000000000000000000000", null },
         { "PUT", "/api/passport/v2/accounts/me/username", PassportBody(userName: UniqueUser("v2-resetname"), verifyCode: "INVALID0", newUserName: UniqueUser("v2-resetname-new"), newVerifyCode: "INVALID1") },
         { "POST", "/api/passport/v2/sessions", PassportBody(userName: UniqueUser("v2-login"), password: "TestPassword123") },
 

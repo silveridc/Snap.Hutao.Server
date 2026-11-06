@@ -281,7 +281,7 @@ public sealed partial class ReleaseService(AppDbContext appDbContext, AppOptions
                 uri.Authority is not null &&
                 string.Equals(uri.Authority, host, StringComparison.OrdinalIgnoreCase))
             {
-                mirror.Url = S3Presigner.PresignGet(mirror.Url, region, accessKeyId, secretAccessKey, expiresHours * 3600, timeProvider.GetUtcNow());
+                mirror.Url = S3Presigner.Presign(mirror.Url, HttpMethod.Get, region, accessKeyId, secretAccessKey, expiresHours * 3600, timeProvider.GetUtcNow());
             }
         }
     }

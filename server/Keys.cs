@@ -9,6 +9,26 @@ public static class Keys
     public const string AfdianSkuGachaLog = "Afdian.SkuGachaLogUploadService";
     public const string Afdian2SkuCdn = "Afdian2.SkuCdnService";
     public const string SmtpDiagnosticEmail = "Smtp.DiagnosticEmailAddress";
+    public const string SmtpServer = "Smtp.Server";
+    public const string SmtpPort = "Smtp.Port";
+    public const string SmtpSecurity = "Smtp.Security";
+    public const string SmtpUserName = "Smtp.UserName";
+    public const string SmtpPassword = "Smtp.Password";
+    public const string SmtpFromName = "Smtp.FromName";
+    public const string SmtpFromAddress = "Smtp.FromAddress";
+    public const string SmtpTimeoutSeconds = "Smtp.TimeoutSeconds";
+    public const string RecaptchaSiteKey = "Recaptcha.SiteKey";
+    public const string RecaptchaSecretKey = "Recaptcha.SecretKey";
+    public const string RecaptchaMinScore = "Recaptcha.MinScore";
+    public const string VerificationCodeExpireSeconds = "Passport.VerificationCodeExpireSeconds";
+    public const string VerificationResendCooldownSeconds = "Passport.VerificationResendCooldownSeconds";
+    public const string ResetPasswordLinkExpireSeconds = "Passport.ResetPasswordLinkExpireSeconds";
+    public const string RegistrationGiftDays = "Passport.RegistrationGiftDays";
+    public const string GachaLogMaxUidPerUser = "GachaLog.MaxUidPerUser";
+    public const string GachaLogExtendDays = "GachaLog.ExtendDays";
+    public const string RedeemCodeExpireDays = "Redeem.CodeExpireDays";
+    public const string JobLogRetentionDays = "JobLog.RetentionDays";
+    public const string SpiralAbyssRecordRetentionDays = "SpiralAbyss.RecordRetentionDays";
     public const string MaintenanceMode = "System.MaintenanceMode";
     public const string RegistrationEnabled = "System.RegistrationEnabled";
     public const string CaptchaEnabled = "System.CaptchaEnabled";
@@ -23,6 +43,8 @@ public static class Keys
     public const string PatchS3ExpiresHours = "Patch.S3.ExpiresHours";
     public const string WallpaperTodayPool = "Wallpaper.Today.Pool";
     public const string MailTemplateHtml = "Mail.TemplateHtml";
+    public const string MailSystemName = "Mail.SystemName";
+    public const string MailPublicBaseUrl = "Mail.PublicBaseUrl";
 
     // 旧版单张配置，只作为壁纸池缺失时的回退，后台不再提供编辑入口
     public const string WallpaperTodayUrl = "Wallpaper.Today.Url";

@@ -250,7 +250,7 @@ export default function AnnouncementPage() {
             width: 130,
             fixed: 'right' as const,
             render: (_value: unknown, record: AnnouncementItem) => (
-              <Space spacing="tight">
+              <Space spacing="tight" wrap>
                 <Button size="small" theme="borderless" onClick={() => setEditing({ row: record, draft: toDraft(record) })}>
                   {t('common.edit')}
                 </Button>

@@ -193,9 +193,12 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
 
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:PrimaryMysql8", connectionString);
-        builder.UseSetting("ConnectionStrings:MetadataMysql8", connectionString);
         builder.UseSetting("App:RedisAddress", $"127.0.0.1:{RedisPort}");
         builder.UseSetting("App:Socket:Status", "false");
+
+        // 空 DSN 关闭 Sentry：不关的话每次跑测试都会往生产 Sentry 项目发 session，
+        // release health 统计里全是 CI 的假量
+        builder.UseSetting("App:SentryDsn", string.Empty);
         // 打开真实来源 IP：ForwardedHeaders 会把 X-Real-IP 还原成 RemoteIpAddress，
         // 审计日志记录的 IP 与属地解析共用这条链路，关掉就没法在测试里带上公网地址
         builder.UseSetting("App:RealIp:Status", "true");

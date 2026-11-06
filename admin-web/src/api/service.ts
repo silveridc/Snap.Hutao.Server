@@ -11,8 +11,12 @@ import type {
   DamageAnalytics,
   GachaAnalytics,
   HutaoReleaseItem,
+  JobLogItem,
   LicenseApplicationItem,
   LoginLogItem,
+  MailContentPayload,
+  MailContentSummary,
+  MailContentUpdateRequest,
   MailTemplatePayload,
   PagedResult,
   RankEntry,
@@ -70,6 +74,16 @@ export async function getLoginLogs(params: {
   success?: boolean;
 }): Promise<PagedResult<LoginLogItem>> {
   const envelope = await get<PagedResult<LoginLogItem>>('/api/admin/login-logs', params);
+  return envelope.data;
+}
+
+export async function getJobLogs(params: {
+  page: number;
+  pageSize: number;
+  jobType?: string;
+  success?: boolean;
+}): Promise<PagedResult<JobLogItem>> {
+  const envelope = await get<PagedResult<JobLogItem>>('/api/admin/job-logs', params);
   return envelope.data;
 }
 
@@ -138,7 +152,9 @@ export async function getReleaseBucketObjects(prefix: string): Promise<ReleaseBu
 }
 
 export async function publishReleaseFromBucket(form: ReleasePublishFromBucketForm): Promise<string> {
-  const envelope = await post<HutaoReleaseItem>('/api/admin/releases/from-bucket', form);
+  // 不带 SHA-256 时服务端要整对象下载才能算哈希，369 MiB 远超默认 20 秒，与服务端 30 分钟读取上限对齐
+  const timeout = form.Validation ? 30000 : 1800000;
+  const envelope = await post<HutaoReleaseItem>('/api/admin/releases/from-bucket', form, undefined, { timeout });
   return envelope.message;
 }
 
@@ -350,6 +366,26 @@ export async function saveMailTemplate(template: string): Promise<string> {
 
 export async function resetMailTemplate(): Promise<string> {
   const envelope = await del<null>('/api/admin/mail/template');
+  return envelope.message;
+}
+
+export async function getMailContents(): Promise<MailContentSummary[]> {
+  const envelope = await get<MailContentSummary[]>('/api/admin/mail/contents');
+  return envelope.data;
+}
+
+export async function getMailContent(kind: string, language: string): Promise<MailContentPayload> {
+  const envelope = await get<MailContentPayload>(`/api/admin/mail/content/${encodeURIComponent(kind)}?language=${encodeURIComponent(language)}`);
+  return envelope.data;
+}
+
+export async function saveMailContent(kind: string, request: MailContentUpdateRequest): Promise<string> {
+  const envelope = await put<null>(`/api/admin/mail/content/${encodeURIComponent(kind)}`, request);
+  return envelope.message;
+}
+
+export async function resetMailContent(kind: string, language: string): Promise<string> {
+  const envelope = await del<null>(`/api/admin/mail/content/${encodeURIComponent(kind)}?language=${encodeURIComponent(language)}`);
   return envelope.message;
 }
 

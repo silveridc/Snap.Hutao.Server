@@ -5,6 +5,8 @@ import {
   Banner,
   Button,
   Card,
+  Modal,
+  Pagination,
   Progress,
   Space,
   Spin,
@@ -13,14 +15,15 @@ import {
   Toast,
   Tooltip,
 } from '@douyinfe/semi-ui';
+import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { IconRefresh } from '@douyinfe/semi-icons';
 
-import { getSystemOverview, getUserStatistics, runJob } from '@/api/service';
+import { getJobLogs, getSystemOverview, getUserStatistics, runJob } from '@/api/service';
 import { useAuth } from '@/auth/AuthProvider';
 import { t, useLocale } from '@/i18n';
 import { formatBytes, formatDateTime, formatDuration, formatNumber } from '@/lib/format';
 import { useQuery } from '@/hooks/useQuery';
-import type { SchedulerJobInfo } from '@/types/api';
+import type { JobLogItem, SchedulerJobInfo } from '@/types/api';
 
 function cpuColor(percent: number): string {
   if (percent >= 85) {
@@ -39,6 +42,14 @@ function shortType(value?: string | null): string {
   }
   const index = value.lastIndexOf('.');
   return index >= 0 ? value.slice(index + 1) : value;
+}
+
+// 任务耗时秒级以内看毫秒更直观，跨分钟才用时长文案
+function shortDuration(value?: number | null): string {
+  if (value === null || value === undefined) {
+    return '—';
+  }
+  return value < 1000 ? `${value} ms` : formatDuration(Math.round(value / 1000));
 }
 
 interface Fact {
@@ -81,6 +92,14 @@ export default function DashboardPage() {
   );
   const [runningJob, setRunningJob] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [logJob, setLogJob] = useState<SchedulerJobInfo | null>(null);
+  const [logPage, setLogPage] = useState(1);
+  const [logPageSize, setLogPageSize] = useState(20);
+
+  const jobLogs = useQuery(
+    () => (logJob ? getJobLogs({ page: logPage, pageSize: logPageSize, jobType: logJob.JobType }) : Promise.resolve(undefined)),
+    [logJob, logPage, logPageSize],
+  );
 
   const loading = overview.loading;
   const ov = overview.data?.ov;
@@ -168,6 +187,13 @@ export default function DashboardPage() {
     }
   }
 
+  // 日志按实现类型归集（调度器没指定 JobKey，Name 是每次启动生成的 GUID）
+  function openJobLogs(row: SchedulerJobInfo) {
+    setLogPage(1);
+    setLogJob(row);
+    jobLogs.reload();
+  }
+
   async function refreshAccount() {
     setRefreshing(true);
     try {
@@ -213,7 +239,8 @@ export default function DashboardPage() {
   ];
 
   const jobColumns = [
-    { title: t('dashboard.scheduler.colName'), dataIndex: 'Name', width: 220, ellipsis: true },
+    // Name 是 GUID，定宽放得下；把弹性留给能读懂的实现类型列
+    { title: t('dashboard.scheduler.colName'), dataIndex: 'Name', width: 320, ellipsis: true },
     {
       title: t('dashboard.scheduler.colType'),
       dataIndex: 'JobType',
@@ -233,20 +260,65 @@ export default function DashboardPage() {
       title: t('dashboard.scheduler.colOp'),
       dataIndex: 'Name',
       key: 'op',
-      width: 110,
+      width: 200,
       fixed: 'right' as const,
       render: (_value: unknown, record: SchedulerJobInfo) => (
-        <Button
-          size="small"
-          theme="borderless"
-          type="primary"
-          loading={runningJob === record.Name}
-          disabled={Boolean(runningJob) && runningJob !== record.Name}
-          onClick={() => runJobNow(record)}
-        >
-          {runningJob === record.Name ? t('dashboard.scheduler.running') : t('dashboard.scheduler.runNow')}
-        </Button>
+        <Space>
+          <Button
+            size="small"
+            theme="borderless"
+            type="primary"
+            loading={runningJob === record.Name}
+            disabled={Boolean(runningJob) && runningJob !== record.Name}
+            onClick={() => runJobNow(record)}
+          >
+            {runningJob === record.Name ? t('dashboard.scheduler.running') : t('dashboard.scheduler.runNow')}
+          </Button>
+          <Button size="small" theme="borderless" type="primary" onClick={() => openJobLogs(record)}>
+            {t('dashboard.scheduler.viewLogs')}
+          </Button>
+        </Space>
       ),
+    },
+  ];
+
+  const logColumns: ColumnProps<JobLogItem>[] = [
+    {
+      title: t('dashboard.scheduler.log.colResult'),
+      dataIndex: 'Success',
+      width: 80,
+      render: (value: boolean) => (
+        <Tag size="small" type="light" color={value ? 'green' : 'red'}>
+          {value ? t('dashboard.scheduler.log.success') : t('dashboard.scheduler.log.failure')}
+        </Tag>
+      ),
+    },
+    {
+      title: t('dashboard.scheduler.log.colStartedAt'),
+      dataIndex: 'StartedAt',
+      width: 180,
+      render: (value: string) => <span className="tabular">{formatDateTime(value)}</span>,
+    },
+    {
+      title: t('dashboard.scheduler.log.colDuration'),
+      dataIndex: 'DurationMs',
+      width: 110,
+      align: 'right' as const,
+      render: (value?: number | null) => <span className="font-mono text-xs tabular">{shortDuration(value)}</span>,
+    },
+    {
+      title: t('dashboard.scheduler.log.colError'),
+      dataIndex: 'Error',
+      minWidth: 200,
+      ellipsis: true,
+      render: (value?: string | null) =>
+        value ? (
+          <Tooltip content={<span className="whitespace-pre-wrap break-all">{value}</span>} position="topLeft">
+            <span className="font-mono text-xs">{value.split('\n')[0]}</span>
+          </Tooltip>
+        ) : (
+          '—'
+        ),
     },
   ];
 
@@ -425,6 +497,40 @@ export default function DashboardPage() {
         />
         {scheduler?.Error && <Banner type="warning" closeIcon={null} description={scheduler.Error} className="mt-3" />}
       </Card>
+
+      <Modal
+        visible={logJob !== null}
+        title={logJob ? t('dashboard.scheduler.log.title', { name: shortType(logJob.JobType) }) : ''}
+        footer={null}
+        width={720}
+        onCancel={() => setLogJob(null)}
+      >
+        {jobLogs.error && <Banner type="danger" closeIcon={null} description={jobLogs.error.message} className="mb-3" />}
+        <Table
+          size="small"
+          rowKey="Id"
+          loading={jobLogs.loading}
+          dataSource={jobLogs.data?.Items ?? []}
+          columns={logColumns}
+          pagination={false}
+          empty={t('dashboard.scheduler.log.empty')}
+        />
+        <div className="mt-4 flex justify-end">
+          <Pagination
+            total={jobLogs.data?.Total ?? 0}
+            currentPage={logPage}
+            pageSize={logPageSize}
+            pageSizeOpts={[10, 20, 50]}
+            showSizeChanger
+            showTotal
+            onChange={setLogPage}
+            onPageSizeChange={(size: number) => {
+              setLogPageSize(size);
+              setLogPage(1);
+            }}
+          />
+        </div>
+      </Modal>
 
       <Card title={t('dashboard.growth.title')}>
         <Facts

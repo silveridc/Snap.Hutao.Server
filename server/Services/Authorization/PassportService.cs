@@ -1,4 +1,4 @@
-﻿using server.Models.Passport;
+using server.Models.Passport;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -58,8 +58,6 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
             {
                 UserName = passport.UserName,
             }).ConfigureAwait(false);
-
-            // 注册赠送：CDN 与抽卡日志各 3 天，同一个到期时刻
             long giftExpireAt = timeProvider.GetUnixTimeSeconds() + (long)TimeSpan.FromDays(3).TotalSeconds;
             newUser.CdnExpireAt = giftExpireAt;
             newUser.GachaLogExpireAt = giftExpireAt;

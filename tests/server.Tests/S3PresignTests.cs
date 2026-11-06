@@ -1,6 +1,7 @@
 ﻿using server.Models.Admin;
 using server.Services.Admin;
 using server.Tests.Infrastructure;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 
@@ -19,10 +20,11 @@ public sealed class S3PresignTests
     }
 
     [Fact]
-    public void PresignGet_ProducesCanonicalSigV4Query()
+    public void Presign_ProducesCanonicalSigV4Query()
     {
-        string url = S3Presigner.PresignGet(
+        string url = S3Presigner.Presign(
             "https://my-bucket.s3.us-east-1.amazonaws.com/hutao/Snap.Hutao_1.17.2.0_x64.msix",
+            HttpMethod.Get,
             "us-east-1",
             "AKIAIOSFODNN7EXAMPLE",
             "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -46,17 +48,28 @@ public sealed class S3PresignTests
     }
 
     [Fact]
-    public void PresignGet_IsDeterministic_AndVariesByRegion()
+    public void Presign_IsDeterministic_AndVariesByRegionAndMethod()
     {
         string url = "https://b.example.com/pkg.zip";
         DateTimeOffset now = new(2026, 10, 25, 0, 0, 0, TimeSpan.Zero);
 
-        string first = S3Presigner.PresignGet(url, "us-east-1", "AK", "SK", 3600, now);
-        string second = S3Presigner.PresignGet(url, "us-east-1", "AK", "SK", 3600, now);
-        string otherRegion = S3Presigner.PresignGet(url, "eu-west-1", "AK", "SK", 3600, now);
+        string first = S3Presigner.Presign(url, HttpMethod.Get, "us-east-1", "AK", "SK", 3600, now);
+        string second = S3Presigner.Presign(url, HttpMethod.Get, "us-east-1", "AK", "SK", 3600, now);
+        string otherRegion = S3Presigner.Presign(url, HttpMethod.Get, "eu-west-1", "AK", "SK", 3600, now);
+        string head = S3Presigner.Presign(url, HttpMethod.Head, "us-east-1", "AK", "SK", 3600, now);
 
         Assert.Equal(first, second);
         Assert.NotEqual(first, otherRegion);
+
+        // SigV4 把 HTTP 方法写进规范请求：GET 的签名不能用于 HEAD，否则 403 SignatureDoesNotMatch
+        Dictionary<string, string> headQuery = head.ParseRawQuery();
+        Assert.NotEqual(first.ParseRawQuery()["X-Amz-Signature"], headQuery["X-Amz-Signature"]);
+
+        // 除签名外两者一致（X-Amz-Date/Expires/Credential 与编码形态）
+        foreach (string key in new[] { "X-Amz-Algorithm", "X-Amz-Credential", "X-Amz-Date", "X-Amz-Expires", "X-Amz-SignedHeaders" })
+        {
+            Assert.Equal(first.ParseRawQuery()[key], headQuery[key]);
+        }
     }
 
     [Fact]
@@ -110,6 +123,23 @@ public sealed class S3PresignTests
             // 指定哈希后只发 HEAD，不下载对象
             Assert.Contains(factory.StubHttp.Requests, r => r.Method == "HEAD" && r.Url.Contains(key, StringComparison.Ordinal));
             Assert.DoesNotContain(factory.StubHttp.Requests, r => r.Method == "GET" && r.Url.Contains(key, StringComparison.Ordinal));
+
+            // 这条 HEAD 必须按 HEAD 签名：桩不校验签名，生产上 GET 签名发 HEAD 会 403 SignatureDoesNotMatch
+            string headUrl = Assert.Single(factory.StubHttp.Requests, r => r.Method == "HEAD" && r.Url.Contains(key, StringComparison.Ordinal)).Url;
+            Dictionary<string, string> headQuery = headUrl.ParseRawQuery();
+            string expectedSignature = S3Presigner.Presign(
+                $"https://bucket.test/{key}",
+                HttpMethod.Head,
+                "us-east-1",
+                "AKIAIOSFODNN7EXAMPLE",
+                "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+                int.Parse(headQuery["X-Amz-Expires"], CultureInfo.InvariantCulture),
+                DateTimeOffset.ParseExact(
+                    headQuery["X-Amz-Date"],
+                    "yyyyMMdd'T'HHmmss'Z'",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal)).ParseRawQuery()["X-Amz-Signature"];
+            Assert.Equal(expectedSignature, headQuery["X-Amz-Signature"]);
 
             using HttpRequestMessage deactivate = new(HttpMethod.Delete, $"/api/admin/releases/{release.Id}/activation");
             deactivate.WithToken(maintainer.AccessToken);

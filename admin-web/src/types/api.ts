@@ -413,7 +413,25 @@ export interface LoginLogItem {
   LoginAt: string;
 }
 
+// 定时任务执行记录，StartedAt 是 ISO 字符串；JobType 是全限定名，与概览页调度表里的同名字段一致
+export interface JobLogItem {
+  Id: number;
+  JobType: string;
+  Success: boolean;
+  Error?: string | null;
+  StartedAt: string;
+  DurationMs: number;
+}
+
 // ===== 壁纸池 / 数据工具 / 缓存 / 邮件模板 / 后台账号 =====
+
+// /api/wallpapers/today 的负载，服务端用 JsonPropertyName 固定了小写下划线命名
+export interface TodayWallpaper {
+  url: string;
+  source_url?: string | null;
+  author?: string | null;
+  uploader?: string | null;
+}
 
 export interface WallpaperPoolItem {
   Url: string;
@@ -426,6 +444,32 @@ export interface MailTemplatePayload {
   Template: string;
   DefaultTemplate: string;
   Customized: boolean;
+}
+
+export interface MailContentSummary {
+  Kind: string;
+  Languages: string[];
+  Variables: string[];
+  Customized: boolean[];
+}
+
+export interface MailContentPayload {
+  Kind: string;
+  Language: string;
+  Variables: string[];
+  Subject: string;
+  Title: string;
+  RawContent: string;
+  Footer: string;
+  Customized: boolean;
+}
+
+export interface MailContentUpdateRequest {
+  Language: string;
+  Subject: string;
+  Title: string;
+  RawContent: string;
+  Footer: string;
 }
 
 export interface CacheInvalidationResult {

@@ -32,7 +32,14 @@
       "license": "开源许可证",
       "adminaccount": "后台账号",
       "clientversion": "版本统计",
-      "settings": "系统设置"
+      "settings": "系统设置",
+      "group": {
+        "overview": "概览",
+        "users": "用户",
+        "content": "运营",
+        "data": "数据",
+        "system": "系统"
+      }
     }
   }
 }

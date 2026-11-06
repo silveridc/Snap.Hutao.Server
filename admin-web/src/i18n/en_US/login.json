@@ -16,6 +16,11 @@
       "defaultName": "Single Sign-On",
       "fail": "Unable to start the SSO login"
     },
+    "captcha": {
+      "notice": "Protected by reCAPTCHA, see the",
+      "privacy": "Google Privacy Policy",
+      "terms": "Terms of Service"
+    },
     "messages": {
       "loginSuccess": "Signed in successfully",
       "loginFail": "Sign in failed",

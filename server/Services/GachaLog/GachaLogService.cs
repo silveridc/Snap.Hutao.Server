@@ -1,14 +1,15 @@
 ﻿using server.Models.Entity.GachaLog;
 using server.Models.GachaLog;
 using server.Models.Metadata;
+using server.Services.Admin;
 using System.Runtime.InteropServices;
 
 namespace server.Services.GachaLog;
 
 // Scoped
-public sealed class GachaLogService(AppDbContext appDbContext, IDistributedCache cache)
+public sealed class GachaLogService(AppDbContext appDbContext, IDistributedCache cache, SystemConfigService systemConfigService)
 {
-    private const int _uidPerUserLimit = 5;
+    public int MaxUidPerUser => systemConfigService.GachaLogMaxUidPerUser;
 
     public async ValueTask<List<GachaEntry>> GetGachaEntriesForUserAsync(int userId)
     {
@@ -112,7 +113,9 @@ public sealed class GachaLogService(AppDbContext appDbContext, IDistributedCache
 
     public async ValueTask<GachaLogSaveResult> SaveGachaItemsAsync(int userId, string uid, List<SimpleGachaItem> gachaItems)
     {
-        if (await appDbContext.GachaItems.Where(i => i.UserId == userId && i.Uid != uid).Select(i => i.Uid).Distinct().CountAsync().ConfigureAwait(false) >= _uidPerUserLimit)
+        IQueryable<EntityGachaItem> userItems = appDbContext.GachaItems.Where(i => i.UserId == userId);
+        if (!await userItems.AnyAsync(i => i.Uid == uid).ConfigureAwait(false)
+            && await userItems.Select(i => i.Uid).Distinct().CountAsync().ConfigureAwait(false) >= MaxUidPerUser)
         {
             return new(GachaLogSaveResultKind.UidPerUserLimitExceeded);
         }

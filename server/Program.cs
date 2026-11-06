@@ -57,10 +57,10 @@ public static class Program
         appBuilder.WebHost.UseSentry(options =>
         {
             options.Release = applicationVersion;
-            options.Dsn = _sentryDsn;
+            options.Dsn = appBuilder.Configuration["App:SentryDsn"] ?? _sentryDsn;
             options.TracesSampleRate = 1D;
             options.SendDefaultPii = true;
-            options.Debug = true;
+
             options.AutoSessionTracking = true;
         });
         services
@@ -129,7 +129,7 @@ public static class Program
                 }
 
                 options
-                    .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+                    .UseMySql(connectionString, new MySqlServerVersion(new Version(8, 4, 11)))
                     .ConfigureWarnings(action => action.Log((RelationalEventId.CommandExecuted, LogLevel.Debug)))
                     .EnableSensitiveDataLogging()
                     .EnableDetailedErrors();
@@ -153,6 +153,7 @@ public static class Program
                 config.ScheduleJob<SpiralAbyssRecordCleanJob>(t => t.StartNow().WithCronSchedule("0 0 4 16 * ?"));
                 config.ScheduleJob<RoleCombatStatisticsRefreshJob>(t => t.StartNow().WithCronSchedule("0 10 */1 * * ?"));
                 config.ScheduleJob<RoleCombatRecordCleanJob>(t => t.StartNow().WithCronSchedule("0 0 4 1 * ?"));
+                config.ScheduleJob<JobLogCleanJob>(t => t.StartNow().WithCronSchedule("0 0 5 * * ?"));
             })
             .AddQuartzHostedService(options => options.WaitForJobsToComplete = true)
 
@@ -212,9 +213,11 @@ public static class Program
             .AddSingleton(appOptions)
 
             // Quartz.
+            .AddSingleton<JobLogListener>()
             .AddTransient<GachaLogStatisticsRefreshJob>()
             .AddTransient<LegacyStatisticsRefreshJob>()
             .AddTransient<RoleCombatRecordCleanJob>()
+            .AddTransient<JobLogCleanJob>()
             .AddTransient<RoleCombatStatisticsRefreshJob>()
             .AddTransient<SpiralAbyssRecordCleanJob>();
 
@@ -407,12 +410,14 @@ public static class Program
         // Endpoint
         app.MapControllers();
 
-        // 后台 SPA 是真实路径路由，深链接直接访问或刷新时回落到入口页
-        // nonfile 约束保证带扩展名的请求（js/css/map 等静态资源）不被回落到 index.html
         app.MapFallbackToFile("admin/{*path:nonfile}", "admin/index.html");
 
         // Initialize dynamic config from DB
         await app.Services.GetRequiredService<SystemConfigService>().InitializeAsync();
+
+        IScheduler scheduler = await app.Services.GetRequiredService<ISchedulerFactory>().GetScheduler(CancellationToken.None).ConfigureAwait(false);
+        scheduler.ListenerManager.AddJobListener(app.Services.GetRequiredService<JobLogListener>(), [GroupMatcher<JobKey>.AnyGroup()]);
+
         _logger.LogInformation($"Api Version:{applicationVersion}");
         await app.RunAsync();
     }

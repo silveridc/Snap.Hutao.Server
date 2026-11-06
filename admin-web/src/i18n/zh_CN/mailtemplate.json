@@ -2,7 +2,7 @@
   "mailtemplate": {
     "title": "邮件模板",
     "description": "通行证验证码、兑换码等全部邮件共用的 HTML 模板；保存后写入数据库并同步内存缓存，下一封邮件立即生效.",
-    "placeholders": "保存时必须保留以下占位符（TinyMCE 中已做保护处理）：",
+    "placeholders": "保存时必须保留以下占位符（可直接编辑，误删后保存会被拦下）：",
     "customized": "使用自定义模板",
     "default": "使用内置默认模板",
     "advanced": "源码模式",
@@ -20,6 +20,36 @@
       "resetConfirm": "删除自定义模板并恢复内置默认模板？",
       "missingPlaceholder": "模板缺少占位符 {placeholder}，不能保存",
       "loadDefaultSuccess": "已载入默认模板，记得点保存"
+    },
+    "content": {
+      "title": "邮件内容",
+      "description": "每种邮件的 SMTP 主题、标题、正文与页脚单独配置，正文支持 {{code}} 这类运行时变量；未自定义的种类使用内置默认文案.",
+      "kind": "邮件种类",
+      "language": "语言",
+      "subject": "SMTP 主题",
+      "contentTitle": "邮件标题",
+      "rawContent": "正文内容",
+      "footer": "页脚",
+      "variables": "可用变量",
+      "messages": {
+        "saveSuccess": "邮件内容已保存",
+        "resetSuccess": "已恢复默认邮件内容",
+        "resetConfirm": "删除该邮件此语言的自定义内容，恢复内置默认文案？",
+        "emptyFields": "主题、标题、正文与页脚均不能为空",
+        "missingVariable": "正文缺少必需变量 {variable}，不能保存"
+      }
+    },
+    "kind": {
+      "RegisterCode": "注册验证码",
+      "ResetPasswordLink": "重置密码链接",
+      "ResetUsernameCode": "重置用户名验证码",
+      "CancelRegistrationCode": "注销通行证验证码",
+      "GachaStorageRedeem": "抽品记录存储兑换",
+      "CdnRedeem": "CDN 兑换"
+    },
+    "lang": {
+      "CHS": "简体中文",
+      "EN": "English"
     }
   }
 }

@@ -527,6 +527,46 @@ namespace server.Migrations
                     b.ToTable("hutao_releases");
                 });
 
+            modelBuilder.Entity("server.Models.Entity.JobLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("DurationMs")
+                        .HasColumnType("bigint")
+                        .HasColumnName("duration_ms");
+
+                    b.Property<string>("Error")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("error");
+
+                    b.Property<string>("JobType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("job_type");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("started_at");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("success");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobType")
+                        .HasDatabaseName("ix_job_logs_job_type");
+
+                    b.ToTable("job_logs");
+                });
+
             modelBuilder.Entity("server.Models.Entity.LicenseApplicationRecord", b =>
                 {
                     b.Property<long>("PrimaryId")

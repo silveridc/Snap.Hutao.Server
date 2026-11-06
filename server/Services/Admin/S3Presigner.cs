@@ -9,13 +9,14 @@ public static class S3Presigner
     /// 生成预签名 URL.不修改原路径与查询，只追加 X-Amz-* 参数与签名.
     /// </summary>
     /// <param name="objectUrl">对象的 https 绝对地址（虚拟主机风格或路径风格均可）.</param>
+    /// <param name="method">将要用于该 URL 的 HTTP 方法.方法名参与规范请求，签名后换方法使用会得到 SignatureDoesNotMatch.</param>
     /// <param name="region">区域名，如 us-east-1.</param>
     /// <param name="accessKeyId">S3 访问密钥 ID.</param>
     /// <param name="secretAccessKey">S3 访问密钥.</param>
     /// <param name="expiresSeconds">有效期（秒），S3 上限 7 天.</param>
     /// <param name="now">签名时刻（UTC），测试可注入.</param>
     /// <returns>带 X-Amz-Signature 的完整 URL.</returns>
-    public static string PresignGet(string objectUrl, string region, string accessKeyId, string secretAccessKey, int expiresSeconds, DateTimeOffset? now = null)
+    public static string Presign(string objectUrl, HttpMethod method, string region, string accessKeyId, string secretAccessKey, int expiresSeconds, DateTimeOffset? now = null)
     {
         Uri uri = new(objectUrl, UriKind.Absolute);
         DateTimeOffset utcNow = (now ?? DateTimeOffset.UtcNow).ToUniversalTime();
@@ -41,7 +42,7 @@ public static class S3Presigner
             .Select(kv => $"{Rfc3986Encode(kv.Key)}={Rfc3986Encode(kv.Value)}"));
 
         string canonicalUri = CanonicalizePath(uri.AbsolutePath);
-        string canonicalRequest = $"GET\n{canonicalUri}\n{canonicalQuery}\nhost:{uri.Authority.ToLowerInvariant()}\n\nhost\nUNSIGNED-PAYLOAD";
+        string canonicalRequest = $"{method.Method}\n{canonicalUri}\n{canonicalQuery}\nhost:{uri.Authority.ToLowerInvariant()}\n\nhost\nUNSIGNED-PAYLOAD";
         string scope = $"{dateStamp}/{region}/s3/aws4_request";
         string stringToSign = $"AWS4-HMAC-SHA256\n{amzDate}\n{scope}\n{Sha256Hex(Encoding.UTF8.GetBytes(canonicalRequest))}";
 

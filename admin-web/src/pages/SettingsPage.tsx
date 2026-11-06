@@ -1,6 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
-import { Banner, Button, Input, Spin, Switch, Toast } from '@douyinfe/semi-ui';
+import { useSearchParams } from 'react-router';
+
+import {
+  IconGiftStroked,
+  IconKeyStroked,
+  IconLockStroked,
+  IconMailStroked,
+  IconServerStroked,
+  IconSettingStroked,
+  IconShieldStroked,
+} from '@douyinfe/semi-icons';
+import { Banner, Button, Input, Spin, Switch, TabPane, Tabs, Toast } from '@douyinfe/semi-ui';
 
 import { getSystemConfig, resetSystemConfig, updateSystemConfig } from '@/api/service';
 import { t, useLocale } from '@/i18n';
@@ -15,6 +26,8 @@ interface ConfigField {
 }
 
 interface ConfigSection {
+  id: string;
+  icon: ReactNode;
   titleKey: string;
   descriptionKey: string;
   fields: ConfigField[];
@@ -22,6 +35,8 @@ interface ConfigSection {
 
 const CONFIG_SECTIONS: ConfigSection[] = [
   {
+    id: 'global',
+    icon: <IconSettingStroked size="small" />,
     titleKey: 'settings.sections.global.title',
     descriptionKey: 'settings.sections.global.description',
     fields: [
@@ -31,6 +46,8 @@ const CONFIG_SECTIONS: ConfigSection[] = [
     ],
   },
   {
+    id: 'killSwitch',
+    icon: <IconShieldStroked size="small" />,
     titleKey: 'settings.sections.killSwitch.title',
     descriptionKey: 'settings.sections.killSwitch.description',
     fields: [
@@ -41,6 +58,8 @@ const CONFIG_SECTIONS: ConfigSection[] = [
     ],
   },
   {
+    id: 's3Sign',
+    icon: <IconServerStroked size="small" />,
     titleKey: 'settings.sections.s3Sign.title',
     descriptionKey: 'settings.sections.s3Sign.description',
     fields: [
@@ -52,6 +71,8 @@ const CONFIG_SECTIONS: ConfigSection[] = [
     ],
   },
   {
+    id: 'pizzaHelper',
+    icon: <IconKeyStroked size="small" />,
     titleKey: 'settings.sections.pizzaHelper.title',
     descriptionKey: 'settings.sections.pizzaHelper.description',
     fields: [
@@ -62,6 +83,8 @@ const CONFIG_SECTIONS: ConfigSection[] = [
     ],
   },
   {
+    id: 'afdian',
+    icon: <IconGiftStroked size="small" />,
     titleKey: 'settings.sections.afdian.title',
     descriptionKey: 'settings.sections.afdian.description',
     fields: [
@@ -70,6 +93,8 @@ const CONFIG_SECTIONS: ConfigSection[] = [
     ],
   },
   {
+    id: 'mail',
+    icon: <IconMailStroked size="small" />,
     titleKey: 'settings.sections.mail.title',
     descriptionKey: 'settings.sections.mail.description',
     fields: [
@@ -77,6 +102,8 @@ const CONFIG_SECTIONS: ConfigSection[] = [
     ],
   },
   {
+    id: 'sso',
+    icon: <IconLockStroked size="small" />,
     titleKey: 'settings.sections.sso.title',
     descriptionKey: 'settings.sections.sso.description',
     fields: [
@@ -97,6 +124,10 @@ const CONFIG_SECTIONS: ConfigSection[] = [
 
 const ALL_KEYS = CONFIG_SECTIONS.flatMap((section) => section.fields.map((field) => field.key));
 
+const SWITCH_KEYS = new Set(
+  CONFIG_SECTIONS.flatMap((section) => section.fields.filter((field) => field.type === 'switch').map((field) => field.key)),
+);
+
 type FormState = Record<string, string | boolean>;
 
 function initForm(data: SystemConfigMap): { form: FormState; original: FormState } {
@@ -104,8 +135,7 @@ function initForm(data: SystemConfigMap): { form: FormState; original: FormState
   const original: FormState = {};
   for (const key of ALL_KEYS) {
     const raw = data[key];
-    const isSwitch = CONFIG_SECTIONS.some((section) => section.fields.some((field) => field.key === key && field.type === 'switch'));
-    const value = isSwitch ? raw === 'true' || raw === 'True' : raw ?? '';
+    const value = SWITCH_KEYS.has(key) ? raw === 'true' || raw === 'True' : raw ?? '';
     form[key] = value;
     original[key] = value;
   }
@@ -119,6 +149,7 @@ export default function SettingsPage() {
   const [original, setOriginal] = useState<FormState>({});
   const [saving, setSaving] = useState(false);
   const config = useQuery(getSystemConfig, []);
+  const [params, setParams] = useSearchParams();
 
   const initialized = useRef(false);
 
@@ -136,6 +167,20 @@ export default function SettingsPage() {
     () => ALL_KEYS.filter((key) => form[key] !== original[key]),
     [form, original],
   );
+
+  // 分 Tab 后未保存的字段会被藏起来，靠页签上的小圆点提示哪个分组还有改动
+  const dirtySections = useMemo(
+    () => new Set(CONFIG_SECTIONS.filter((section) => section.fields.some((field) => form[field.key] !== original[field.key])).map((section) => section.id)),
+    [form, original],
+  );
+
+  const activeTab = CONFIG_SECTIONS.find((section) => section.id === params.get('tab'))?.id ?? CONFIG_SECTIONS[0]?.id ?? '';
+
+  function selectTab(key: string) {
+    const next = new URLSearchParams(params);
+    next.set('tab', key);
+    setParams(next, { replace: true });
+  }
 
   async function reload() {
     initialized.current = false;
@@ -178,57 +223,82 @@ export default function SettingsPage() {
     }
   }
 
+  // 全开关的分组三列铺开；带开关的保持两列，让开关和它的熔断原因成对落在同一行；
+  // 纯输入项的分组在超宽屏上给到三列
+  function gridClass(fields: ConfigField[]) {
+    const switches = fields.filter((field) => field.type === 'switch').length;
+    if (switches === fields.length) {
+      return 'grid grid-cols-1 gap-3 md:grid-cols-3';
+    }
+    if (switches > 0) {
+      return 'grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2';
+    }
+    return 'grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 2xl:grid-cols-3';
+  }
+
+  function renderField(field: ConfigField) {
+    const value = form[field.key];
+    if (field.type === 'switch') {
+      return (
+        <div key={field.key} className="rounded-md border border-[var(--semi-color-border)] px-4 py-2.5">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-sm font-medium">{t(field.labelKey)}</span>
+            <Switch checked={Boolean(value)} onChange={(checked) => updateField(field.key, checked)} />
+          </div>
+          <div className="mt-1 text-xs leading-[18px] text-[var(--semi-color-text-2)]">{t(field.hintKey)}</div>
+        </div>
+      );
+    }
+    return (
+      <div key={field.key} className="flex min-w-0 flex-col gap-1.5">
+        <span className="text-sm font-medium">{t(field.labelKey)}</span>
+        <div className="flex items-center gap-2">
+          <Input
+            className="min-w-0 flex-1"
+            mode={field.type === 'password' ? 'password' : undefined}
+            value={String(value ?? '')}
+            placeholder={t('settings.form.emptyPlaceholder')}
+            onChange={(next) => updateField(field.key, next)}
+          />
+          <Button size="small" type="tertiary" onClick={() => resetField(field.key)}>
+            {t('settings.form.reset')}
+          </Button>
+        </div>
+        <div className="text-xs leading-[18px] text-[var(--semi-color-text-2)]">{t(field.hintKey)}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4 pb-24">
+    <div className="w-full space-y-4 pb-24">
       {config.error && <Banner type="danger" closeIcon={null} description={config.error.message} />}
 
       <Spin spinning={config.loading}>
-        <div className="space-y-4">
-          {CONFIG_SECTIONS.map((section) => {
-            const allSwitches = section.fields.every((field) => field.type === 'switch');
-            return (
-              <div key={section.titleKey} className="rounded-[var(--semi-border-radius-medium)] bg-[var(--semi-color-bg-0)] p-6">
-                <h3 className="text-base font-semibold">{t(section.titleKey)}</h3>
-                <p className="mb-4 mt-1 text-xs text-[var(--semi-color-text-2)]">{t(section.descriptionKey)}</p>
-
-                <div className={allSwitches ? 'grid grid-cols-1 gap-3 md:grid-cols-3' : 'grid grid-cols-1 gap-x-8 gap-y-5 lg:grid-cols-2'}>
-                  {section.fields.map((field) => {
-                    const value = form[field.key];
-                    if (field.type === 'switch') {
-                      return (
-                        <div key={field.key} className="rounded-md border border-[var(--semi-color-border)] px-4 py-2.5">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium">{t(field.labelKey)}</span>
-                            <Switch checked={Boolean(value)} onChange={(checked) => updateField(field.key, checked)} />
-                          </div>
-                          <div className="mt-1 text-xs leading-[18px] text-[var(--semi-color-text-2)]">{t(field.hintKey)}</div>
-                        </div>
-                      );
-                    }
-                    return (
-                      <div key={field.key} className="flex min-w-0 flex-col gap-1.5">
-                        <span className="text-sm font-medium">{t(field.labelKey)}</span>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            className="min-w-0 flex-1"
-                            mode={field.type === 'password' ? 'password' : undefined}
-                            value={String(value ?? '')}
-                            placeholder={t('settings.form.emptyPlaceholder')}
-                            onChange={(next) => updateField(field.key, next)}
-                          />
-                          <Button size="small" type="tertiary" onClick={() => resetField(field.key)}>
-                            {t('settings.form.reset')}
-                          </Button>
-                        </div>
-                        <div className="text-xs leading-[18px] text-[var(--semi-color-text-2)]">{t(field.hintKey)}</div>
-                      </div>
-                    );
-                  })}
+        {/* newapi classic 的设置页：一个分组一个卡片式页签，页签写进 ?tab= 方便直接分享定位 */}
+        <Tabs type="card" collapsible activeKey={activeTab} onChange={selectTab}>
+          {CONFIG_SECTIONS.map((section) => (
+            <TabPane
+              key={section.id}
+              itemKey={section.id}
+              tab={
+                <span className="flex items-center gap-1.5">
+                  {section.icon}
+                  {t(section.titleKey)}
+                  {dirtySections.has(section.id) && <span className="h-1.5 w-1.5 rounded-full bg-[var(--semi-color-warning)]" />}
+                </span>
+              }
+            >
+              {activeTab === section.id && (
+                <div className="px-1 pt-5">
+                  <p className="mb-4 text-xs text-[var(--semi-color-text-2)]">{t(section.descriptionKey)}</p>
+                  <div className={gridClass(section.fields)}>
+                    {section.fields.map(renderField)}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              )}
+            </TabPane>
+          ))}
+        </Tabs>
       </Spin>
 
       <div className="sticky bottom-4 z-10 flex items-center justify-between gap-6 rounded-[var(--semi-border-radius-medium)] bg-[var(--semi-color-bg-0)] px-6 py-3 shadow-[0_2px_12px_rgba(0,0,0,0.1)]">

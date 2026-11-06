@@ -67,7 +67,18 @@
       "colOp": "Actions",
       "runNow": "Run now",
       "running": "Running…",
-      "runSuccess": "Job {name} triggered"
+      "runSuccess": "Job {name} triggered",
+      "viewLogs": "Job logs",
+      "log": {
+        "title": "Job Logs · {name}",
+        "empty": "No runs recorded",
+        "colResult": "Result",
+        "colStartedAt": "Started",
+        "colDuration": "Duration",
+        "colError": "Error",
+        "success": "Success",
+        "failure": "Failure"
+      }
     },
     "account": {
       "title": "Account Info",

@@ -32,7 +32,14 @@
       "license": "Licenses",
       "adminaccount": "Admin accounts",
       "clientversion": "Client versions",
-      "settings": "Settings"
+      "settings": "Settings",
+      "group": {
+        "overview": "Overview",
+        "users": "Users",
+        "content": "Operations",
+        "data": "Data",
+        "system": "System"
+      }
     }
   }
 }

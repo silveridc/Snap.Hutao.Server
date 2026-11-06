@@ -120,6 +120,7 @@ public static class ServiceEndpoints
 
         new("GET", "/api/admin/audit-logs?page=1&pageSize=10", null, ReturnCodes.Success),
         new("GET", "/api/admin/login-logs?page=1&pageSize=10", null, ReturnCodes.Success),
+        new("GET", "/api/admin/job-logs?page=1&pageSize=10", null, ReturnCodes.Success),
         new("GET", "/api/admin/cache/keys?pattern=*&limit=10", null, ReturnCodes.Success),
         new("DELETE", "/api/admin/cache", JsonSerializer.Serialize(new CacheInvalidationRequest
         {
@@ -150,6 +151,20 @@ public static class ServiceEndpoints
         new("PUT", "/api/admin/mail/template", JsonSerializer.Serialize(new MailTemplateUpdateRequest { Template = "<html>missing placeholders</html>" }), ReturnCodes.InvalidUploadData),
         // 恢复默认有状态（是否自定义过取决于其它用例的执行顺序），只要求穿过权限过滤器
         new("DELETE", "/api/admin/mail/template", null, null),
+
+        new("GET", "/api/admin/mail/contents", null, ReturnCodes.Success),
+        new("GET", "/api/admin/mail/content/RegisterCode?language=CHS", null, ReturnCodes.Success),
+        // 保存有状态：缺少运行时变量的请求稳定落在校验失败分支，不覆盖测试库里的文案
+        new("PUT", "/api/admin/mail/content/RegisterCode", JsonSerializer.Serialize(new MailContentUpdateRequest
+        {
+            Language = "CHS",
+            Subject = "Smoke Subject",
+            Title = "Smoke Title",
+            RawContent = "<p>missing variables</p>",
+            Footer = "Smoke Footer",
+        }), ReturnCodes.InvalidUploadData),
+        // 恢复默认有状态（是否自定义过取决于其它用例的执行顺序），只要求穿过权限过滤器
+        new("DELETE", "/api/admin/mail/content/RegisterCode?language=CHS", null, null),
 
         new("GET", "/api/admin/wallpaper-pool", null, ReturnCodes.Success),
         // 保存有状态：用 http 直链稳定落在校验失败分支，不覆盖测试库里的壁纸池

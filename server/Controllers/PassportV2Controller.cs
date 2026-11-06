@@ -23,38 +23,47 @@ public class PassportV2Controller(
     AppOptions appOptions) : ControllerBase
 {
     /// <summary>
-    /// 申请邮箱验证码以完成注册、找回密码或账号安全操作；同一邮箱同一场景 60 秒内限一次.
+    /// 申请邮箱验证码以完成注册或账号安全操作；找回密码改为下发带有效期的重置链接.
     /// </summary>
     /// <param name="request">包含用户名与场景标记的请求体.</param>
-    /// <returns>验证码申请结果.</returns>
+    /// <returns>验证码或重置链接的申请结果.</returns>
     [HttpPost("verification-codes")]
     public async Task<IActionResult> RequestVerifyCodeAsync([FromBody] PassportRequest request)
     {
         string normalizedUserName = passportService.DecryptNormalizedUserName(request, out string userName);
-        string key = request switch
-        {
-            { IsResetPassword: true } => PassportVerificationService.ResetPassword,
-            { IsResetUserName: true } => PassportVerificationService.ResetUserName,
-            { IsResetUserNameNew: true } => PassportVerificationService.ResetUserNameNew,
-            { IsCancelRegistration: true } => PassportVerificationService.CancelRegistration,
-            _ => "Registration",
-        };
-
-        if (passportVerificationService.TryGetNonExpiredVerifyCode(normalizedUserName, key, out _))
-        {
-            return Fail("Too many requests, please try again in 1 minute", ReturnCode.VerifyCodeTooFrequently, ServerKeys.ServerPassportVerifyTooFrequent);
-        }
-
-        bool userExists = appDbContext.Users.Any(u => u.NormalizedUserName == normalizedUserName);
-        string code = passportVerificationService.GenerateVerifyCode(normalizedUserName, key);
 
         try
         {
+            if (request.IsResetPassword)
+            {
+                return await RequestResetPasswordLinkAsync(normalizedUserName, userName).ConfigureAwait(false);
+            }
+
+            string key = request switch
+            {
+                { IsResetUserName: true } => PassportVerificationService.ResetUserName,
+                { IsResetUserNameNew: true } => PassportVerificationService.ResetUserNameNew,
+                { IsCancelRegistration: true } => PassportVerificationService.CancelRegistration,
+                _ => "Registration",
+            };
+
+            if (passportVerificationService.TryGetNonExpiredVerifyCode(normalizedUserName, key, out _))
+            {
+                int cooldownSeconds = passportVerificationService.GetVerifyCodeResendCooldownSeconds(normalizedUserName, key);
+                return Fail($"Too many requests, please try again in {cooldownSeconds} seconds", ReturnCode.VerifyCodeTooFrequently);
+            }
+
+            bool userExists = appDbContext.Users.Any(u => u.NormalizedUserName == normalizedUserName);
+            string code = passportVerificationService.GenerateVerifyCode(normalizedUserName, key);
             return await PrivateRequestVerifyCodeAsync(request, normalizedUserName, userName, userExists, code).ConfigureAwait(false);
         }
         catch (SmtpCommandException)
         {
             return Success("Failed to request verification code", ServerKeys.ServerPassportVerifyRequestFailed);
+        }
+        catch (ParseException)
+        {
+            return Fail("Failed to request verification code", ReturnCode.InvalidUserName, ServerKeys.ServerPassportVerifyRequestUserNameInvalid);
         }
     }
 
@@ -120,17 +129,43 @@ public class PassportV2Controller(
     }
 
     /// <summary>
-    /// 通过邮箱验证码设置新的登录密码.
+    /// 查询重置链接的状态，返回脱敏邮箱与剩余有效期，供落地页展示.
     /// </summary>
-    /// <param name="request">包含用户名、新密码与验证码的请求体.</param>
+    /// <param name="token">链接中携带的一次性 token.</param>
+    /// <returns>链接状态.</returns>
+    [HttpGet("password/reset/{token}")]
+    public IActionResult GetResetPasswordLinkAsync([FromRoute] string token)
+    {
+        if (!passportVerificationService.TryPeekResetToken(token, out string userName, out TimeSpan? remaining))
+        {
+            return Fail("Verification failed", ReturnCode.RegisterFail, ServerKeys.ServerPassportVerifyFailed);
+        }
+
+        PassportResetLinkState state = new()
+        {
+            UserName = MaskEmail(userName),
+            ExpireInSeconds = (int)Math.Max(0, Math.Ceiling((remaining ?? TimeSpan.Zero).TotalSeconds)),
+        };
+
+        return Success<PassportResetLinkState>("Reset link is valid", state, ServerKeys.ServerPassportVerifyRequestSuccess);
+    }
+
+    /// <summary>
+    /// 使用重置链接设置新的登录密码，链接一经使用立即失效.
+    /// </summary>
+    /// <param name="request">包含链接 token 与新密码（至少 8 位）的请求体.</param>
     /// <returns>重置结果.</returns>
-    [HttpPut("accounts/me/password")]
+    [HttpPut("password/reset")]
     public async Task<IActionResult> ResetPasswordAsync([FromBody] PassportRequest request)
     {
-        DeviceInfo deviceInfo = this.GetDeviceInfo();
-        string normalizedUserName = passportService.DecryptNormalizedUserNameAndVerifyCode(request, out string userName, out string code);
+        string password = passportService.Decrypt(request.Password);
 
-        if (!passportVerificationService.TryValidateVerifyCode(normalizedUserName, PassportVerificationService.ResetPassword, code))
+        if (password.Length < 8)
+        {
+            return Fail("Password must be at least 8 characters", ReturnCode.TooShortPassword, ServerKeys.ServerPassportPasswordTooShort);
+        }
+
+        if (!passportVerificationService.TryConsumeResetToken(passportService.Decrypt(request.Token), out string userName))
         {
             return Fail("Verification failed", ReturnCode.RegisterFail, ServerKeys.ServerPassportVerifyFailed);
         }
@@ -138,18 +173,14 @@ public class PassportV2Controller(
         Passport passport = new()
         {
             UserName = userName,
-            Password = passportService.Decrypt(request.Password),
+            Password = password,
         };
 
-        if (passport.Password.Length < 8)
-        {
-            return Fail("Password must be at least 8 characters", ReturnCode.TooShortPassword, ServerKeys.ServerPassportPasswordTooShort);
-        }
-
-        PassportResult result = await passportService.ResetPasswordAsync(passport, deviceInfo).ConfigureAwait(false);
+        // 落地页在浏览器里打开，没有设备头，按无设备下发令牌
+        PassportResult result = await passportService.ResetPasswordAsync(passport, deviceInfo: null).ConfigureAwait(false);
 
         return result.Success
-            ? Success<TokenResponse>(result.Message, result.Token, result.LocalizationKey!)
+            ? Success(result.Message, result.LocalizationKey!)
             : Fail(result.Message, ReturnCode.RegisterFail, result.LocalizationKey!);
     }
 
@@ -417,6 +448,24 @@ public class PassportV2Controller(
     }
 
     /// <summary>
+    /// 脱敏邮箱，避免通过链接状态接口枚举账号.
+    /// </summary>
+    /// <param name="email">原始邮箱.</param>
+    /// <returns>形如 ab***@example.com 的展示值.</returns>
+    private static string MaskEmail(string email)
+    {
+        int at = email.IndexOf('@', StringComparison.Ordinal);
+        if (at <= 0)
+        {
+            return $"{email[..Math.Min(email.Length, 2)]}***";
+        }
+
+        string local = email[..at];
+        string prefix = local.Length <= 2 ? local[..1] : local[..2];
+        return $"{prefix}***{email[at..]}";
+    }
+
+    /// <summary>
     /// 根据场景发送对应的验证码邮件.
     /// </summary>
     /// <param name="request">验证码请求.</param>
@@ -427,63 +476,67 @@ public class PassportV2Controller(
     /// <returns>验证码发送结果.</returns>
     private async Task<IActionResult> PrivateRequestVerifyCodeAsync(PassportRequest request, string normalizedUserName, string userName, bool userExists, string code)
     {
-        try
+        if (request.IsResetUserName)
         {
-            if (request.IsResetPassword)
+            if (!userExists)
             {
-                if (!userExists)
-                {
-                    passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.ResetPassword);
-                    return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserNotExisted);
-                }
-
-                await mailService.SendResetPasswordVerifyCodeAsync(userName, code).ConfigureAwait(false);
-                return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
+                passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.ResetUserName);
+                return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserNotExisted);
             }
 
-            if (request.IsResetUserName)
-            {
-                if (!userExists)
-                {
-                    passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.ResetUserName);
-                    return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserNotExisted);
-                }
-
-                await mailService.SendResetUsernameVerifyCodeAsync(userName, code).ConfigureAwait(false);
-                return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
-            }
-
-            if (request.IsCancelRegistration)
-            {
-                if (!userExists)
-                {
-                    passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.CancelRegistration);
-                    return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserNotExisted);
-                }
-
-                await mailService.SendCancelRegistrationVerifyCodeAsync(userName, code).ConfigureAwait(false);
-                return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
-            }
-
-            if (userExists)
-            {
-                passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.Registration);
-                passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.ResetUserNameNew);
-                return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserAlreadyExisted);
-            }
-
-            if (request.IsResetUserNameNew)
-            {
-                await mailService.SendResetUsernameVerifyCodeAsync(userName, code).ConfigureAwait(false);
-                return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
-            }
-
-            await mailService.SendRegistrationVerifyCodeAsync(userName, code).ConfigureAwait(false);
+            await mailService.SendResetUsernameVerifyCodeAsync(userName, code).ConfigureAwait(false);
             return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
         }
-        catch (ParseException)
+
+        if (request.IsCancelRegistration)
         {
-            return Fail("Failed to request verification code", ReturnCode.InvalidUserName, ServerKeys.ServerPassportVerifyRequestUserNameInvalid);
+            if (!userExists)
+            {
+                passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.CancelRegistration);
+                return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserNotExisted);
+            }
+
+            await mailService.SendCancelRegistrationVerifyCodeAsync(userName, code).ConfigureAwait(false);
+            return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
         }
+
+        if (userExists)
+        {
+            passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.Registration);
+            passportVerificationService.RemoveVerifyCode(normalizedUserName, PassportVerificationService.ResetUserNameNew);
+            return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserAlreadyExisted);
+        }
+
+        if (request.IsResetUserNameNew)
+        {
+            await mailService.SendResetUsernameVerifyCodeAsync(userName, code).ConfigureAwait(false);
+            return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
+        }
+
+        await mailService.SendRegistrationVerifyCodeAsync(userName, code).ConfigureAwait(false);
+        return Success("Verification code requested successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
+    }
+
+    /// <summary>
+    /// 签发并通过邮件下发重置密码链接，同一邮箱按配置的冷却时间限流.
+    /// </summary>
+    /// <param name="normalizedUserName">标准化后的邮箱.</param>
+    /// <param name="userName">原始邮箱.</param>
+    /// <returns>链接下发结果.</returns>
+    private async Task<IActionResult> RequestResetPasswordLinkAsync(string normalizedUserName, string userName)
+    {
+        if (!appDbContext.Users.Any(u => u.NormalizedUserName == normalizedUserName))
+        {
+            return Fail("Failed to request verification code", ReturnCode.VerifyCodeNotAllowed, ServerKeys.ServerPassportVerifyRequestUserNotExisted);
+        }
+
+        if (!passportVerificationService.TryGenerateResetToken(normalizedUserName, userName, out string token))
+        {
+            int cooldownSeconds = passportVerificationService.GetResetTokenResendCooldownSeconds(normalizedUserName);
+            return Fail($"Too many requests, please try again in {cooldownSeconds} seconds", ReturnCode.VerifyCodeTooFrequently);
+        }
+
+        await mailService.SendResetPasswordLinkAsync(userName, token).ConfigureAwait(false);
+        return Success("Reset link sent successfully", ServerKeys.ServerPassportVerifyRequestSuccess);
     }
 }

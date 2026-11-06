@@ -337,7 +337,7 @@ export default function UserPage() {
               width: 300,
               fixed: 'right',
               render: (_value: unknown, record: UserListItem) => (
-                <Space spacing="tight">
+                <Space spacing="tight" wrap>
                   <Button size="small" theme="borderless" type="primary" onClick={() => openDetail(record)}>
                     {t('user.list.detail')}
                   </Button>

@@ -24,7 +24,7 @@ public sealed class AdminAccountController(AdminSsoService adminSsoService) : Co
         int? currentAccountId = this.TryGetAdminAccountId(out int accountId) ? accountId : null;
         List<AdminAccountItem> items = await adminSsoService.ListAsync(currentAccountId, cancellationToken).ConfigureAwait(false);
 
-        return Success<List<AdminAccountItem>>("Admin account list acquired successfully", items, ServerKeys.ServerAdminAccountListSucceed);
+        return Success("Admin account list acquired successfully", items, ServerKeys.ServerAdminAccountListSucceed);
     }
 
     /// <summary>

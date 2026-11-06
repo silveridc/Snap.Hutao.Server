@@ -67,7 +67,18 @@
       "colOp": "操作",
       "runNow": "立即执行",
       "running": "执行中…",
-      "runSuccess": "任务 {name} 已触发"
+      "runSuccess": "任务 {name} 已触发",
+      "viewLogs": "查看任务日志",
+      "log": {
+        "title": "执行日志 · {name}",
+        "empty": "暂无执行记录",
+        "colResult": "结果",
+        "colStartedAt": "开始时间",
+        "colDuration": "耗时",
+        "colError": "异常",
+        "success": "成功",
+        "failure": "失败"
+      }
     },
     "account": {
       "title": "账号信息",

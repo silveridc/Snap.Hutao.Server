@@ -8,7 +8,9 @@ import { getCaptchaSettings } from '@/api/passport';
 import { getSsoChallenge, getSsoStatus } from '@/api/sso';
 import { useAuth } from '@/auth/AuthProvider';
 import { t, useLocale } from '@/i18n';
+import { get } from '@/lib/http';
 import { getReCaptchaToken } from '@/lib/recaptcha';
+import type { TodayWallpaper } from '@/types/api';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export default function LoginPage() {
   const [sso, setSso] = useState({ enabled: false, displayName: '' });
   const [siteKey, setSiteKey] = useState('');
   const [ssoLoading, setSsoLoading] = useState(false);
+  const [wallpaper, setWallpaper] = useState('');
 
   const redirect = params.get('redirect') || '/';
 
@@ -40,6 +43,10 @@ export default function LoginPage() {
     getCaptchaSettings()
       .then((settings) => setSiteKey(settings?.Enabled ? (settings.SiteKey ?? '') : ''))
       .catch(() => setSiteKey(''));
+    // 登录页是匿名页，壁纸接口也是公开的，拿不到就退回纯色背景
+    get<TodayWallpaper>('/api/wallpapers/today')
+      .then((envelope) => setWallpaper(envelope.data?.url ?? ''))
+      .catch(() => setWallpaper(''));
   }, []);
 
   async function onSubmit(event: FormEvent) {
@@ -82,17 +89,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-semi-color-bg-0 px-4">
-      <div className="w-full max-w-[380px]">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 bg-semi-color-bg-0">
+      {wallpaper && (
+        <>
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${wallpaper})` }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-black/45" />
+        </>
+      )}
+
+      <div className="relative w-full max-w-[380px]">
         <div className="mb-6 text-center">
-          <Typography.Title heading={3} className="!mb-1">
+          <Typography.Title heading={3} className="!mb-1" style={wallpaper ? { color: '#fff' } : undefined}>
             {t('common.brand')}
           </Typography.Title>
-          <Typography.Text type="tertiary">{t('common.subtitle')}</Typography.Text>
-          <div className="mt-2 text-xs text-semi-color-text-2">{t('login.tip')}</div>
+          <Typography.Text type="tertiary" style={wallpaper ? { color: 'rgba(255,255,255,.85)' } : undefined}>
+            {t('common.subtitle')}
+          </Typography.Text>
+          <div className="mt-2 text-xs text-semi-color-text-2" style={wallpaper ? { color: 'rgba(255,255,255,.65)' } : undefined}>
+            {t('login.tip')}
+          </div>
         </div>
 
-        <Card bodyStyle={{ padding: 20 }} className="!shadow-none">
+        <Card
+          bodyStyle={{ padding: 20 }}
+          className={wallpaper ? '!bg-white/85 !shadow-lg backdrop-blur' : '!shadow-none'}
+        >
           <form onSubmit={onSubmit} className="space-y-3">
             <Input
               size="large"
@@ -126,7 +147,25 @@ export default function LoginPage() {
           )}
         </Card>
 
-        <div className="mt-6 text-center text-xs text-semi-color-text-3">{t('common.copyright')}</div>
+        <div
+          className="mt-6 text-center text-xs text-semi-color-text-3"
+          style={wallpaper ? { color: 'rgba(255,255,255,.55)' } : undefined}
+        >
+          {t('common.copyright')}
+          {/* 右下角角标被 CSS 隐藏了，Google 条款要求改成在页面上标注出处；后端未启用人机验证时整行不出现 */}
+          {siteKey && (
+            <div className="mt-1">
+              {t('login.captcha.notice')}{' '}
+              <a className="underline" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
+                {t('login.captcha.privacy')}
+              </a>
+              {' · '}
+              <a className="underline" href="https://policies.google.com/terms" target="_blank" rel="noreferrer">
+                {t('login.captcha.terms')}
+              </a>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

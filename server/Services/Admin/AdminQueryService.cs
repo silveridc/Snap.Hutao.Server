@@ -317,6 +317,49 @@ public sealed class AdminQueryService(AppDbContext appDbContext, IpRegionService
         return new PagedResult<UserLoginLogItem> { Total = total, Page = page, PageSize = pageSize, Items = items };
     }
 
+    /// <summary>定时任务执行记录：按任务实现类型过滤，最新的在前.</summary>
+    public async Task<PagedResult<JobLogItem>> GetJobLogsAsync(int page, int pageSize, string? jobType, bool? success)
+    {
+        page = page < 1 ? 1 : page;
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        IQueryable<JobLog> query = appDbContext.JobLogs.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(jobType))
+        {
+            string type = jobType.Trim();
+            query = query.Where(log => log.JobType == type);
+        }
+
+        if (success is bool successFilter)
+        {
+            query = query.Where(log => log.Success == successFilter);
+        }
+
+        long total = await query.LongCountAsync().ConfigureAwait(false);
+        List<JobLog> rows = await query
+            .OrderByDescending(log => log.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        List<JobLogItem> items =
+        [
+            .. rows.Select(row => new JobLogItem
+            {
+                Id = row.Id,
+                JobType = row.JobType,
+                Success = row.Success,
+                Error = row.Error,
+                StartedAt = row.StartedAt,
+                DurationMs = row.DurationMs,
+            }),
+        ];
+
+        return new PagedResult<JobLogItem> { Total = total, Page = page, PageSize = pageSize, Items = items };
+    }
+
     public async Task<UserDetail?> GetUserDetailAsync(int userId)
     {
         HutaoUser? user = await appDbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);

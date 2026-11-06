@@ -132,8 +132,8 @@ export default function HomePage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <Typography.Title heading={4} className="!mb-1 !text-[20px]">
+        <div className="min-w-0">
+          <Typography.Title heading={4} className="!mb-1 !text-[20px] !whitespace-normal break-all">
             {t(greetingKey(), { name: user?.UserName ?? '' })}
           </Typography.Title>
           <Typography.Text type="tertiary" className="!text-[13px]">
@@ -167,9 +167,10 @@ export default function HomePage() {
               </div>
               <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-dashed border-semi-color-border pt-3 md:grid-cols-3">
                 {facts.map((fact) => (
-                  <div key={fact.label} className="min-w-0 text-xs">
-                    <span className="tabular font-semibold text-semi-color-text-0">{fact.value}</span>
-                    <span className="ml-1 truncate text-semi-color-text-2">{fact.label}</span>
+                  <div key={fact.label} className="flex min-w-0 items-baseline gap-1 text-xs">
+                    <span className="shrink-0 tabular font-semibold text-semi-color-text-0">{fact.value}</span>
+                    {/* truncate 对行内 span 无效（需要块级盒），改成 flex 子项才能真正省略号截断 */}
+                    <span className="min-w-0 truncate text-semi-color-text-2">{fact.label}</span>
                   </div>
                 ))}
               </div>

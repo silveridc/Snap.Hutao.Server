@@ -32,6 +32,7 @@ public sealed class PassportV2Tests
         string? verifyCode = null,
         string? newUserName = null,
         string? newVerifyCode = null,
+        string? token = null,
         bool isResetPassword = false,
         bool isResetUserName = false,
         bool isResetUserNameNew = false,
@@ -67,6 +68,11 @@ public sealed class PassportV2Tests
         if (newVerifyCode is not null)
         {
             body["NewVerifyCode"] = RsaPayload.Encrypt(newVerifyCode);
+        }
+
+        if (token is not null)
+        {
+            body["Token"] = RsaPayload.Encrypt(token);
         }
 
         if (isResetPassword)
@@ -105,6 +111,21 @@ public sealed class PassportV2Tests
         Assert.Equal(ReturnCodes.Success, parsed.Retcode);
 
         return await factory.Smtp.WaitForVerifyCodeAsync(TimeSpan.FromSeconds(30));
+    }
+
+    /// <summary>
+    /// 申请重置密码链接并从假 SMTP 中取出邮件里那条链接的 token.
+    /// 重置密码不再走验证码，链接一次性、15 分钟有效.
+    /// </summary>
+    private async Task<string> RequestResetTokenAsync(string email)
+    {
+        factory.Smtp.Clear();
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/verification-codes", Body(userName: email, isResetPassword: true), token: null);
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        return await factory.Smtp.WaitForResetTokenAsync(TimeSpan.FromSeconds(30));
     }
 
     [Fact]
@@ -393,15 +414,26 @@ public sealed class PassportV2Tests
     }
 
     [Fact]
-    public async Task ResetPassword_WithValidCode_ChangesPassword()
+    public async Task ResetPassword_WithValidLink_ChangesPassword()
     {
         TestUser user = await users.CreateUniqueAsync("v2-resetpwd");
         const string newPassword = "BrandNewPassword456";
 
-        string code = await RequestVerifyCodeAsync(Body(userName: user.UserName, isResetPassword: true));
+        string token = await RequestResetTokenAsync(user.UserName);
+
+        using HttpResponseMessage stateResponse = await client.GetWithTokenAsync(
+            $"/api/passport/v2/password/reset/{token}", token: null);
+        TestResponse state = await stateResponse.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, state.Retcode);
+
+        PassportResetLinkState? link = state.DeserializeData<PassportResetLinkState>();
+        Assert.NotNull(link);
+        Assert.EndsWith("@example.com", link!.UserName, StringComparison.Ordinal);
+        Assert.Contains("***", link.UserName, StringComparison.Ordinal);
+        Assert.True(link.ExpireInSeconds is > 0 and <= 900);
 
         using HttpResponseMessage response = await client.SendJsonWithTokenAsync(HttpMethod.Put,
-            "/api/passport/v2/accounts/me/password", Body(userName: user.UserName, password: newPassword, verifyCode: code), token: null);
+            "/api/passport/v2/password/reset", Body(token: token, password: newPassword), token: null);
         Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
 
         using HttpResponseMessage loginResponse = await client.PostJsonWithTokenAsync(
@@ -411,14 +443,55 @@ public sealed class PassportV2Tests
     }
 
     [Fact]
+    public async Task ResetPassword_WithUsedLink_Fails()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-resetpwd-reuse");
+
+        string token = await RequestResetTokenAsync(user.UserName);
+
+        using HttpResponseMessage first = await client.SendJsonWithTokenAsync(HttpMethod.Put,
+            "/api/passport/v2/password/reset", Body(token: token, password: "BrandNewPassword456"), token: null);
+        Assert.Equal(ReturnCodes.Success, (await first.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage second = await client.SendJsonWithTokenAsync(HttpMethod.Put,
+            "/api/passport/v2/password/reset", Body(token: token, password: "AnotherPassword789"), token: null);
+        Assert.Equal(ReturnCodes.RegisterFail, (await second.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage stateResponse = await client.GetWithTokenAsync(
+            $"/api/passport/v2/password/reset/{token}", token: null);
+        Assert.Equal(ReturnCodes.RegisterFail, (await stateResponse.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_LinkRequestTwiceWithinOneMinute_IsThrottled()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-resetpwd-throttle");
+
+        await RequestResetTokenAsync(user.UserName);
+
+        using HttpResponseMessage second = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/verification-codes", Body(userName: user.UserName, isResetPassword: true), token: null);
+        Assert.Equal(ReturnCodes.VerifyCodeTooFrequently, (await second.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
     public async Task ResetPassword_WithSamePassword_Fails()
     {
         TestUser user = await users.CreateUniqueAsync("v2-resetpwd-same");
 
-        string code = await RequestVerifyCodeAsync(Body(userName: user.UserName, isResetPassword: true));
+        string token = await RequestResetTokenAsync(user.UserName);
 
         using HttpResponseMessage response = await client.SendJsonWithTokenAsync(HttpMethod.Put,
-            "/api/passport/v2/accounts/me/password", Body(userName: user.UserName, password: Password, verifyCode: code), token: null);
+            "/api/passport/v2/password/reset", Body(token: token, password: Password), token: null);
+
+        Assert.Equal(ReturnCodes.RegisterFail, (await response.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithUnknownLink_Fails()
+    {
+        using HttpResponseMessage response = await client.GetWithTokenAsync(
+            "/api/passport/v2/password/reset/00000000000000000000000000000000", token: null);
 
         Assert.Equal(ReturnCodes.RegisterFail, (await response.ReadTestResponseAsync()).Retcode);
     }

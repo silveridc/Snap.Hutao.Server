@@ -16,6 +16,11 @@
       "defaultName": "单点登录",
       "fail": "无法发起单点登录"
     },
+    "captcha": {
+      "notice": "受 reCAPTCHA 保护，详见",
+      "privacy": "Google 隐私政策",
+      "terms": "服务条款"
+    },
     "messages": {
       "loginSuccess": "登录成功",
       "loginFail": "登录失败",

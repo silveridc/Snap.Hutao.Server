@@ -1,12 +1,11 @@
 using server.Models.Admin;
 using server.Models.Entity;
 using server.Services.Admin;
-using System.Text.RegularExpressions;
 
 namespace server.Controllers.Filter;
 
 // Transient
-public sealed partial class AuditLogActionFilter(IServiceScopeFactory scopeFactory, ILogger<AuditLogActionFilter> logger, TimeProvider timeProvider) : IAsyncActionFilter
+public sealed class AuditLogActionFilter(IServiceScopeFactory scopeFactory, ILogger<AuditLogActionFilter> logger, TimeProvider timeProvider) : IAsyncActionFilter
 {
     private const int _maxDetailLength = 2000;
 
@@ -35,7 +34,7 @@ public sealed partial class AuditLogActionFilter(IServiceScopeFactory scopeFacto
                 AdminAccountId = accountId > 0 ? accountId : null,
                 AdminAccountName = await GetAdminAccountNameAsync(scope.ServiceProvider, accountId).ConfigureAwait(false),
                 Action = context.HttpContext.Request.Path.Value ?? string.Empty,
-                Detail = Redact(SerializeArgs(context.ActionArguments)),
+                Detail = SerializeArgs(context.ActionArguments),
                 Ip = context.HttpContext.GetClientIp(),
                 Success = executed.Exception is null,
                 Timestamp = timeProvider.GetUnixTimeSeconds(),
@@ -72,7 +71,15 @@ public sealed partial class AuditLogActionFilter(IServiceScopeFactory scopeFacto
 
         try
         {
-            string json = JsonSerializer.Serialize(args);
+            JsonElement data = JsonSerializer.SerializeToElement(args);
+            using MemoryStream buffer = new();
+            using (Utf8JsonWriter writer = new(buffer))
+            {
+                WriteRedacted(writer, data);
+            }
+
+            // 先脱敏再截断，避免秘密值被截在一半后绕过清洗
+            string json = Encoding.UTF8.GetString(buffer.ToArray());
             return json.Length > _maxDetailLength ? json[.._maxDetailLength] : json;
         }
         catch
@@ -81,11 +88,39 @@ public sealed partial class AuditLogActionFilter(IServiceScopeFactory scopeFacto
         }
     }
 
-    private static string? Redact(string? detail)
+    private static void WriteRedacted(Utf8JsonWriter writer, JsonElement element)
     {
-        return string.IsNullOrEmpty(detail) ? detail : PasswordRegex().Replace(detail, "\"$1\":\"***\"");
-    }
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                writer.WriteStartObject();
+                foreach (JsonProperty property in element.EnumerateObject())
+                {
+                    writer.WritePropertyName(property.Name);
+                    if (SystemSettingSecurity.IsSensitiveKey(property.Name))
+                    {
+                        writer.WriteStringValue("***");
+                    }
+                    else
+                    {
+                        WriteRedacted(writer, property.Value);
+                    }
+                }
 
-    [GeneratedRegex("\"(\\w*[Pp]assword\\w*)\"\\s*:\\s*\"[^\"]*\"")]
-    private static partial Regex PasswordRegex();
+                writer.WriteEndObject();
+                break;
+            case JsonValueKind.Array:
+                writer.WriteStartArray();
+                foreach (JsonElement item in element.EnumerateArray())
+                {
+                    WriteRedacted(writer, item);
+                }
+
+                writer.WriteEndArray();
+                break;
+            default:
+                element.WriteTo(writer);
+                break;
+        }
+    }
 }

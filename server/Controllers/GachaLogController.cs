@@ -144,7 +144,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
         return result.Kind switch
         {
             GachaLogSaveResultKind.Ok => Success<GachaLogSaveResult>($"Uploaded {uidAndItems.Items.Count} items of Uid {uidAndItems.Uid}, stored {result.SaveCount} items", result),
-            GachaLogSaveResultKind.UidPerUserLimitExceeded => Fail("A Snap Hutao account can store gacha logs of at most 5 Uids", ReturnCode.TooManyGachaLogUids, ServerKeys.ServerGachaLogServiceInsufficientRecordSlot),
+            GachaLogSaveResultKind.UidPerUserLimitExceeded => Fail($"A Snap Hutao account can store gacha logs of at most {gachaLogService.MaxUidPerUser} Uids", ReturnCode.TooManyGachaLogUids),
             GachaLogSaveResultKind.InvalidGachaItemDetected => Fail("Invalid data, unable to save to the cloud", ReturnCode.InvalidGachaLogItems, ServerKeys.ServerGachaLogServiceInvalidGachaLogData),
             GachaLogSaveResultKind.DatebaseOperationFailed => Fail("Data error, unable to save to the cloud", ReturnCode.GachaLogDbException, ServerKeys.ServerGachaLogServiceServerDatabaseError),
             _ => throw new InvalidOperationException(),

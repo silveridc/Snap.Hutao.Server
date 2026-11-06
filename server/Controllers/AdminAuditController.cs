@@ -41,4 +41,23 @@ public sealed class AdminAuditController(AdminQueryService adminQueryService) : 
 
         return Success<PagedResult<UserLoginLogItem>>("Login log acquired successfully", result, ServerKeys.ServerAdminLoginLogListSucceed);
     }
+
+    /// <summary>
+    /// 分页获取定时任务执行记录.
+    /// </summary>
+    /// <param name="page">页码.</param>
+    /// <param name="pageSize">每页条数.</param>
+    /// <param name="jobType">任务实现类型，留空表示全部.</param>
+    /// <param name="success">只看成功或失败的执行，留空表示全部.</param>
+    /// <returns>操作结果.</returns>
+    [HttpGet("job-logs")]
+    public async Task<IActionResult> JobLogListAsync(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? jobType = null,
+        [FromQuery] bool? success = null)
+    {
+        PagedResult<JobLogItem> result = await adminQueryService.GetJobLogsAsync(page, pageSize, jobType, success).ConfigureAwait(false);
+        return Success<PagedResult<JobLogItem>>("Job log acquired successfully", result, ServerKeys.ServerAdminJobLogListSucceed);
+    }
 }

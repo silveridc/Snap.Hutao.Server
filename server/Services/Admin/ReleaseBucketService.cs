@@ -19,6 +19,9 @@ public sealed partial class ReleaseBucketService(
     private const int _maxKeyLength = 1024;
     private const int _presignSeconds = 600;
 
+    // 元数据请求（列举与 HEAD）应在前端 20 秒超时内返回，不能让默认的 100 秒挂死
+    private const int _metadataTimeoutSeconds = 15;
+
     public bool IsConfigured => systemConfig.IsPatchS3SigningEnabled;
 
     private string Host
@@ -46,7 +49,8 @@ public sealed partial class ReleaseBucketService(
         string url = $"https://{Host}/?list-type=2&prefix={Uri.EscapeDataString(normalizedPrefix)}&max-keys={_maxListedKeys}";
 
         using HttpClient client = httpClientFactory.CreateClient();
-        using HttpResponseMessage response = await client.GetAsync(Sign(url), cancellationToken).ConfigureAwait(false);
+        client.Timeout = TimeSpan.FromSeconds(_metadataTimeoutSeconds);
+        using HttpResponseMessage response = await client.GetAsync(Sign(url, HttpMethod.Get), cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
             logger.LogWarning("Bucket list failed: HTTP {Status}", (int)response.StatusCode);
@@ -220,7 +224,7 @@ public sealed partial class ReleaseBucketService(
         // 安装包动辄几百 MiB，默认 100 秒的超时不够从桶里读完一遍.
         client.Timeout = TimeSpan.FromMinutes(30);
         using HttpResponseMessage response = await client
-            .GetAsync(Sign(BuildObjectUrl(key)), HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .GetAsync(Sign(BuildObjectUrl(key), HttpMethod.Get), HttpCompletionOption.ResponseHeadersRead, cancellationToken)
             .ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
@@ -251,10 +255,11 @@ public sealed partial class ReleaseBucketService(
         return $"https://{Host}/{path}";
     }
 
-    private string Sign(string url)
+    private string Sign(string url, HttpMethod method)
     {
-        return S3Presigner.PresignGet(
+        return S3Presigner.Presign(
             url,
+            method,
             systemConfig.GetOrDefault(Keys.PatchS3Region, string.Empty).Trim(),
             systemConfig.GetOrDefault(Keys.PatchS3AccessKeyId, string.Empty).Trim(),
             systemConfig.GetOrDefault(Keys.PatchS3SecretAccessKey, string.Empty),
@@ -264,8 +269,9 @@ public sealed partial class ReleaseBucketService(
     private async Task<(bool Exists, long Length, string Message, string? LocalizationKey)> TryHeadAsync(string key, CancellationToken cancellationToken)
     {
         using HttpClient client = httpClientFactory.CreateClient();
+        client.Timeout = TimeSpan.FromSeconds(_metadataTimeoutSeconds);
         using HttpResponseMessage response = await client
-            .SendAsync(new HttpRequestMessage(HttpMethod.Head, Sign(BuildObjectUrl(key))), cancellationToken)
+            .SendAsync(new HttpRequestMessage(HttpMethod.Head, Sign(BuildObjectUrl(key), HttpMethod.Head)), cancellationToken)
             .ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)

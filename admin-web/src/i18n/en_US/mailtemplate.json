@@ -2,7 +2,7 @@
   "mailtemplate": {
     "title": "Mail Template",
     "description": "Shared HTML template for passport verification codes and redeem codes; saved to the database with the in-memory cache refreshed immediately.",
-    "placeholders": "The following placeholders must be kept (TinyMCE protects them automatically):",
+    "placeholders": "The following placeholders must be kept (they are editable; saving is blocked if one goes missing):",
     "customized": "Custom template in use",
     "default": "Built-in default template",
     "advanced": "Source mode",
@@ -20,6 +20,36 @@
       "resetConfirm": "Delete the custom template and restore the built-in default?",
       "missingPlaceholder": "The template is missing the placeholder {placeholder}",
       "loadDefaultSuccess": "Default template loaded, remember to save"
+    },
+    "content": {
+      "title": "Mail Content",
+      "description": "Configure the SMTP subject, title, body and footer of each mail kind separately; the body supports runtime variables such as {{code}}. Kinds without customization fall back to the built-in defaults.",
+      "kind": "Mail kind",
+      "language": "Language",
+      "subject": "SMTP subject",
+      "contentTitle": "Mail title",
+      "rawContent": "Body content",
+      "footer": "Footer",
+      "variables": "Available variables",
+      "messages": {
+        "saveSuccess": "Mail content saved",
+        "resetSuccess": "Mail content restored to default",
+        "resetConfirm": "Delete the custom content of this mail in this language and restore the built-in default?",
+        "emptyFields": "Subject, title, body and footer are all required",
+        "missingVariable": "The body is missing the required variable {variable}"
+      }
+    },
+    "kind": {
+      "RegisterCode": "Registration code",
+      "ResetPasswordLink": "Password reset link",
+      "ResetUsernameCode": "Username reset code",
+      "CancelRegistrationCode": "Account deletion code",
+      "GachaStorageRedeem": "Gacha storage redeem",
+      "CdnRedeem": "CDN redeem"
+    },
+    "lang": {
+      "CHS": "简体中文",
+      "EN": "English"
     }
   }
 }

@@ -291,3 +291,6 @@ __pycache__/
 node_modules/
 wwwroot/admin/
 wwwroot/doc/
+
+# sourcemap 只给 Sentry 用；wwwroot 下的 .map 会被静态目录直接公开下载
+server/wwwroot/admin/**/*.map

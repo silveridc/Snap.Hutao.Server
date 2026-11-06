@@ -80,6 +80,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
 
     public DbSet<UserLoginLog> UserLoginLogs { get; set; } = default!;
 
+    public DbSet<JobLog> JobLogs { get; set; } = default!;
+
     /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

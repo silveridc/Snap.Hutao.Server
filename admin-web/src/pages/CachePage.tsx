@@ -126,11 +126,12 @@ export default function CachePage() {
       </div>
 
       <Card title={t('cache.browse.title')}>
-        <Space className="mb-4">
+        {/* Space 的子项不会收缩，窄屏下 320 的输入框会顶出卡片；换成可换行的 flex，输入框宽度跟随容器 */}
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <Input
             value={browsePattern}
             placeholder={t('cache.browse.patternPlaceholder')}
-            style={{ width: 320 }}
+            className="w-full max-w-[320px]"
             showClear
             onChange={setBrowsePattern}
             onEnterPress={queryKeys}
@@ -141,7 +142,7 @@ export default function CachePage() {
           <Button type="danger" theme="light" disabled={!selected.length} loading={invalidating} onClick={expireSelected}>
             {t('cache.browse.expireSelected', { count: selected.length })}
           </Button>
-        </Space>
+        </div>
 
         {keyList.error && <Banner type="danger" closeIcon={null} description={keyList.error.message} className="mb-3" />}
 

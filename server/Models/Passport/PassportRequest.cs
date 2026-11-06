@@ -28,6 +28,11 @@ public sealed class PassportRequest
     public string NewVerifyCode { get; set; } = default!;
 
     /// <summary>
+    /// Gets or sets 重置密码链接里的一次性 token.
+    /// </summary>
+    public string Token { get; set; } = default!;
+
+    /// <summary>
     /// Gets or sets a value indicating whether 指示请求用于重置密码.
     /// </summary>
     public bool IsResetPassword

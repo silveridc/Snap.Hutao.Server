@@ -43,6 +43,33 @@ public sealed partial class FakeSmtpServer : IDisposable
         throw new TimeoutException($"No verification code mail received within {timeout}. Messages: {messages.Count}");
     }
 
+    /// <summary>等待一封重置密码链接邮件并返回其中的一次性 token.</summary>
+    public async Task<string> WaitForResetTokenAsync(TimeSpan timeout)
+    {
+        DateTimeOffset deadline = DateTimeOffset.UtcNow + timeout;
+
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            foreach (string message in messages)
+            {
+                // MailKit 把 HTML 正文按 quoted-printable 编码：`=` 写作 `=3D`，长行以 `=` 软换行
+                string decoded = message
+                    .Replace("=\r\n", string.Empty, StringComparison.Ordinal)
+                    .Replace("=3D", "=", StringComparison.Ordinal);
+
+                Match match = ResetTokenPattern().Match(decoded);
+                if (match.Success)
+                {
+                    return match.Groups[1].Value;
+                }
+            }
+
+            await Task.Delay(50);
+        }
+
+        throw new TimeoutException($"No reset link mail received within {timeout}. Messages: {messages.Count}");
+    }
+
     public void Clear()
     {
         messages.Clear();
@@ -143,4 +170,8 @@ public sealed partial class FakeSmtpServer : IDisposable
     // 验证码形如 <span class="mail-code">XXXXXXXX</span>，MailKit 会做 quoted-printable 编码，故允许中间的软换行
     [GeneratedRegex(@"mail-code[^>]*>(?:=\r?\n)?\s*([A-Z0-9]{6,10})\s*<", RegexOptions.IgnoreCase)]
     private static partial Regex VerifyCodePattern();
+
+    // 重置链接形如 .../reset-password.html?token=32位小写十六进制，解码 quoted-printable 后匹配
+    [GeneratedRegex(@"token=([0-9a-f]{32})", RegexOptions.IgnoreCase)]
+    private static partial Regex ResetTokenPattern();
 }

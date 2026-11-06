@@ -533,7 +533,7 @@ export default function RedeemPage() {
             width: 210,
             fixed: 'right' as const,
             render: (_value: unknown, record: RedeemCodeItem) => (
-              <Space spacing="tight">
+              <Space spacing="tight" wrap>
                 <Button size="small" theme="borderless" disabled={!record.UsedCount} onClick={() => openUsages(record)}>
                   {t('redeem.actions.uses')}
                 </Button>
