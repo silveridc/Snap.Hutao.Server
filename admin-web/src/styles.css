@@ -1,0 +1,226 @@
+@layer tailwind-base, semi, tailwind-components, tailwind-utils;
+
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-components {
+  @tailwind components;
+}
+
+@layer tailwind-utils {
+  @tailwind utilities;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+/* 全站只留一条字体串。Lato 是设计意图，但工程里没有打包 webfont、本机也没装，
+   顺位会落到真实存在 600 字重的 Segoe UI（Semibold），中文再顺位到雅黑。
+   不能让 Semi 用它那串：它在 160 条组件规则里硬写了 Inter…Microsoft YaHei…，
+   于是同一屏上我们手写的文本是 Arial、Semi 组件是雅黑，同样一个 font-semibold
+   一边渲染成 Arial Bold、一边渲染成雅黑 Bold，看着就是「字重不对」 */
+:root {
+  --app-font-family: Lato, 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  --app-mono-family: 'JetBrains Mono', 'Cascadia Mono', Consolas, 'Courier New', monospace;
+}
+
+body {
+  margin: 0;
+  font-family: var(--app-font-family);
+  color: var(--semi-color-text-0);
+  background-color: var(--semi-color-bg-0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 把 Semi 组件也拉回同一串。semi.min.css 是层外引入的，普通规则盖不住它的 .semi-* 声明，
+   这里只能同样在层外用 !important；body 本身也要带上，暗色下 Semi 的
+   body[theme-mode=dark] 规则特异度高于上面的 body */
+body,
+body * {
+  font-family: var(--app-font-family) !important;
+}
+
+/* 等宽文本从上面的统一里抢回来：Tailwind 的 font-mono 在 @layer 里，盖不住层外 !important。
+   后代也要一起写：.font-mono 常常挂在外层（如 Semi Tag），文字在它内部的 span 上，
+   而继承来的字体敌不过 body * 那条 !important 声明 */
+.mono,
+.font-mono,
+code,
+pre,
+kbd,
+samp,
+.mono *,
+.font-mono *,
+code *,
+pre * {
+  font-family: var(--app-mono-family) !important;
+}
+
+a {
+  color: inherit;
+}
+
+/* 等宽数字与代码类文本，后台大量指标要靠它对齐 */
+.mono,
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 卡片内的「标签 / 值」两列行，替代原先一排 t-descriptions */
+.info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--semi-color-border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--semi-color-text-2);
+}
+
+.info-value {
+  min-width: 0;
+  text-align: right;
+  word-break: break-all;
+  font-size: 13px;
+  color: var(--semi-color-text-0);
+}
+
+/* 侧栏在窄屏收起后不要让导航文字换行 */
+.semi-navigation-item {
+  margin-bottom: 4px !important;
+}
+
+/* Semi 2.104 把直接挂在 list 下的一级导航项写成 font-weight:600，整条侧栏全粗；
+   newapi classic 的侧栏是常态常规、选中才加重，这里按基线压回来。
+   中文顺位是雅黑，它只有 Regular/Bold 两档，600 等于全粗，所以一级项必须回 400 */
+.semi-navigation-list > .semi-navigation-item {
+  font-weight: 400 !important;
+}
+
+.semi-navigation-list > .semi-navigation-item-selected {
+  font-weight: 500 !important;
+}
+
+.semi-navigation-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 侧栏分组标题（newapi classic 的分类标签）：收起时整个隐藏，只留图标 */
+.nav-group-label {
+  padding: 14px 14px 4px;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--semi-color-text-2);
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.semi-navigation-collapsed .nav-group-label {
+  display: none;
+}
+
+/* ===== newapi classic 风格基线 ===== */
+
+/* 玻璃顶栏：内容从底下滚过时毛玻璃虚化（newapi 的 bg-white/75 + backdrop-blur）。
+   透明度比 newapi 再低一档（0.65）、模糊 20px，纯白页面上才看得出雾；
+   不要再加 border-b，一条实线会把顶栏压成不透明板子，毛玻璃就白做了。
+   这里不能用 Tailwind 的 dark:!bg-* —— 工具类在 @layer 里，而 important 的层序是反的 */
+.semi-layout-header {
+  background: rgba(255, 255, 255, 0.65) !important;
+}
+
+html.dark .semi-layout-header {
+  background: rgba(24, 24, 27, 0.65) !important;
+}
+
+/* 控件统一 10px 圆角（同 newapi classic 的全局覆盖） */
+.semi-radio,
+.semi-tagInput,
+.semi-input-textarea-wrapper,
+.semi-navigation-sub-title,
+.semi-page-item,
+.semi-navigation-item,
+.semi-tag-closable,
+.semi-input-wrapper,
+.semi-tabs-tab-button,
+.semi-select,
+.semi-button,
+.semi-datepicker-range-input {
+  border-radius: 10px !important;
+}
+
+/* 卡片：16px 大圆角、无边框、轻阴影，头/体 padding 收紧到 10px */
+.semi-card {
+  border-radius: 16px !important;
+  border: 0 !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+.semi-card-header,
+.semi-card-body {
+  padding: 10px !important;
+}
+
+/* 侧栏滚动条：newapi classic 的做法是直接隐藏（.sidebar-nav 的 scrollbar-width:none
+   + ::-webkit-scrollbar{display:none}），滚轮照常滚，但不占那条约 17px 的原生轨道——
+   轨道一出现，Nav 的固定 240 就被挤得贴边，分组文字也跟着变窄 */
+.sider-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sider-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* 表格滚动条收细，避免宽表横向滚动时压住行高 */
+.semi-table-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.semi-table-body::-webkit-scrollbar-thumb {
+  background: rgba(var(--semi-grey-2), 0.3);
+  border-radius: 2px;
+}
+
+.semi-table-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--semi-grey-2), 0.5);
+}
+
+.semi-table-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* reCAPTCHA v3 是 invisible 模式（登录页只 grecaptcha.execute 拿 token，页面上没有
+   验证框），但 api.js 仍会往 body 末尾插一个 256×60 的 position:fixed 角标，
+   右下角压在登录卡片上。visibility 而不是 display：Google 文档给的就是这一条，
+   元素留在 DOM 里，token 流程不受影响 */
+.grecaptcha-badge {
+  visibility: hidden !important;
+}

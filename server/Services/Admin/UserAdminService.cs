@@ -1,0 +1,177 @@
+using server.Models.Admin;
+
+namespace server.Services.Admin;
+
+// Scoped
+public sealed class UserAdminService(AppDbContext appDbContext, IDistributedCache cache, UserManager<HutaoUser> userManager, TimeProvider timeProvider)
+{
+    public const string StatisticsCacheKey = "Admin:UserStatistics";
+    private static readonly TimeSpan StatisticsCacheDuration = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// Gets the aggregated user statistics, cached for a short period.
+    /// </summary>
+    /// <returns>The current user statistics.</returns>
+    public async Task<UserStatistics> GetStatisticsAsync()
+    {
+        if (cache.TryGetValue(StatisticsCacheKey, out UserStatistics? cached) && cached is not null)
+        {
+            return cached;
+        }
+
+        long now = timeProvider.GetUnixTimeSeconds();
+        DateTimeOffset localNow = timeProvider.GetLocalNow();
+        long dayStart = new DateTimeOffset(localNow.Date, localNow.Offset).ToUnixTimeSeconds();
+
+        UserStatistics statistics = new()
+        {
+            TotalUsers = await appDbContext.Users.CountAsync().ConfigureAwait(false),
+            Maintainers = await appDbContext.Users.CountAsync(u => u.IsMaintainer).ConfigureAwait(false),
+            LicensedDevelopers = await appDbContext.Users.CountAsync(u => u.IsLicensedDeveloper).ConfigureAwait(false),
+            ActiveGachaLogUsers = await appDbContext.Users.CountAsync(u => u.GachaLogExpireAt > now).ConfigureAwait(false),
+            ActiveCdnUsers = await appDbContext.Users.CountAsync(u => u.CdnExpireAt > now).ConfigureAwait(false),
+            BannedUids = await appDbContext.BannedList.CountAsync().ConfigureAwait(false),
+            GachaItemCount = await appDbContext.GachaItems.LongCountAsync().ConfigureAwait(false),
+            SpiralAbyssRecordCount = await appDbContext.Records.CountAsync().ConfigureAwait(false),
+            RoleCombatRecordCount = await appDbContext.RoleCombatRecords.CountAsync().ConfigureAwait(false),
+            NewUsersToday = await appDbContext.Users.CountAsync(u => u.CreatedAt >= dayStart).ConfigureAwait(false),
+            NewUsersLast7Days = await appDbContext.Users.CountAsync(u => u.CreatedAt >= now - 604800).ConfigureAwait(false),
+            NewUsersLast30Days = await appDbContext.Users.CountAsync(u => u.CreatedAt >= now - 2592000).ConfigureAwait(false),
+        };
+
+        cache.Set(StatisticsCacheKey, statistics, StatisticsCacheDuration);
+        return statistics;
+    }
+
+    /// <summary>
+    /// Gets a page of users, optionally filtered by keyword, privilege flags, or privileges expiring soon.
+    /// </summary>
+    /// <param name="page">The one-based page number; values below 1 are treated as 1.</param>
+    /// <param name="pageSize">The page size, clamped to the range 1-100.</param>
+    /// <param name="keyword">The optional user name or email keyword.</param>
+    /// <param name="maintainer">The optional maintainer privilege filter.</param>
+    /// <param name="developer">The optional licensed developer privilege filter.</param>
+    /// <param name="expiringInDays">The optional filter for privileges expiring within the given number of days.</param>
+    /// <returns>The requested page of users.</returns>
+    public async Task<PagedResult<UserListItem>> GetUsersAsync(int page, int pageSize, string? keyword, bool? maintainer = null, bool? developer = null, int? expiringInDays = null)
+    {
+        page = page < 1 ? 1 : page;
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        IQueryable<HutaoUser> query = appDbContext.Users.AsNoTracking();
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            string trimmed = keyword.Trim();
+            query = query.Where(u => (u.UserName != null && u.UserName.Contains(trimmed)) || (u.Email != null && u.Email.Contains(trimmed)));
+        }
+
+        if (maintainer is { } m)
+        {
+            query = query.Where(u => u.IsMaintainer == m);
+        }
+
+        if (developer is { } d)
+        {
+            query = query.Where(u => u.IsLicensedDeveloper == d);
+        }
+
+        if (expiringInDays is { } days && days > 0)
+        {
+            long now = timeProvider.GetUnixTimeSeconds();
+            long threshold = timeProvider.GetUtcNow().AddDays(days).ToUnixTimeSeconds();
+            query = query.Where(u =>
+                (u.GachaLogExpireAt > now && u.GachaLogExpireAt <= threshold) ||
+                (u.CdnExpireAt > now && u.CdnExpireAt <= threshold));
+        }
+
+        long total = await query.LongCountAsync().ConfigureAwait(false);
+        List<UserListItem> items = await query
+            .OrderBy(u => u.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(u => new UserListItem
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                IsMaintainer = u.IsMaintainer,
+                IsLicensedDeveloper = u.IsLicensedDeveloper,
+                GachaLogExpireAt = u.GachaLogExpireAt,
+                CdnExpireAt = u.CdnExpireAt,
+            })
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return new PagedResult<UserListItem>
+        {
+            Total = total,
+            Page = page,
+            PageSize = pageSize,
+            Items = items,
+        };
+    }
+
+    /// <summary>
+    /// Updates the maintainer and licensed developer flags of the specified user and invalidates the related caches.
+    /// </summary>
+    /// <param name="userId">The user identifier.</param>
+    /// <param name="isMaintainer">The new maintainer flag, or <see langword="null"/> to leave it unchanged.</param>
+    /// <param name="isLicensedDeveloper">The new licensed developer flag, or <see langword="null"/> to leave it unchanged.</param>
+    /// <returns>
+    /// <see langword="true"/> if the user exists and was updated; otherwise, <see langword="false"/>.
+    /// </returns>
+    public async Task<bool> UpdatePrivilegeAsync(int userId, bool? isMaintainer, bool? isLicensedDeveloper)
+    {
+        HutaoUser? user = await appDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+        if (user is null)
+        {
+            return false;
+        }
+
+        if (isMaintainer.HasValue)
+        {
+            user.IsMaintainer = isMaintainer.Value;
+        }
+
+        if (isLicensedDeveloper.HasValue)
+        {
+            user.IsLicensedDeveloper = isLicensedDeveloper.Value;
+        }
+
+        await appDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        // ValidateMaintainPermission 会缓存维护者判定 15 分钟，这里主动失效使其立即生效
+        cache.Remove($"User:IsMaintainer:{userId}");
+        cache.Remove(StatisticsCacheKey);
+        return true;
+    }
+
+    /// <summary>
+    /// Resets the password of the specified user on behalf of an administrator.
+    /// </summary>
+    /// <param name="userId">The user identifier.</param>
+    /// <param name="newPassword">The new password.</param>
+    /// <returns>
+    /// A tuple containing whether the reset succeeded, the error description when it failed,
+    /// and the localization key of the error message.
+    /// </returns>
+    public async Task<(bool Ok, string? Error, string? LocalizationKey)> ResetPasswordAsync(int userId, string newPassword)
+    {
+        HutaoUser? user = await userManager.FindByIdAsync(userId.ToString()).ConfigureAwait(false);
+        if (user is null)
+        {
+            return (false, "User does not exist", ServerKeys.ServerAdminUserNotFound);
+        }
+
+        // 手工 SQL 插入/迁移来的历史行可能没有 stamp，而下面的令牌路径读到 null 会直接抛（生产实测 500）.补盖后再继续.
+        if (string.IsNullOrEmpty(user.SecurityStamp))
+        {
+            await userManager.UpdateSecurityStampAsync(user).ConfigureAwait(false);
+        }
+
+        string token = await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
+        IdentityResult result = await userManager.ResetPasswordAsync(user, token, newPassword).ConfigureAwait(false);
+        return result.Succeeded
+            ? (true, null, null)
+            : (false, string.Join("; ", result.Errors.Select(e => e.Description)), null);
+    }
+}

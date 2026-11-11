@@ -1,0 +1,88 @@
+{
+  "redeem": {
+    "service": {
+      "gachalog": "祈愿记录",
+      "cdn": "CDN / 胡桃云"
+    },
+    "limit": {
+      "time": "限时",
+      "times": "限次",
+      "none": "无限制"
+    },
+    "gen": {
+      "title": "生成兑换码",
+      "tipPre": "对应 ",
+      "tipSuf": "，时间限制与次数限制可叠加。",
+      "serviceType": "服务类型",
+      "count": "生成数量",
+      "valueDays": "服务时长（天）",
+      "limitMode": "限制方式",
+      "limitModeHint": "两项都不勾选即为不限时、不限次",
+      "expireTime": "过期时间",
+      "times": "可使用次数",
+      "description": "备注",
+      "descriptionPlaceholder": "可选，说明这批兑换码的用途",
+      "submit": "生成",
+      "resultCount": "已生成 {n} 张兑换码",
+      "copyAll": "复制全部",
+      "copied": "已复制到剪贴板",
+      "copyFail": "复制失败，请手动选择文本复制"
+    },
+    "use": {
+      "title": "代为兑换",
+      "tipPre": "对应 ",
+      "tipSuf": "，用户留空时按当前登录账号兑换。",
+      "code": "兑换码",
+      "codePlaceholder": "18 位兑换码",
+      "username": "目标用户",
+      "usernamePlaceholder": "用户名 / 邮箱，留空为当前账号",
+      "submit": "兑换",
+      "result": "兑换成功：{service} 服务延长 {days} 天，有效期至 {expire}"
+    },
+    "list": {
+      "title": "兑换码列表",
+      "searchPlaceholder": "按兑换码 / 备注 / 创建者搜索",
+      "colCode": "兑换码",
+      "colService": "服务",
+      "colValue": "时长(天)",
+      "colLimit": "限制",
+      "colExpire": "过期时间",
+      "colUsed": "已用 / 上限",
+      "colDescription": "备注",
+      "colCreator": "创建者",
+      "colCreateTime": "创建时间",
+      "colOp": "操作",
+      "batchDelete": "批量删除（{n}）",
+      "exportCsv": "导出 CSV"
+    },
+    "edit": {
+      "title": "编辑兑换码"
+    },
+    "actions": {
+      "uses": "使用记录"
+    },
+    "dialog": {
+      "removeTitle": "删除兑换码",
+      "removeBody": "确定删除兑换码 {code}？它的使用记录会一并删除。",
+      "batchRemoveTitle": "批量删除兑换码",
+      "batchRemoveBody": "确定删除选中的 {n} 张兑换码？它们的使用记录会一并删除。"
+    },
+    "messages": {
+      "countRequired": "请填写生成数量",
+      "codeRequired": "请填写兑换码",
+      "expireTimeRequired": "勾选了时间限制，请选择过期时间",
+      "timesRequired": "勾选了次数限制，请填写可使用次数",
+      "selectFirst": "请先勾选要删除的兑换码",
+      "batchDeleted": "已删除 {n} 张兑换码",
+      "exportEmpty": "没有可导出的兑换码",
+      "exportLimited": "兑换码超过 {max} 张，CSV 只导出前 {max} 张"
+    },
+    "uses": {
+      "title": "{code} 的使用记录",
+      "colUser": "用户",
+      "colUserId": "用户 ID",
+      "colTime": "使用时间",
+      "empty": "还没有人使用这张兑换码"
+    }
+  }
+}

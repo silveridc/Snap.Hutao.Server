@@ -1,0 +1,55 @@
+{
+  "analytics": {
+    "gacha": {
+      "title": "卡池抽卡分布",
+      "colPool": "卡池",
+      "colPulls": "抽数",
+      "colStar5": "五星数",
+      "colRate": "五星出率",
+      "colAverage": "平均每金抽数",
+      "totalPulls": "有效抽数",
+      "totalStar5": "五星数量",
+      "star5Rate": "五星出率",
+      "untrusted": "未计入（不可信）",
+      "topItems": "出得最多的五星",
+      "days7": "7 天",
+      "days30": "30 天",
+      "days90": "90 天",
+      "daysAll": "全部",
+      "pool": {
+        "100": "新手池",
+        "200": "常驻池",
+        "301": "角色活动",
+        "302": "武器活动",
+        "400": "集录祈愿",
+        "500": "城市活动"
+      }
+    },
+    "abyss": {
+      "title": "深渊玩法数据",
+      "spiral": "深境螺旋",
+      "theater": "幻想真境剧诗",
+      "records": "上传记录",
+      "uniqueUids": "覆盖 UID",
+      "fullStar": "满星记录",
+      "colFloor": "层",
+      "colRecords": "记录数",
+      "colAverageStar": "平均星数",
+      "topAvatars": "出场角色",
+      "spiralTop": "深境螺旋出场角色"
+    },
+    "damage": {
+      "title": "伤害分布",
+      "tip": "直接聚合 damage_ranks 明细表（MySQL），不依赖 Redis 统计快照.",
+      "totalDamage": "总伤害",
+      "samples": "样本记录数",
+      "colRank": "排名",
+      "colAvatar": "角色 ID",
+      "colDamage": "总伤害",
+      "colShare": "占比"
+    },
+    "messages": {
+      "noData": "暂无数据"
+    }
+  }
+}

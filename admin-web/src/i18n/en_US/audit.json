@@ -1,0 +1,18 @@
+{
+  "audit": {
+    "list": {
+      "title": "Admin Operation Audit",
+      "refresh": "Refresh",
+      "tip": "Records write operations performed by maintainers (banning, password resets, approvals, editing redeem codes/announcements, etc.); sensitive fields such as passwords are masked.",
+      "colTime": "Time",
+      "colOperator": "Operator",
+      "colIp": "Client IP",
+      "colIpRegion": "IP Region",
+      "colAction": "Action",
+      "colResult": "Result",
+      "colDetail": "Details",
+      "success": "Success",
+      "failure": "Error"
+    }
+  }
+}

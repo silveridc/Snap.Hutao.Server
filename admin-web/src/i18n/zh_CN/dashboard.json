@@ -1,0 +1,113 @@
+{
+  "dashboard": {
+    "overview": {
+      "noData": "暂无数据"
+    },
+    "system": {
+      "title": "运行时",
+      "appVersion": "程序版本",
+      "machine": "主机名",
+      "os": "操作系统",
+      "framework": "运行时框架",
+      "processId": "进程 ID",
+      "startedAt": "启动时间",
+      "uptime": "运行时长",
+      "localTime": "服务器本地时间",
+      "timeZone": "时区"
+    },
+    "resource": {
+      "title": "资源占用",
+      "cpu": "CPU 占用",
+      "cores": "逻辑核心",
+      "cpuSeconds": "累计 CPU",
+      "workingSet": "工作集",
+      "privateMemory": "私有内存",
+      "managedHeap": "托管堆",
+      "threads": "线程数",
+      "heapShare": "占私有内存"
+    },
+    "redis": {
+      "title": "Redis",
+      "online": "在线",
+      "offline": "不可用",
+      "endpoint": "接入地址",
+      "version": "版本",
+      "usedMemory": "已用内存",
+      "policy": "淘汰策略",
+      "clients": "客户端数",
+      "keys": "键数量",
+      "uptimeDays": "运行天数",
+      "ping": "Ping 延迟",
+      "instanceName": "实例前缀",
+      "infoUnavailable": "服务端未开放 INFO，部分指标不可用"
+    },
+    "database": {
+      "title": "数据库连接",
+      "colName": "数据上下文",
+      "colStatus": "状态",
+      "colVersion": "服务端版本",
+      "colAddress": "地址",
+      "colDatabase": "库名",
+      "colPool": "连接池上限",
+      "colRoundtrip": "往返耗时"
+    },
+    "scheduler": {
+      "title": "定时任务",
+      "state": "调度器状态",
+      "name": "调度器名称",
+      "instanceId": "实例 ID",
+      "jobCount": "任务数",
+      "triggerCount": "触发器数",
+      "colName": "名称",
+      "colType": "实现类型",
+      "colCron": "Cron",
+      "colState": "触发器状态",
+      "colNext": "下次执行",
+      "colPrevious": "上次执行",
+      "colOp": "操作",
+      "runNow": "立即执行",
+      "running": "执行中…",
+      "runSuccess": "任务 {name} 已触发",
+      "viewLogs": "查看任务日志",
+      "log": {
+        "title": "执行日志 · {name}",
+        "empty": "暂无执行记录",
+        "colResult": "结果",
+        "colStartedAt": "开始时间",
+        "colDuration": "耗时",
+        "colError": "异常",
+        "success": "成功",
+        "failure": "失败"
+      }
+    },
+    "account": {
+      "title": "账号信息",
+      "refresh": "刷新",
+      "email": "邮箱账号",
+      "authKind": "身份类型",
+      "kindAdmin": "后台专属账号",
+      "kindUser": "主站账号",
+      "maintainer": "维护者",
+      "canWrite": "可写权限",
+      "licensedDeveloper": "开发者授权",
+      "gachaLogExpireAt": "祈愿记录服务到期",
+      "cdnExpireAt": "CDN 服务到期",
+      "yes": "是",
+      "no": "否"
+    },
+    "shortcuts": {
+      "title": "快捷操作",
+      "statistics": "触发深渊统计刷新",
+      "compensation": "补偿服务时长",
+      "announcement": "发布公告",
+      "redeem": "生成兑换码"
+    },
+    "growth": {
+      "title": "用户增长",
+      "total": "总用户",
+      "today": "今日新注册",
+      "last7": "近 7 天",
+      "last30": "近 30 天"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "adminaccount": {
+    "title": "后台账号",
+    "tip": "身份源只负责证明你是谁，能否进入后台由这张表决定.启用单点登录后，只有这里的账号可以修改数据；要用单点登录进启动器，还得把后台账号绑定到一个主站账号.",
+    "readonly": "当前身份只能查看：启用单点登录后，写操作需要后台账号.",
+    "colSubject": "主体标识",
+    "colUserName": "显示名",
+    "colEmail": "备注邮箱",
+    "colBound": "绑定的主站账号",
+    "colState": "状态",
+    "colCreated": "创建时间",
+    "colLastLogin": "最近登录",
+    "colOp": "操作",
+    "enabled": "可用",
+    "disabled": "已停用",
+    "current": "当前账号",
+    "bootstrap": "种子账号",
+    "enable": "启用",
+    "disable": "停用",
+    "never": "尚未登录",
+    "unbound": "未绑定",
+    "refresh": "刷新",
+    "add": {
+      "btn": "新增账号",
+      "header": "新增后台账号",
+      "subject": "主体标识",
+      "subjectPlaceholder": "身份源里的 sub 声明",
+      "userName": "显示名",
+      "userNamePlaceholder": "留空时使用主体标识",
+      "email": "备注邮箱",
+      "emailPlaceholder": "可留空",
+      "confirm": "添加",
+      "subjectRequired": "请填写主体标识"
+    },
+    "bind": {
+      "btn": "绑定",
+      "rebind": "改绑",
+      "header": "绑定主站账号",
+      "userName": "主站账号",
+      "userNamePlaceholder": "注册时用的邮箱",
+      "body": "把「{subject}」绑定到一个主站账号，绑定后这个身份就能用单点登录进启动器，登录进去的就是这个主站账号.",
+      "confirm": "绑定",
+      "userNameRequired": "请填写主站账号的邮箱"
+    },
+    "unbind": {
+      "btn": "解绑",
+      "header": "解除绑定",
+      "body": "解除「{subject}」的主站账号绑定？该身份将无法再用单点登录进启动器，后台登录不受影响.",
+      "confirm": "解绑"
+    },
+    "remove": {
+      "btn": "删除",
+      "header": "删除后台账号",
+      "body": "确定删除「{subject}」吗？删除后该身份无法登录后台.",
+      "confirm": "删除"
+    },
+    "messages": {
+      "loadFail": "后台账号清单加载失败",
+      "addSucceed": "后台账号已添加",
+      "addFail": "后台账号添加失败",
+      "toggleSucceed": "后台账号状态已更新",
+      "toggleFail": "后台账号状态更新失败",
+      "bindSucceed": "已绑定主站账号",
+      "bindFail": "绑定主站账号失败",
+      "unbindSucceed": "已解除绑定",
+      "unbindFail": "解除绑定失败",
+      "removeSucceed": "后台账号已删除",
+      "removeFail": "后台账号删除失败"
+    }
+  }
+}

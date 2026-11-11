@@ -1,0 +1,33 @@
+{
+  "license": {
+    "approve": {
+      "title": "Approve Open Source License Applications",
+      "tipPre": "Corresponds to ",
+      "tipSuf": " (maintainer authentication required). The approve code comes from the application approval email; you can also approve with one click from the application list below.",
+      "emailLabel": "Applicant Email",
+      "emailPlaceholder": "Email the applicant registered with",
+      "codeLabel": "Approve Code",
+      "submit": "Approve"
+    },
+    "list": {
+      "title": "Applications",
+      "onlyPending": "Pending only",
+      "refresh": "Refresh",
+      "approved": "Approved",
+      "pending": "Pending",
+      "approve": "Approve"
+    },
+    "columns": {
+      "applicant": "Applicant",
+      "projectUrl": "Project URL",
+      "status": "Status",
+      "op": "Actions"
+    },
+    "messages": {
+      "fillRequired": "Please provide the applicant email and the approve code",
+      "approveSuccess": "Approved successfully",
+      "approveFail": "Failed to approve",
+      "loadListFail": "Failed to load the application list"
+    }
+  }
+}

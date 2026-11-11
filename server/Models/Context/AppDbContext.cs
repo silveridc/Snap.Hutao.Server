@@ -1,0 +1,92 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using server.Models.Context.Configuration;
+using server.Models.Entity;
+using server.Models.Entity.Announcement;
+using server.Models.Entity.GachaLog;
+using server.Models.Entity.Redeem;
+using server.Models.Entity.RoleCombat;
+using server.Models.Entity.SpiralAbyss;
+using server.Models.Entity.Telemetry;
+using server.Models.Metadata;
+
+namespace server.Models.Context;
+
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<HutaoUser, IdentityRole<int>, int>(options)
+{
+    public DbSet<AllowedVersion> AllowedVersions { get; set; } = default!;
+
+    public DbSet<ClientVersion> ClientVersions { get; set; } = default!;
+
+    public DbSet<LicenseApplicationRecord> Licenses { get; set; } = default!;
+
+    public DbSet<EntityAnnouncement> Announcements { get; set; } = default!;
+
+    public DbSet<RegistrationRecord> RegistrationRecords { get; set; } = default!;
+
+    public DbSet<RedeemCode> RedeemCodes { get; set; } = default!;
+
+    public DbSet<RedeemCodeUseItem> RedeemCodeUseItems { get; set; } = default!;
+
+    public DbSet<AdminAuditLog> AdminAuditLogs { get; set; } = default!;
+
+    public DbSet<AdminAccount> AdminAccounts { get; set; } = default!;
+
+    public DbSet<HutaoRelease> HutaoReleases { get; set; } = default!;
+
+    public DbSet<SystemSetting> SystemSettings { get; set; } = default!;
+
+    /// <summary>Gets or sets 祈愿卡池配置（原独立元数据库，连接串与主库相同，已并入）.</summary>
+    public DbSet<GachaEventInfo> GachaEvents { get; set; } = default!;
+
+    public DbSet<KnownItem> KnownItems { get; set; } = default!;
+
+    public DbSet<YaeAchievementMetadata> YaeAchievementMetadata { get; set; } = default!;
+
+    public DbSet<HutaoLog> HutaoLogs { get; set; } = default!;
+
+    public DbSet<HutaoLogSingleItem> HutaoLogSingleItems { get; set; } = default!;
+
+    public DbSet<LegacyStatistics> Statistics { get; set; } = default!;
+
+    public DbSet<Banned> BannedList { get; set; } = default!;
+
+    public DbSet<EntityRecord> Records { get; set; } = default!;
+
+    public DbSet<EntityAvatar> Avatars { get; set; } = default!;
+
+    public DbSet<EntitySpiralAbyss> SpiralAbysses { get; set; } = default!;
+
+    public DbSet<EntityFloor> SpiralAbyssFloors { get; set; } = default!;
+
+    public DbSet<EntityDamageRank> DamageRanks { get; set; } = default!;
+
+    public DbSet<EntityTakeDamageRank> TakeDamageRanks { get; set; } = default!;
+
+    public DbSet<GachaStatistics> GachaStatistics { get; set; } = default!;
+
+    public DbSet<InvalidGachaUid> InvalidGachaUids { get; set; } = default!;
+
+    public DbSet<EntityGachaItem> GachaItems { get; set; } = default!;
+
+    public DbSet<RoleCombatRecord> RoleCombatRecords { get; set; } = default!;
+
+    public DbSet<RoleCombatAvatar> RoleCombatAvatars { get; set; } = default!;
+
+    public DbSet<RoleCombatStatistics> RoleCombatStatistics { get; set; } = default!;
+
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = default!;
+
+    public DbSet<OAuthBindIdentity> OAuthBindIdentities { get; set; } = default!;
+
+    public DbSet<UserLoginLog> UserLoginLogs { get; set; } = default!;
+
+    public DbSet<JobLog> JobLogs { get; set; } = default!;
+
+    /// <inheritdoc/>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new EntityFloorConfiguration());
+        SnakeCaseNamingConvention.Apply(modelBuilder);
+    }
+}

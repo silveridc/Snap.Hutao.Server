@@ -1,0 +1,40 @@
+{
+  "ban": {
+    "add": {
+      "title": "Ban UID",
+      "tip": "Banned UIDs can no longer upload Spiral Abyss / Theater Mode records.",
+      "uidLabel": "UID",
+      "uidPlaceholder": "9-10 digit UID",
+      "reasonLabel": "Ban reason (optional)",
+      "reasonPlaceholder": "Ban reason",
+      "submit": "Ban"
+    },
+    "batch": {
+      "title": "Batch Ban",
+      "tip": "Separate 9-10 digit UIDs with line breaks, spaces or commas. Existing entries are skipped.",
+      "uidListLabel": "UID list",
+      "uidListPlaceholder": "Multiple UIDs, separated by line breaks or commas",
+      "reasonLabel": "Ban reason (optional)",
+      "reasonPlaceholder": "Batch ban reason",
+      "submit": "Batch Ban"
+    },
+    "list": {
+      "title": "Ban List",
+      "searchPlaceholder": "Search by UID",
+      "colReason": "Reason",
+      "colBanTime": "Banned At",
+      "colOp": "Actions",
+      "unban": "Unban"
+    },
+    "dialog": {
+      "unbanHeader": "Confirm Unban",
+      "unbanBody": "Lift the ban on UID {uid}?",
+      "unbanConfirm": "Unban"
+    },
+    "messages": {
+      "uidFormat": "Enter a 9-10 digit UID",
+      "emptyUids": "Enter at least one UID",
+      "invalidUids": "{count} UID(s) are not 9-10 digits, please check"
+    }
+  }
+}

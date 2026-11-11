@@ -1,0 +1,258 @@
+{
+  "settings": {
+    "header": {
+      "title": "System Settings",
+      "tip": "Dynamic configuration is stored in the database and takes precedence over appsettings.json. Leave a field empty to use the default value from the configuration file.",
+      "reload": "Reload",
+      "saveBtn": "Save Changes ({n})"
+    },
+    "sections": {
+      "global": {
+        "title": "Global Switches",
+        "description": "Controls overall system behavior. Changes take effect immediately."
+      },
+      "captcha": {
+        "title": "Human Verification",
+        "description": "reCAPTCHA v3 used by login and open-source license applications. Empty keys follow the App section of appsettings.json; changes take effect immediately without a restart."
+      },
+      "duration": {
+        "title": "Grant & Retention Days",
+        "description": "Days for gifted service time, redeem-code validity and cleanup retention. Changes take effect immediately; the next cleanup run applies the new retention window."
+      },
+      "pizzaHelper": {
+        "title": "Genshin Pizza Helper",
+        "description": "Upstream salts and endpoints for Spiral Abyss data sync, maintained entirely here. Empty fields no longer fall back to appsettings.json."
+      },
+      "afdian": {
+        "title": "Afdian Orders",
+        "description": "Order verification credentials and product IDs, maintained entirely here. Empty fields no longer fall back to appsettings.json."
+      },
+      "mail": {
+        "title": "Email Notifications",
+        "description": "Recipients of system diagnostic emails"
+      },
+      "yae": {
+        "title": "Yae Achievement Metadata",
+        "description": "Bucket URLs used to pull the Yae version table (protobuf) and the CN client executable fingerprints, maintained entirely here. Separate multiple values with commas, semicolons, or newlines; empty values use the built-in defaults."
+      },
+      "sso": {
+        "title": "Single Sign-On (SSO)",
+        "description": "External OIDC identity provider, maintained entirely here. Empty fields no longer fall back to appsettings.json; changes take effect immediately without a restart."
+      },
+      "killSwitch": {
+        "title": "Feature Kill Switches",
+        "description": "Emergency-disable injection features on clients, delivered via /Patch/hutao and applied on next client launch; turning a switch off restores user-local settings."
+      },
+      "s3Sign": {
+        "title": "Update Package S3 Presigned URLs",
+        "description": "When a mirror URL matches this host name, /Patch/hutao issues a time-limited presigned URL on the fly before delivery, so the bucket can stay private. Leave empty to disable."
+      }
+    },
+    "fields": {
+      "maintenanceMode": {
+        "label": "Maintenance Mode",
+        "hint": "When enabled, all non-admin endpoints return a maintenance response"
+      },
+      "registrationEnabled": {
+        "label": "Allow Registration",
+        "hint": "When disabled, new users cannot register passport accounts"
+      },
+      "captchaEnabled": {
+        "label": "Enable Captcha",
+        "hint": "When disabled, login no longer verifies reCAPTCHA; leaving either the site key or the secret key empty also disables it"
+      },
+      "recaptchaSiteKey": {
+        "label": "Site Key",
+        "hint": "reCAPTCHA v3 site key, embedded in the login page and the built-in verification page; publicly visible"
+      },
+      "recaptchaSecretKey": {
+        "label": "Secret Key",
+        "hint": "Server-side credential only; shown as ********. Leave it empty or keep ******** to keep the saved value, use Reset to clear it"
+      },
+      "recaptchaMinScore": {
+        "label": "Minimum Score",
+        "hint": "0-1. Verification fails when the Google confidence score is below this value; default 0.5"
+      },
+      "uidSalt": {
+        "label": "Uid Salt",
+        "hint": "Salt used for UID obfuscation"
+      },
+      "apiSalt": {
+        "label": "Api Salt",
+        "hint": "Salt used for request signing"
+      },
+      "avatarHolding": {
+        "label": "Avatar Holding Endpoint",
+        "hint": "AvatarHolding API address"
+      },
+      "spiralAbyss": {
+        "label": "Spiral Abyss Endpoint",
+        "hint": "SpiralAbyss API address"
+      },
+      "skuGachaLog": {
+        "label": "Wish Log SKU",
+        "hint": "SKU ID of the wish log service in Afdian orders"
+      },
+      "skuCdn": {
+        "label": "CDN Service SKU",
+        "hint": "SKU ID of the CDN service in Afdian 2 orders"
+      },
+      "afdianUserId": {
+        "label": "Afdian User ID",
+        "hint": "Afdian user ID used for order verification (query-order)"
+      },
+      "afdianUserToken": {
+        "label": "Afdian Token",
+        "hint": "Afdian open API token used for order verification; leave blank to keep the current value"
+      },
+      "afdian2UserId": {
+        "label": "Afdian2 User ID",
+        "hint": "Afdian user ID used for CDN order verification"
+      },
+      "afdian2UserToken": {
+        "label": "Afdian2 Token",
+        "hint": "Afdian open API token used for CDN order verification; leave blank to keep the current value"
+      },
+      "yaeBucketUrls": {
+        "label": "Bucket URLs",
+        "hint": "Tried in order, separated by commas, semicolons, or newlines; leave blank to use the built-in defaults"
+      },
+      "yaeChineseGameHashes": {
+        "label": "CN Executable Fingerprints",
+        "hint": "Decimal CRC32 of the first 64 KiB of YuanShen.exe, separated by commas; leave blank to use the built-in default"
+      },
+      "registrationGiftDays": {
+        "label": "Registration Gift Days",
+        "hint": "Days of Hutao Cloud access granted to a brand new account on first registration; 1-365, default 3"
+      },
+      "gachaLogExtendDays": {
+        "label": "Abyss Upload Gift Days",
+        "hint": "Days added to the gacha log service of the bound passport account when a Spiral Abyss record is uploaded; 1-365, default 3"
+      },
+      "redeemCodeExpireDays": {
+        "label": "Redeem Code Valid Days",
+        "hint": "Validity of redeem codes generated for unregistered users; 1-365, default 3. The day count in the delivery email follows this value"
+      },
+      "jobLogRetentionDays": {
+        "label": "Job Log Retention Days",
+        "hint": "How long scheduled job execution logs are kept; 7-3650, default 90"
+      },
+      "spiralAbyssRecordRetentionDays": {
+        "label": "Spiral Abyss Record Retention Days",
+        "hint": "How long uploaded Spiral Abyss records and their rankings are kept; 7-3650, default 30. Older records are deleted together with the rankings"
+      },
+      "diagnosticEmail": {
+        "label": "Diagnostic Email",
+        "hint": "Email address that receives system exception and order diagnostic notifications"
+      },
+      "sso": {
+        "title": "Single Sign-On (SSO)",
+        "description": "External OIDC identity provider. Changes take effect immediately without a restart."
+      },
+      "ssoEnabled": {
+        "label": "Enable SSO",
+        "hint": "When off, the admin falls back to maintainer login and no write gate is enforced"
+      },
+      "ssoAuthority": {
+        "label": "Authority",
+        "hint": "Issuer address, must serve /.well-known/openid-configuration; Auto-fill verifies it against the discovery document and backfills what it can"
+      },
+      "ssoClientId": {
+        "label": "Client ID",
+        "hint": "The client ID registered at the identity provider"
+      },
+      "ssoClientSecret": {
+        "label": "Client Secret",
+        "hint": "Confidential credential, server-side only; keep it in sync with the identity provider"
+      },
+      "ssoRedirectUri": {
+        "label": "Admin redirect URI",
+        "hint": "Must match the registration exactly, e.g. https://api.example.com/Admin/Sso/Callback"
+      },
+      "ssoClientRedirectUri": {
+        "label": "Launcher redirect URI",
+        "hint": "Redirect URI for client-side SSO, a different address from the admin one; the launcher no longer offers SSO sign-in, so this can stay empty"
+      },
+      "ssoScope": {
+        "label": "Scope",
+        "hint": "Defaults to openid profile email"
+      },
+      "ssoDisplayName": {
+        "label": "Display name",
+        "hint": "Provider name shown on the login button; falls back to frontend copy when empty"
+      },
+      "ssoBootstrapClaim": {
+        "label": "Bootstrap claim",
+        "hint": "Claim name for the first admin account, e.g. sub / preferred_username / email"
+      },
+      "ssoBootstrapValue": {
+        "label": "Bootstrap value",
+        "hint": "The first login whose claim matches this value provisions the seed account"
+      },
+      "ssoRequireHttps": {
+        "label": "Require HTTPS",
+        "hint": "Keep enabled in production; only disable for local http testing"
+      },
+      "disableFpsUnlock": {
+        "label": "Disable FPS unlock",
+        "hint": "Force the FPS unlock off for all clients in the current session"
+      },
+      "disableFpsUnlockReason": {
+        "label": "FPS unlock reason",
+        "hint": "Shown to clients while disabled; leave empty for the default hint"
+      },
+      "disableIslandInjection": {
+        "label": "Disable Island injection",
+        "hint": "Force Island injection off for all clients in the current session"
+      },
+      "disableIslandInjectionReason": {
+        "label": "Island injection reason",
+        "hint": "Shown to clients while disabled; leave empty for the default hint"
+      },
+      "s3Host": {
+        "label": "Object host name",
+        "hint": "e.g. my-bucket.s3.us-east-1.amazonaws.com"
+      },
+      "s3Region": {
+        "label": "Region",
+        "hint": "Signing region, e.g. us-east-1"
+      },
+      "s3AccessKeyId": {
+        "label": "AccessKeyId",
+        "hint": "AccessKeyId of the AWS/S3-compatible storage"
+      },
+      "s3SecretAccessKey": {
+        "label": "SecretAccessKey",
+        "hint": "Server-side only (password input)"
+      },
+      "s3ExpiresHours": {
+        "label": "Expires (hours)",
+        "hint": "1-168, 24 recommended"
+      }
+    },
+    "form": {
+      "emptyPlaceholder": "Leave empty to use the default",
+      "resetTooltip": "Reset to default",
+      "reset": "Reset",
+      "discover": "Auto-fill"
+    },
+    "messages": {
+      "loadFail": "Failed to load configuration",
+      "noChanges": "No changes",
+      "saveSuccess": "Saved successfully",
+      "saveFail": "Failed to save",
+      "resetSuccess": "Reset successfully",
+      "resetFail": "Failed to reset",
+      "discoverEmpty": "Enter the authority address first",
+      "discoverInvalid": "The authority must be a full URL starting with http:// or https://",
+      "discoverTimeout": "Timed out reading the discovery document: {url}",
+      "discoverNetworkFail": "Unable to read {url}; the provider probably does not allow cross-origin requests from this admin origin",
+      "discoverHttpStatus": "The discovery document returned HTTP {status}: {url}",
+      "discoverBadJson": "The discovery document is not valid JSON: {url}",
+      "discoverIssuerMissing": "The discovery document has no issuer",
+      "discoverIssuerMismatch": "The discovery issuer is {actual} while you entered {expected}; the server rejects this metadata too, so fill in the issuer",
+      "discoverNoChange": "Discovery verified; the configuration already matches",
+      "discoverSuccess": "Filled {fields}; review and save"
+    }
+  }
+}

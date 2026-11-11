@@ -1,0 +1,39 @@
+{
+  "datatools": {
+    "versions": {
+      "title": "Allowed Client Versions",
+      "tipPre": "Manage the client version headers allowed for access (corresponds to the ",
+      "tipSuf": " table).",
+      "inputPlaceholder": "Version header, e.g. Snap Hutao/1.17.1",
+      "add": "Add",
+      "refresh": "Refresh",
+      "empty": "No allowed versions"
+    },
+    "uids": {
+      "title": "Invalid Gacha UIDs",
+      "tipPre": "UIDs flagged as abnormal by the statistics job (corresponds to the ",
+      "tipSuf": " table). They can be counted again after removal.",
+      "searchPlaceholder": "Search by UID",
+      "search": "Search",
+      "colOp": "Actions",
+      "remove": "Remove"
+    },
+    "dialog": {
+      "removeVersionHeader": "Remove Allowed Version",
+      "removeVersionBody": "Are you sure you want to remove the allowed version 「{header}」?",
+      "removeVersionConfirm": "Remove",
+      "removeUidHeader": "Remove Invalid UID",
+      "removeUidBody": "Are you sure you want to remove invalid UID {uid}? It can be included in gacha statistics again after removal.",
+      "removeUidConfirm": "Remove"
+    },
+    "messages": {
+      "loadVersionsFail": "Failed to load allowed versions",
+      "headerRequired": "Please enter the version header",
+      "addSuccess": "Added successfully",
+      "addFail": "Failed to add",
+      "loadUidsFail": "Failed to load invalid UIDs",
+      "removeSuccess": "Removed successfully",
+      "removeFail": "Failed to remove"
+    }
+  }
+}

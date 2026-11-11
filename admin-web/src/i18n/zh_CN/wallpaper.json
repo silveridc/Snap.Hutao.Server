@@ -1,0 +1,33 @@
+{
+  "wallpaper": {
+    "title": "今日壁纸",
+    "description": "客户端选「今日壁纸」背景时，每天从列表里随机挑一张返回；列表为空时回退到 Bing 每日壁纸.",
+    "columns": {
+      "url": "壁纸直链",
+      "sourceUrl": "来源页",
+      "author": "作者",
+      "uploader": "上传者",
+      "op": "操作"
+    },
+    "placeholders": {
+      "url": "HTTPS 壁纸直链，如 https://...",
+      "sourceUrl": "留空使用壁纸直链",
+      "author": "留空为 Snap Hutao",
+      "uploader": "留空为 Snap Hutao"
+    },
+    "reload": "刷新",
+    "add": "添加壁纸",
+    "save": "保存",
+    "empty": "还没有壁纸，点「添加壁纸」开始",
+    "hint": "每天按日期稳定随机选一张，同一天内客户端重复取图结果一致；修改后下一次取图生效.",
+    "messages": {
+      "loadFail": "获取今日壁纸池失败",
+      "saveSuccess": "今日壁纸池已保存",
+      "saveFail": "保存今日壁纸池失败",
+      "urlRequired": "第 {n} 条壁纸的直链不能为空",
+      "urlInvalid": "第 {n} 条壁纸的直链必须是 HTTPS 绝对地址",
+      "sourceUrlInvalid": "第 {n} 条壁纸的来源页必须是 HTTPS 绝对地址",
+      "tooMany": "最多只能添加 {max} 条壁纸"
+    }
+  }
+}

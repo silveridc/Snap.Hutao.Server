@@ -1,0 +1,155 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_ROOT_PASSWORD: ci-root-pwd
+      MYSQL_TEST_PASSWORD: ci-test-pwd
+      HUTAO_TEST_MYSQL_ADMIN: Server=127.0.0.1;Uid=root;Pwd=ci-root-pwd;
+      HUTAO_TEST_MYSQL: Server=127.0.0.1;Database=snaphutao_test;Uid=snaphutao_test;Pwd=ci-test-pwd;Charset=utf8mb4;AllowLoadLocalInfile=true;
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root-pwd
+          # 默认只允许 root@localhost，而容器里看到的客户端是 docker 网关地址
+          MYSQL_ROOT_HOST: '%'
+        ports: ['3306:3306']
+        options: >-
+          --default-authentication-plugin=mysql_native_password
+          --local-infile=1
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci-root-pwd"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # 测试主机里的假 SMTP 监听 25，Ubuntu 默认只放行 1024 以上
+      - name: Allow privileged ports
+        run: sudo sysctl -w net.ipv4.ip_unprivileged_port_start=0
+
+      - name: Prepare MySQL accounts
+        run: |
+          set -euo pipefail
+          cid=$(docker ps --filter ancestor=mysql:8.0 --format '{{.ID}}' | head -1)
+          # HutaoServerFactory 只建 @localhost 账号，容器场景下连接来自网关 IP，
+          # 所以要预先建好 '%' 变体；snaphutao_server@localhost 那行 GRANT
+          # 也要求账号已存在（MySQL 8 不再自动建用户）
+          docker exec -i "$cid" mysql -uroot -p"$MYSQL_ROOT_PASSWORD" <<SQL
+            CREATE USER IF NOT EXISTS 'snaphutao_test'@'%' IDENTIFIED BY '$MYSQL_TEST_PASSWORD';
+            GRANT ALL PRIVILEGES ON *.* TO 'snaphutao_test'@'%' WITH GRANT OPTION;
+            CREATE USER IF NOT EXISTS 'snaphutao_server'@'localhost' IDENTIFIED BY '$MYSQL_TEST_PASSWORD';
+            FLUSH PRIVILEGES;
+          SQL
+
+      - name: Build test host
+        run: dotnet build tests/server.Tests/server.Tests.csproj -c Debug --nologo
+
+      # dotnet test 在 SDK 10 上不可用：xunit.v3 走 Microsoft.Testing.Platform，拒绝 VSTest 宿主
+      - name: Run server.Tests
+        run: ./tests/server.Tests/bin/Debug/net10.0/server.Tests.exe -noColor
+
+  package:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: admin-web/pnpm-lock.yaml
+
+      # 产物写入 server/wwwroot/admin（emptyOutDir 会清掉仓库里已提交的旧哈希文件），
+      # 必须在 dotnet publish 之前执行才会被打进发布包
+      - name: Build admin-web
+        working-directory: admin-web
+        # 三个变量齐了才上传 sourcemap，缺任一就跳过（见 vite.config.ts），
+        # 所以 fork 上没配 secrets 也不会红
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        run: pnpm install --frozen-lockfile && pnpm run build
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish server
+        run: dotnet publish server/server.csproj -c Release -o "$RUNNER_TEMP/publish" --nologo
+
+      - name: Pack bundle
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            VERSION="$GITHUB_REF_NAME"
+          else
+            VERSION="${GITHUB_SHA::7}"
+          fi
+          ZIP="snap-hutao-server-$VERSION.zip"
+
+          # 本地 publish 照常带出配置与私钥；CI 产物里排除，避免密钥进入可下载的
+          # artifact/Release，也避免部署时覆盖服务器上已有的配置
+          bundle="$RUNNER_TEMP/bundle"
+          cp -a "$RUNNER_TEMP/publish" "$bundle"
+          find "$bundle" -maxdepth 1 \( -name 'appsettings*.json' -o -name 'privkey.key' \) -print -delete
+
+          # 没配 Sentry secrets 时 vite 不会删掉 hidden sourcemap，产物里手动删；
+          # 运行时也有中间件挡着 /admin/**/*.map（Program.cs）
+          find "$bundle" -name '*.map' -print -delete
+
+          (cd "$bundle" && zip -qr "$RUNNER_TEMP/$ZIP" .)
+          echo "bundle=$RUNNER_TEMP/$ZIP" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: ${{ env.bundle }}
+          if-no-files-found: error
+
+  release:
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          zip=(snap-hutao-server-*.zip)
+          sha256sum "${zip[0]}" > "${zip[0]}.sha256"
+          gh release create "$GITHUB_REF_NAME" "${zip[0]}" "${zip[0]}.sha256" \
+            --title "$GITHUB_REF_NAME" --generate-notes

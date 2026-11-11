@@ -1,0 +1,71 @@
+{
+  "adminaccount": {
+    "title": "Admin Accounts",
+    "tip": "The identity provider only proves who you are; this table decides whether you may enter the console. Once SSO is enabled, only these accounts can modify data, and signing in to the launcher with SSO additionally requires binding an admin account to a Hutao account.",
+    "readonly": "This identity is read-only: writes require an admin account once SSO is enabled.",
+    "colSubject": "Subject",
+    "colUserName": "Display name",
+    "colEmail": "Email note",
+    "colBound": "Bound Hutao account",
+    "colState": "State",
+    "colCreated": "Created",
+    "colLastLogin": "Last sign-in",
+    "colOp": "Actions",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "current": "Current",
+    "bootstrap": "Seeded",
+    "enable": "Enable",
+    "disable": "Disable",
+    "never": "Never",
+    "unbound": "Unbound",
+    "refresh": "Refresh",
+    "add": {
+      "btn": "Add account",
+      "header": "Add an admin account",
+      "subject": "Subject",
+      "subjectPlaceholder": "The sub claim from the identity provider",
+      "userName": "Display name",
+      "userNamePlaceholder": "Falls back to the subject",
+      "email": "Email note",
+      "emailPlaceholder": "Optional",
+      "confirm": "Add",
+      "subjectRequired": "The subject is required"
+    },
+    "bind": {
+      "btn": "Bind",
+      "rebind": "Rebind",
+      "header": "Bind a Hutao account",
+      "userName": "Hutao account",
+      "userNamePlaceholder": "The email it was registered with",
+      "body": "Bind “{subject}” to a Hutao account. Once bound, this identity can sign in to the launcher through SSO as that Hutao account.",
+      "confirm": "Bind",
+      "userNameRequired": "The Hutao account email is required"
+    },
+    "unbind": {
+      "btn": "Unbind",
+      "header": "Remove the binding",
+      "body": "Unbind “{subject}”? This identity will no longer be able to sign in to the launcher through SSO; console sign-in is unaffected.",
+      "confirm": "Unbind"
+    },
+    "remove": {
+      "btn": "Remove",
+      "header": "Remove the admin account",
+      "body": "Remove “{subject}”? This identity will no longer be able to sign in.",
+      "confirm": "Remove"
+    },
+    "messages": {
+      "loadFail": "Failed to load admin accounts",
+      "addSucceed": "Admin account added",
+      "addFail": "Failed to add the admin account",
+      "toggleSucceed": "Admin account updated",
+      "toggleFail": "Failed to update the admin account",
+      "bindSucceed": "Hutao account bound",
+      "bindFail": "Failed to bind the Hutao account",
+      "unbindSucceed": "Binding removed",
+      "unbindFail": "Failed to remove the binding",
+      "removeSucceed": "Admin account removed",
+      "removeFail": "Failed to remove the admin account"
+    }
+  }
+}

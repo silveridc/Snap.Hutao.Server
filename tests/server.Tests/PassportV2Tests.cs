@@ -1,0 +1,727 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using server.Models.Admin;
+using server.Models.Passport;
+using server.Options;
+using server.Services.Admin;
+using server.Tests.Infrastructure;
+using System.Net;
+
+namespace server.Tests;
+
+[Collection(HutaoServerCollection.Name)]
+public sealed class PassportV2Tests
+{
+    private const string Password = "TestPassword123";
+
+    private readonly HutaoServerFactory factory;
+    private readonly HttpClient client;
+    private readonly TestUsers users;
+
+    public PassportV2Tests(HutaoServerFactory factory)
+    {
+        this.factory = factory;
+        client = factory.CreateApiClient();
+        users = new TestUsers(factory);
+    }
+
+    private static string NewEmail(string tag) => $"{tag}-{Guid.NewGuid():N}@example.com";
+
+    private static Dictionary<string, object?> Body(
+        string? userName = null,
+        string? password = null,
+        string? verifyCode = null,
+        string? newUserName = null,
+        string? newVerifyCode = null,
+        string? token = null,
+        bool isResetPassword = false,
+        bool isResetUserName = false,
+        bool isResetUserNameNew = false,
+        bool isCancelRegistration = false,
+        string? captchaToken = null)
+    {
+        Dictionary<string, object?> body = [];
+        if (userName is not null)
+        {
+            body["UserName"] = RsaPayload.Encrypt(userName);
+        }
+
+        if (password is not null)
+        {
+            body["Password"] = RsaPayload.Encrypt(password);
+        }
+
+        if (verifyCode is not null)
+        {
+            body["VerifyCode"] = RsaPayload.Encrypt(verifyCode);
+        }
+
+        if (captchaToken is not null)
+        {
+            body["CaptchaToken"] = captchaToken;
+        }
+
+        if (newUserName is not null)
+        {
+            body["NewUserName"] = RsaPayload.Encrypt(newUserName);
+        }
+
+        if (newVerifyCode is not null)
+        {
+            body["NewVerifyCode"] = RsaPayload.Encrypt(newVerifyCode);
+        }
+
+        if (token is not null)
+        {
+            body["Token"] = RsaPayload.Encrypt(token);
+        }
+
+        if (isResetPassword)
+        {
+            body["IsResetPassword"] = true;
+        }
+
+        if (isResetUserName)
+        {
+            body["IsResetUserName"] = true;
+        }
+
+        if (isResetUserNameNew)
+        {
+            body["IsResetUserNameNew"] = true;
+        }
+
+        if (isCancelRegistration)
+        {
+            body["IsCancelRegistration"] = true;
+        }
+
+        return body;
+    }
+
+    /// <summary>
+    /// 申请验证码并从假 SMTP 中取出邮件里的验证码.
+    /// 每次调用前清空收件队列，避免取到其它用例遗留的验证码.
+    /// </summary>
+    private async Task<string> RequestVerifyCodeAsync(Dictionary<string, object?> body, string? token = null)
+    {
+        factory.Smtp.Clear();
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync("/api/passport/v2/verification-codes", body, token);
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+        return await factory.Smtp.WaitForVerifyCodeAsync(TimeSpan.FromSeconds(30));
+    }
+
+    /// <summary>
+    /// 申请重置密码链接并从假 SMTP 中取出邮件里那条链接的 token.
+    /// 重置密码不再走验证码，链接一次性、15 分钟有效.
+    /// </summary>
+    private async Task<string> RequestResetTokenAsync(string email)
+    {
+        factory.Smtp.Clear();
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/verification-codes", Body(userName: email, isResetPassword: true), token: null);
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        return await factory.Smtp.WaitForResetTokenAsync(TimeSpan.FromSeconds(30));
+    }
+
+    [Fact]
+    public async Task Register_WithVerificationCode_SucceedsAndIssuesToken()
+    {
+        string email = NewEmail("v2-register");
+
+        string code = await RequestVerifyCodeAsync(Body(userName: email));
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/accounts", Body(userName: email, password: Password, verifyCode: code), token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+        TokenResponse? token = parsed.DeserializeData<TokenResponse>();
+        Assert.NotNull(token);
+        Assert.False(string.IsNullOrEmpty(token!.AccessToken));
+        Assert.False(string.IsNullOrEmpty(token.RefreshToken));
+
+        // 首次注册会赠送 3 天祈愿记录与 CDN 服务
+        using HttpResponseMessage infoResponse = await client.GetWithTokenAsync("/api/passport/v2/me", token.AccessToken);
+        TestResponse info = await infoResponse.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, info.Retcode);
+
+        UserInfo? user = info.DeserializeData<UserInfo>();
+        Assert.NotNull(user);
+        Assert.Equal(email.ToUpperInvariant(), user!.NormalizedUserName);
+        Assert.True(user.GachaLogExpireAt > DateTimeOffset.UtcNow);
+        Assert.True(user.CdnExpireAt > DateTimeOffset.UtcNow);
+    }
+
+    /// <summary>首次注册赠送的胡桃云天数取自 Passport.RegistrationGiftDays，后台改动后立即生效.</summary>
+    [Fact]
+    public async Task Register_FirstTimeGiftDaysComeFromSavedSettings()
+    {
+        SystemConfigService config = factory.Services.GetRequiredService<SystemConfigService>();
+        await config.UpdateAsync(new Dictionary<string, string?> { [Keys.RegistrationGiftDays] = "6" }, 0);
+
+        try
+        {
+            string email = NewEmail("v2-register-gift");
+            string code = await RequestVerifyCodeAsync(Body(userName: email));
+
+            using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+                "/api/passport/v2/accounts", Body(userName: email, password: Password, verifyCode: code), token: null);
+            TestResponse parsed = await response.ReadTestResponseAsync();
+            Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+            TokenResponse? token = parsed.DeserializeData<TokenResponse>();
+            Assert.NotNull(token);
+
+            using HttpResponseMessage infoResponse = await client.GetWithTokenAsync("/api/passport/v2/me", token!.AccessToken);
+            UserInfo? user = (await infoResponse.ReadTestResponseAsync()).DeserializeData<UserInfo>();
+            Assert.NotNull(user);
+
+            foreach (DateTimeOffset expireAt in new[] { user.GachaLogExpireAt, user.CdnExpireAt })
+            {
+                Assert.True(
+                    (expireAt - DateTimeOffset.UtcNow.AddDays(6)).Duration() <= TimeSpan.FromMinutes(5),
+                    $"注册赠送有效期未按保存的 6 天发放：{expireAt:o}");
+            }
+
+            Assert.Contains("6 days", parsed.Message, StringComparison.Ordinal);
+        }
+        finally
+        {
+            await config.DeleteAsync(Keys.RegistrationGiftDays);
+        }
+    }
+
+    [Fact]
+    public async Task Register_WithWrongVerificationCode_Fails()
+    {
+        string email = NewEmail("v2-register-bad");
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/accounts", Body(userName: email, password: Password, verifyCode: "WRONGCOD"), token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.RegisterFail, parsed.Retcode);
+    }
+
+    [Fact]
+    public async Task Register_WithShortPassword_Fails()
+    {
+        string email = NewEmail("v2-register-short");
+
+        string code = await RequestVerifyCodeAsync(Body(userName: email));
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/accounts", Body(userName: email, password: "short", verifyCode: code), token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.TooShortPassword, parsed.Retcode);
+    }
+
+    [Fact]
+    public async Task Register_WithExistingAccount_Fails()
+    {
+        TestUser existing = await users.CreateUniqueAsync("v2-register-dup");
+        string email = existing.UserName;
+
+        using HttpResponseMessage verifyResponse = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/verification-codes", Body(userName: email), token: null);
+
+        // 已存在的邮箱不允许申请注册验证码
+        TestResponse verify = await verifyResponse.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.VerifyCodeNotAllowed, verify.Retcode);
+    }
+
+    [Fact]
+    public async Task Verify_RequestedTwiceWithinOneMinute_IsThrottled()
+    {
+        string email = NewEmail("v2-verify-throttle");
+
+        using HttpResponseMessage first = await client.PostJsonWithTokenAsync("/api/passport/v2/verification-codes", Body(userName: email), token: null);
+        Assert.Equal(ReturnCodes.Success, (await first.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage second = await client.PostJsonWithTokenAsync("/api/passport/v2/verification-codes", Body(userName: email), token: null);
+        Assert.Equal(ReturnCodes.VerifyCodeTooFrequently, (await second.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task Verify_ForResetPasswordOfUnknownAccount_IsRejected()
+    {
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/verification-codes", Body(userName: NewEmail("v2-verify-unknown"), isResetPassword: true), token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.VerifyCodeNotAllowed, parsed.Retcode);
+    }
+
+    [Fact]
+    public async Task Register_WithoutDeviceHeader_IsRejected()
+    {
+        // Register/Login/LoggedInDevices 会读取设备头，缺失时由异常处理中间件返回错误
+        using HttpRequestMessage request = new(HttpMethod.Post, "/api/passport/v2/accounts")
+        {
+            Content = JsonContent.Create(Body(userName: NewEmail("v2-nodevice"), password: Password, verifyCode: "INVALID0")),
+        };
+        request.WithClientVersion();
+
+        using HttpResponseMessage response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+        string body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(
+            response.StatusCode is HttpStatusCode.InternalServerError or HttpStatusCode.BadRequest,
+            $"Expected the missing device header to be rejected, got {(int)response.StatusCode}: {body}");
+    }
+
+    [Fact]
+    public async Task Login_WithValidCredentials_ReturnsTokenPair()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-login");
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password), token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+        TokenResponse? token = parsed.DeserializeData<TokenResponse>();
+        Assert.NotNull(token);
+        Assert.False(string.IsNullOrEmpty(token!.AccessToken));
+        Assert.False(string.IsNullOrEmpty(token.RefreshToken));
+
+        // 设备版访问令牌有效期 15 分钟
+        Assert.Equal(15 * 60, token.ExpiresIn);
+    }
+
+    [Fact]
+    public async Task Login_WithWrongPassword_Fails()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-login-bad");
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: user.UserName, password: "WrongPassword123"), token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
+    }
+
+    [Fact]
+    public async Task Login_WithUnknownAccount_Fails()
+    {
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: NewEmail("v2-login-unknown"), password: Password), token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
+    }
+
+    [Fact]
+    public async Task RefreshToken_WithValidToken_IssuesNewAccessToken()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-refresh");
+
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions/refresh",
+            new Dictionary<string, object?> { ["RefreshToken"] = RsaPayload.Encrypt(user.RefreshToken) },
+            token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+        TokenResponse? token = parsed.DeserializeData<TokenResponse>();
+        Assert.NotNull(token);
+        Assert.False(string.IsNullOrEmpty(token!.AccessToken));
+    }
+
+    [Fact]
+    public async Task RefreshToken_WithEmptyToken_ReturnsInvalidRequestBody()
+    {
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions/refresh", new Dictionary<string, object?> { ["RefreshToken"] = string.Empty }, token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.InvalidRequestBody, parsed.Retcode);
+    }
+
+    [Fact]
+    public async Task RefreshToken_WithGarbageToken_Fails()
+    {
+        using HttpResponseMessage response = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions/refresh",
+            new Dictionary<string, object?> { ["RefreshToken"] = RsaPayload.Encrypt("not-a-real-refresh-token") },
+            token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
+    }
+
+    [Fact]
+    public async Task LoggedInDevices_ListsTheDeviceUsedToLogIn()
+    {
+        string deviceId = $"device-{Guid.NewGuid():N}";
+        TestUser user = await users.CreateUniqueAsync("v2-devices");
+        TokenResponse token = await users.IssueTokenAsync(user.Id, new DeviceInfo(deviceId, "Integration Device", "Windows"));
+
+        using HttpRequestMessage request = new(HttpMethod.Get, "/api/passport/v2/sessions");
+        request.WithToken(token.AccessToken);
+        request.WithDevice(deviceId, "Integration Device", "Windows");
+
+        using HttpResponseMessage response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, parsed.Retcode);
+
+        List<LoggedInDeviceInfo>? devices = parsed.DeserializeData<List<LoggedInDeviceInfo>>();
+        Assert.NotNull(devices);
+        Assert.Contains(devices!, device => device.DeviceId == deviceId);
+        Assert.Contains(devices!, device => device.DeviceId == deviceId && device.IsCurrentDevice);
+    }
+
+    [Fact]
+    public async Task RevokeToken_RemovesOnlyTheTargetedDevice()
+    {
+        string deviceA = $"device-a-{Guid.NewGuid():N}";
+        string deviceB = $"device-b-{Guid.NewGuid():N}";
+
+        TestUser user = await users.CreateUniqueAsync("v2-revoke");
+        TokenResponse tokenA = await users.IssueTokenAsync(user.Id, new DeviceInfo(deviceA, "Device A", "Windows"));
+        await users.IssueTokenAsync(user.Id, new DeviceInfo(deviceB, "Device B", "Windows"));
+
+        using HttpResponseMessage response = await client.SendJsonWithTokenAsync(
+            HttpMethod.Delete,
+            $"/api/passport/v2/sessions?deviceId={Uri.EscapeDataString(RsaPayload.Encrypt(deviceA))}",
+            (object?)null,
+            tokenA.AccessToken);
+
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        using HttpRequestMessage listRequest = new(HttpMethod.Get, "/api/passport/v2/sessions");
+        listRequest.WithToken(tokenA.AccessToken);
+        listRequest.WithDevice(deviceA);
+
+        using HttpResponseMessage listResponse = await client.SendAsync(listRequest, TestContext.Current.CancellationToken);
+        List<LoggedInDeviceInfo>? devices = (await listResponse.ReadTestResponseAsync()).DeserializeData<List<LoggedInDeviceInfo>>();
+
+        Assert.NotNull(devices);
+        Assert.DoesNotContain(devices!, device => device.DeviceId == deviceA);
+        Assert.Contains(devices!, device => device.DeviceId == deviceB);
+    }
+
+    [Fact]
+    public async Task RevokeAllTokens_InvalidatesEveryRefreshToken()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-revoke-all");
+        TokenResponse deviceToken = await users.IssueTokenAsync(user.Id, new DeviceInfo($"device-{Guid.NewGuid():N}", "Device", "Windows"));
+
+        using HttpResponseMessage response = await client.SendJsonWithTokenAsync(
+            HttpMethod.Delete, "/api/passport/v2/sessions", (object?)null, deviceToken.AccessToken);
+
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage refreshResponse = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions/refresh",
+            new Dictionary<string, object?> { ["RefreshToken"] = RsaPayload.Encrypt(deviceToken.RefreshToken) },
+            token: null);
+
+        Assert.Equal(ReturnCodes.LoginFail, (await refreshResponse.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task UserInfo_WithoutToken_ReturnsLoginFailEnvelope()
+    {
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/passport/v2/me", token: null);
+
+        TestResponse parsed = await response.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.LoginFail, parsed.Retcode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UserInfo_ReflectsPrivilegeFlags()
+    {
+        TestUser maintainer = await users.MaintainerAsync();
+
+        using HttpResponseMessage response = await client.GetWithTokenAsync("/api/passport/v2/me", maintainer.AccessToken);
+        UserInfo? info = (await response.ReadTestResponseAsync()).DeserializeData<UserInfo>();
+
+        Assert.NotNull(info);
+        Assert.True(info!.IsMaintainer);
+        Assert.True(info.IsLicensedDeveloper);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithValidLink_ChangesPassword()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-resetpwd");
+        const string newPassword = "BrandNewPassword456";
+
+        string token = await RequestResetTokenAsync(user.UserName);
+
+        using HttpResponseMessage stateResponse = await client.GetWithTokenAsync(
+            $"/api/passport/v2/password/reset/{token}", token: null);
+        TestResponse state = await stateResponse.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, state.Retcode);
+
+        PassportResetLinkState? link = state.DeserializeData<PassportResetLinkState>();
+        Assert.NotNull(link);
+        Assert.EndsWith("@example.com", link!.UserName, StringComparison.Ordinal);
+        Assert.Contains("***", link.UserName, StringComparison.Ordinal);
+        Assert.True(link.ExpireInSeconds is > 0 and <= 900);
+
+        using HttpResponseMessage response = await client.SendJsonWithTokenAsync(HttpMethod.Put,
+            "/api/passport/v2/password/reset", Body(token: token, password: newPassword), token: null);
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage loginResponse = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: user.UserName, password: newPassword), token: null);
+
+        Assert.Equal(ReturnCodes.Success, (await loginResponse.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithUsedLink_Fails()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-resetpwd-reuse");
+
+        string token = await RequestResetTokenAsync(user.UserName);
+
+        using HttpResponseMessage first = await client.SendJsonWithTokenAsync(HttpMethod.Put,
+            "/api/passport/v2/password/reset", Body(token: token, password: "BrandNewPassword456"), token: null);
+        Assert.Equal(ReturnCodes.Success, (await first.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage second = await client.SendJsonWithTokenAsync(HttpMethod.Put,
+            "/api/passport/v2/password/reset", Body(token: token, password: "AnotherPassword789"), token: null);
+        Assert.Equal(ReturnCodes.RegisterFail, (await second.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage stateResponse = await client.GetWithTokenAsync(
+            $"/api/passport/v2/password/reset/{token}", token: null);
+        Assert.Equal(ReturnCodes.RegisterFail, (await stateResponse.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_LinkRequestTwiceWithinOneMinute_IsThrottled()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-resetpwd-throttle");
+
+        await RequestResetTokenAsync(user.UserName);
+
+        using HttpResponseMessage second = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/verification-codes", Body(userName: user.UserName, isResetPassword: true), token: null);
+        Assert.Equal(ReturnCodes.VerifyCodeTooFrequently, (await second.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithSamePassword_Fails()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-resetpwd-same");
+
+        string token = await RequestResetTokenAsync(user.UserName);
+
+        using HttpResponseMessage response = await client.SendJsonWithTokenAsync(HttpMethod.Put,
+            "/api/passport/v2/password/reset", Body(token: token, password: Password), token: null);
+
+        Assert.Equal(ReturnCodes.RegisterFail, (await response.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithUnknownLink_Fails()
+    {
+        using HttpResponseMessage response = await client.GetWithTokenAsync(
+            "/api/passport/v2/password/reset/00000000000000000000000000000000", token: null);
+
+        Assert.Equal(ReturnCodes.RegisterFail, (await response.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task ResetUsername_WithBothCodes_SwitchesAccountName()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-resetname");
+        string newEmail = NewEmail("v2-resetname-new");
+
+        string oldCode = await RequestVerifyCodeAsync(Body(userName: user.UserName, isResetUserName: true));
+        string newCode = await RequestVerifyCodeAsync(Body(userName: newEmail, isResetUserNameNew: true));
+
+        using HttpResponseMessage response = await client.SendJsonWithTokenAsync(HttpMethod.Put,
+            "/api/passport/v2/accounts/me/username",
+            Body(userName: user.UserName, verifyCode: oldCode, newUserName: newEmail, newVerifyCode: newCode),
+            token: null);
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage loginResponse = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: newEmail, password: Password), token: null);
+
+        Assert.Equal(ReturnCodes.Success, (await loginResponse.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task Cancel_WithValidCode_DeletesAccount()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-cancel");
+
+        string code = await RequestVerifyCodeAsync(Body(userName: user.UserName, isCancelRegistration: true), user.AccessToken);
+
+        using HttpResponseMessage response = await client.SendJsonWithTokenAsync(HttpMethod.Delete,
+            "/api/passport/v2/accounts/me", Body(userName: user.UserName, password: Password, verifyCode: code), token: null);
+        Assert.Equal(ReturnCodes.Success, (await response.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage loginResponse = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password), token: null);
+
+        Assert.Equal(ReturnCodes.LoginFail, (await loginResponse.ReadTestResponseAsync()).Retcode);
+    }
+
+    [Fact]
+    public async Task Cancel_WithWrongCode_IsRejected()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-cancel-badcode");
+
+        using HttpResponseMessage response = await client.SendJsonWithTokenAsync(HttpMethod.Delete,
+            "/api/passport/v2/accounts/me", Body(userName: user.UserName, password: Password, verifyCode: "INVALID0"), token: null);
+
+        Assert.Equal(ReturnCodes.RegisterFail, (await response.ReadTestResponseAsync()).Retcode);
+    }
+
+    /// <summary>
+    /// 登录日志：失败与成功各落一条，后台按邮箱能查到；成功那条关联用户 id，失败那条带失败词条.
+    /// </summary>
+    [Fact]
+    public async Task Login_WithCaptchaEnabled_RequiresAValidToken()
+    {
+        AppOptions appOptions = factory.Services.GetRequiredService<AppOptions>();
+        SystemConfigService config = factory.Services.GetRequiredService<SystemConfigService>();
+        string originalSiteKey = appOptions.ReCaptcha.SiteKey;
+        appOptions.ReCaptcha.SiteKey = "test-site-key";
+        await config.UpdateAsync(new Dictionary<string, string?> { ["System.CaptchaEnabled"] = "true" }, 0);
+
+        try
+        {
+            TestUser user = await users.CreateUniqueAsync("v2-captcha");
+
+            using HttpResponseMessage missing = await client.PostJsonWithTokenAsync(
+                "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password), token: null);
+            Assert.Equal(ReturnCodes.ReCaptchaVerifyFailed, (await missing.ReadTestResponseAsync()).Retcode);
+
+            string wrongActionToken = $"captcha-{Guid.NewGuid():N}";
+            factory.StubHttp.MapJson(
+                "recaptcha/api/siteverify",
+                """{"success":true,"score":0.9,"action":"other"}""",
+                bodyFragment: $"response={wrongActionToken}");
+
+            using HttpResponseMessage wrongAction = await client.PostJsonWithTokenAsync(
+                "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password, captchaToken: wrongActionToken), token: null);
+            Assert.Equal(ReturnCodes.ReCaptchaVerifyFailed, (await wrongAction.ReadTestResponseAsync()).Retcode);
+
+            string token = $"captcha-{Guid.NewGuid():N}";
+            factory.StubHttp.MapJson(
+                "recaptcha/api/siteverify",
+                """{"success":true,"score":0.9,"action":"login"}""",
+                bodyFragment: $"response={token}");
+
+            using HttpResponseMessage ok = await client.PostJsonWithTokenAsync(
+                "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password, captchaToken: token), token: null);
+            Assert.Equal(ReturnCodes.Success, (await ok.ReadTestResponseAsync()).Retcode);
+        }
+        finally
+        {
+            appOptions.ReCaptcha.SiteKey = originalSiteKey;
+            await config.DeleteAsync("System.CaptchaEnabled");
+        }
+    }
+
+    /// <summary>
+    /// reCAPTCHA：私钥与最低分值都取自后台保存值，而不是 appsettings 里的固定配置.
+    /// </summary>
+    [Fact]
+    public async Task Login_CaptchaSecretAndMinScoreComeFromSavedSettings()
+    {
+        AppOptions appOptions = factory.Services.GetRequiredService<AppOptions>();
+        SystemConfigService config = factory.Services.GetRequiredService<SystemConfigService>();
+        string originalSiteKey = appOptions.ReCaptcha.SiteKey;
+        string secret = $"stub-secret-{Guid.NewGuid():N}";
+        appOptions.ReCaptcha.SiteKey = "test-site-key";
+        await config.UpdateAsync(new Dictionary<string, string?>
+        {
+            ["System.CaptchaEnabled"] = "true",
+            [Keys.RecaptchaSecretKey] = secret,
+            [Keys.RecaptchaMinScore] = "0.8",
+        }, 0);
+
+        try
+        {
+            TestUser user = await users.CreateUniqueAsync("v2-captcha-score");
+            string token = $"captcha-{Guid.NewGuid():N}";
+            factory.StubHttp.MapJson(
+                "recaptcha/api/siteverify",
+                """{"success":true,"score":0.7,"action":"login"}""",
+                bodyFragment: $"response={token}");
+
+            using HttpResponseMessage belowThreshold = await client.PostJsonWithTokenAsync(
+                "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password, captchaToken: token), token: null);
+            Assert.Equal(ReturnCodes.ReCaptchaVerifyFailed, (await belowThreshold.ReadTestResponseAsync()).Retcode);
+
+            // 向 Google 换票时带上的是后台保存的私钥
+            Assert.Contains(factory.StubHttp.Requests, request =>
+                request.Url.Contains("recaptcha/api/siteverify", StringComparison.Ordinal)
+                && request.Body?.Contains($"secret={secret}", StringComparison.Ordinal) == true);
+
+            await config.UpdateAsync(new Dictionary<string, string?> { [Keys.RecaptchaMinScore] = "0.5" }, 0);
+            using HttpResponseMessage aboveThreshold = await client.PostJsonWithTokenAsync(
+                "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password, captchaToken: token), token: null);
+            Assert.Equal(ReturnCodes.Success, (await aboveThreshold.ReadTestResponseAsync()).Retcode);
+        }
+        finally
+        {
+            appOptions.ReCaptcha.SiteKey = originalSiteKey;
+            await config.DeleteAsync("System.CaptchaEnabled");
+            await config.DeleteAsync(Keys.RecaptchaSecretKey);
+            await config.DeleteAsync(Keys.RecaptchaMinScore);
+        }
+    }
+
+    [Fact]
+    public async Task Login_RecordsUserLoginLog()
+    {
+        TestUser user = await users.CreateUniqueAsync("v2-login-log");
+
+        using HttpResponseMessage failedResponse = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: user.UserName, password: "WrongPassword123"), token: null);
+        Assert.Equal(ReturnCodes.LoginFail, (await failedResponse.ReadTestResponseAsync()).Retcode);
+
+        using HttpResponseMessage successResponse = await client.PostJsonWithTokenAsync(
+            "/api/passport/v2/sessions", Body(userName: user.UserName, password: Password), token: null);
+        Assert.Equal(ReturnCodes.Success, (await successResponse.ReadTestResponseAsync()).Retcode);
+
+        TestUser maintainer = await users.MaintainerAsync();
+        using HttpResponseMessage listResponse = await client.GetWithTokenAsync(
+            $"/api/admin/login-logs?page=1&pageSize=50&keyword={Uri.EscapeDataString(user.UserName)}",
+            maintainer.AccessToken);
+        TestResponse list = await listResponse.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, list.Retcode);
+
+        List<UserLoginLogItem> items = list.DeserializeData<PagedResult<UserLoginLogItem>>()!.Items;
+        Assert.Equal(2, items.Count);
+
+        UserLoginLogItem succeeded = Assert.Single(items, item => item.Success);
+        Assert.Equal(user.Id, succeeded.UserId);
+        Assert.Equal("password", succeeded.Method);
+        Assert.Null(succeeded.FailureKey);
+
+        UserLoginLogItem failed = Assert.Single(items, item => !item.Success);
+        Assert.Null(failed.UserId);
+        Assert.Equal(ServerKeys.ServerPassportUserNameOrPasswordIncorrect, failed.FailureKey);
+
+        // 客户端自助查询：只能看到自己成功的登录（失败记录只给后台审计看）
+        using HttpResponseMessage ownResponse = await client.GetWithTokenAsync(
+            "/api/passport/v2/me/login-logs?page=1&pageSize=50",
+            user.AccessToken);
+        TestResponse own = await ownResponse.ReadTestResponseAsync();
+        Assert.Equal(ReturnCodes.Success, own.Retcode);
+
+        List<UserLoginLogItem> ownItems = own.DeserializeData<PagedResult<UserLoginLogItem>>()!.Items;
+        Assert.All(ownItems, item => Assert.Equal(user.Id, item.UserId));
+        Assert.Contains(ownItems, item => item.Success);
+    }
+}

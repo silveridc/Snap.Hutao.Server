@@ -1,0 +1,46 @@
+{
+  "login": {
+    "tip": "Please sign in with a maintainer account",
+    "form": {
+      "emailPlaceholder": "Account email",
+      "passwordPlaceholder": "Password",
+      "loginBtn": "Sign in"
+    },
+    "rules": {
+      "email": "Please enter your email",
+      "password": "Please enter your password"
+    },
+    "sso": {
+      "divider": "or",
+      "btn": "Sign in with {name}",
+      "defaultName": "Single Sign-On",
+      "fail": "Unable to start the SSO login"
+    },
+    "captcha": {
+      "notice": "Protected by reCAPTCHA, see the",
+      "privacy": "Google Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "messages": {
+      "loginSuccess": "Signed in successfully",
+      "loginFail": "Sign in failed",
+      "captchaFail": "Human verification failed, please refresh and retry"
+    }
+  },
+  "sso": {
+    "exchanging": "Completing single sign-on…",
+    "fail": "Single sign-on failed, please return to the console and try again",
+    "retryHint": "A ticket can only be used once. If this page has been open for a while, start the login again.",
+    "subject": "Subject",
+    "copied": "Subject copied",
+    "errors": {
+      "expired": "The login request has expired or was already used. Start SSO again.",
+      "upstream": "The identity provider rejected this login. Try again or sign in with a password.",
+      "invalidToken": "The identity token failed validation. Start SSO again.",
+      "notProvisioned": "Your identity is verified but no admin account exists yet. Send the subject to an administrator.",
+      "disabled": "This admin account has been disabled. Contact an administrator.",
+      "ticket": "The login ticket is invalid or has expired. Start SSO again.",
+      "unknown": "The SSO login failed. Start again or sign in with a password."
+    }
+  }
+}

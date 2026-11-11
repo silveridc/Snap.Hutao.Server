@@ -1,0 +1,83 @@
+{
+  "release": {
+    "current": {
+      "title": "Currently Active Version",
+      "version": "Version",
+      "publisher": "Publisher",
+      "publishedAt": "Published At",
+      "mirrors": "Mirrors",
+      "releaseNotes": "Release Notes",
+      "minimumVersion": "Minimum Required Version",
+      "copyHash": "Copy full checksum",
+      "copiedHash": "SHA-256 copied",
+      "copyFail": "Copy failed; select the text and copy manually"
+    },
+    "form": {
+      "title": "Publish New Version",
+      "tipPre": "Backed by ",
+      "tipSuf": ". The version activates automatically on publish and the previous one becomes history.",
+      "version": "Version",
+      "versionPlaceholder": "Four segments of numbers, e.g. 1.17.2.0",
+      "validation": "SHA-256 Checksum",
+      "validationPlaceholder": "64-character hexadecimal string",
+      "minimumVersion": "Minimum required version",
+      "minimumVersionPlaceholder": "Empty for optional, e.g. 1.17.0.0",
+      "minimumVersionHint": "Clients below this version must update and cannot skip; must not exceed the release version",
+      "mirrors": "Download Mirrors",
+      "mirrorNamePlaceholder": "Mirror name",
+      "mirrorUrlPlaceholder": "HTTPS download URL",
+      "removeMirror": "Remove",
+      "addMirror": "Add Mirror",
+      "releaseNotes": "Release Notes",
+      "releaseNotesPlaceholder": "Optional, what is new in this version",
+      "submit": "Publish"
+    },
+    "bucket": {
+      "title": "Publish from Bucket",
+      "tip": "Upload the installer to the patch bucket first, then pick the object here: the server reads it to compute the SHA-256, parses the version from the file name, and builds the Direct mirror URL.",
+      "prefix": "Object prefix",
+      "prefixPlaceholder": "e.g. patch/, empty to list everything",
+      "refreshObjects": "Refresh Objects",
+      "object": "Installer object",
+      "objectPlaceholder": "Select an object in the bucket",
+      "versionAutoHint": "Empty to parse from the object file name, e.g. Snap.Hutao.1.17.2.0.msix",
+      "mirrorName": "Mirror name",
+      "mirrorNameHint": "Empty to use the bucket host name",
+      "validation": "SHA-256 (optional)",
+      "validationHint": "Paste a precomputed checksum to skip downloading the installer: the server only HEADs the object. Leave empty to hash it.",
+      "validationPlaceholder": "64 hex characters; empty to let the server compute it",
+      "submit": "Verify and Publish",
+      "publishing": "Reading the object and computing the SHA-256; a large installer takes a while…",
+      "publishingWithHash": "Verifying the object and publishing…",
+      "truncated": "More than 200 objects; only the first 200 are shown, narrow the prefix",
+      "objectRequired": "Select the installer object to publish first",
+      "validationInvalid": "SHA-256 must be 64 hexadecimal characters"
+    },
+    "list": {
+      "title": "Release History",
+      "colVersion": "Version",
+      "colMirrors": "Mirrors",
+      "colStatus": "Status",
+      "colPublisher": "Publisher",
+      "colPublishedAt": "Published At",
+      "colOp": "Actions",
+      "active": "Active",
+      "history": "History"
+    },
+    "actions": {
+      "activate": "Activate",
+      "deactivate": "Unpublish"
+    },
+    "dialog": {
+      "activateTitle": "Activate Historical Version",
+      "activateBody": "Set version {version} as the currently active version? The active version will be replaced.",
+      "deactivateTitle": "Unpublish the Active Release",
+      "deactivateBody": "Unpublish version {version}? Clients will no longer receive this update."
+    },
+    "messages": {
+      "versionRequired": "Please enter the version number",
+      "validationRequired": "Please enter the SHA-256 checksum",
+      "mirrorEmpty": "The name and URL of mirror {n} cannot be empty"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "announcement": {
+    "form": {
+      "title": "Publish Announcement",
+      "tip": "Announcements are only visible to clients that report a version. Max Present Version limits an announcement to older clients.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Announcement title",
+      "severity": "Severity",
+      "link": "Link",
+      "linkPlaceholder": "Optional URL opened on click",
+      "maxVersion": "Max Present Version",
+      "maxVersionPlaceholder": "Optional, e.g. 1.17.1.0",
+      "content": "Content",
+      "contentPlaceholder": "Announcement body",
+      "submit": "Publish"
+    },
+    "severity": {
+      "informational": "Informational",
+      "success": "Success",
+      "warning": "Warning",
+      "error": "Error"
+    },
+    "list": {
+      "title": "Announcements",
+      "colTitle": "Title",
+      "colLocale": "Locale",
+      "colSeverity": "Severity",
+      "colMaxVersion": "Max Version",
+      "colEnabled": "Online",
+      "colUpdateTime": "Updated At",
+      "colOp": "Actions"
+    },
+    "edit": {
+      "title": "Edit Announcement",
+      "meta": "ID {id} · Locale {locale}"
+    },
+    "dialog": {
+      "removeTitle": "Delete Announcement",
+      "removeBody": "Delete announcement 「{title}」 (ID {id} / {locale})?"
+    },
+    "messages": {
+      "titleContentRequired": "Fill in both title and content"
+    }
+  }
+}

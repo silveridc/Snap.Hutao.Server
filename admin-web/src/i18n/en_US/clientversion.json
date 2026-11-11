@@ -1,0 +1,18 @@
+{
+  "clientversion": {
+    "title": "Client Versions",
+    "tipPre": "Every Snap Hutao request carries its version and device id; the server keeps one row per device and refreshes it at most once an hour (table ",
+    "tipSuf": "). The table below groups those devices by client version.",
+    "refresh": "Refresh",
+    "totalDevices": "Devices",
+    "versionCount": "Versions",
+    "list": {
+      "colVersion": "Client Version",
+      "colDevices": "Devices",
+      "colRatio": "Share",
+      "colFirstSeen": "First Seen",
+      "colLastSeen": "Last Seen",
+      "empty": "No client has reported a version yet"
+    }
+  }
+}

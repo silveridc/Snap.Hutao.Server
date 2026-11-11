@@ -1,0 +1,33 @@
+{
+  "wallpaper": {
+    "title": "Today Wallpaper",
+    "description": "When a client picks the Today wallpaper background, one entry from this list is returned at random each day; an empty list falls back to Bing's daily wallpaper.",
+    "columns": {
+      "url": "Wallpaper URL",
+      "sourceUrl": "Source page",
+      "author": "Author",
+      "uploader": "Uploader",
+      "op": "Actions"
+    },
+    "placeholders": {
+      "url": "Absolute HTTPS URL, e.g. https://...",
+      "sourceUrl": "Empty to reuse the wallpaper URL",
+      "author": "Empty for Snap Hutao",
+      "uploader": "Empty for Snap Hutao"
+    },
+    "reload": "Refresh",
+    "add": "Add Wallpaper",
+    "save": "Save",
+    "empty": "No wallpapers yet; click Add Wallpaper to start",
+    "hint": "One entry is picked randomly and stays stable for the whole day; changes apply on the next fetch.",
+    "messages": {
+      "loadFail": "Failed to load the wallpaper pool",
+      "saveSuccess": "Wallpaper pool saved",
+      "saveFail": "Failed to save the wallpaper pool",
+      "urlRequired": "The URL of wallpaper {n} is required",
+      "urlInvalid": "The URL of wallpaper {n} must be an absolute HTTPS URL",
+      "sourceUrlInvalid": "The source page of wallpaper {n} must be an absolute HTTPS URL",
+      "tooMany": "At most {max} wallpapers can be added"
+    }
+  }
+}

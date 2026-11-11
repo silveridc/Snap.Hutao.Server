@@ -1,0 +1,19 @@
+namespace server.Models.Afdian;
+
+public class AfdianResponse
+{
+    [JsonPropertyName("ec")]
+    public int ErrorCode
+    {
+        get; set;
+    }
+
+    [JsonPropertyName("em")]
+    public string ErrorMessage { get; set; } = default!;
+}
+
+public sealed class AfdianResponse<T> : AfdianResponse
+{
+    [JsonPropertyName("data")]
+    public T Data { get; set; } = default!;
+}

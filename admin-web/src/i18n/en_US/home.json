@@ -1,0 +1,82 @@
+{
+  "home": {
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}",
+      "night": "Still up, {name}",
+      "sub": "Today is {date}. Here is the current server state."
+    },
+    "updatedAt": "Updated at {time}",
+    "duration": {
+      "d": "{count}d",
+      "h": "{count}h",
+      "m": "{count}m",
+      "s": "{count}s"
+    },
+    "growth": {
+      "title": "Users and data",
+      "total": "Registered users",
+      "today": "New today",
+      "last7": "New in 7 days",
+      "last30": "New in 30 days",
+      "maintainers": "Maintainers",
+      "developers": "Licensed developers",
+      "banned": "Banned UIDs",
+      "activeGacha": "Active gacha log",
+      "activeCdn": "Active CDN",
+      "gachaItems": "Gacha records",
+      "abyssRecords": "Spiral Abyss records"
+    },
+    "health": {
+      "title": "Service health",
+      "process": "Process",
+      "database": "Database",
+      "redis": "Redis",
+      "scheduler": "Scheduler",
+      "uptime": "Uptime",
+      "version": "Version",
+      "cpu": "CPU",
+      "memory": "Working set",
+      "ok": "OK",
+      "down": "Down",
+      "unknown": "Not probed",
+      "jobsRunning": "{count} jobs scheduled",
+      "probeError": "{name}: {error}"
+    },
+    "release": {
+      "title": "Current release",
+      "none": "No client version has been published",
+      "version": "Version",
+      "publishedAt": "Published at",
+      "publishedBy": "Published by",
+      "mirrors": "Mirrors",
+      "minimumVersion": "Minimum upgradable version",
+      "go": "Open releases"
+    },
+    "pending": {
+      "title": "Needs attention",
+      "license": "License applications pending",
+      "licenseCount": "{count} open",
+      "licenseNone": "No application pending",
+      "view": "View",
+      "empty": "Nothing needs attention"
+    },
+    "audit": {
+      "title": "Recent admin actions",
+      "operator": "Operator",
+      "action": "Action",
+      "result": "Result",
+      "time": "Time",
+      "success": "Success",
+      "failure": "Failed",
+      "viewAll": "View all"
+    },
+    "quick": {
+      "title": "Quick links"
+    },
+    "errors": {
+      "partial": "Some data failed to load: {names}"
+    }
+  }
+}

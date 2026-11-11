@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.6887863">
+  <PropertyGroup>
+    <!-- F5 / 调试时启动的命令（Vite 开发服务器，端口 5180） -->
+    <StartupCommand>pnpm run dev</StartupCommand>
+    <!-- 发布（Publish）时执行的构建命令，产物输出到 server/wwwroot/doc -->
+    <BuildCommand>pnpm run build</BuildCommand>
+    <JsxRuntime>react</JsxRuntime>
+    <!-- 本仓库只用 pnpm，锁文件不是 package-lock.json -->
+    <NpmInstallCheck>$(MSBuildProjectDirectory)\node_modules\.pnpm-install-check</NpmInstallCheck>
+    <ShouldRunNpmAudit>false</ShouldRunNpmAudit>
+  </PropertyGroup>
+
+  <!--
+    JS SDK 的 RunNpmInstall 硬编码 npm install，而本项目由 pnpm 管理.
+    SDK 的 targets 在项目体之后导入、覆盖不掉，所以挂一个前置 target：
+    先用 pnpm 装好依赖并写检查点，等 SDK 的 RunNpmInstall 执行时增量检查直接跳过.
+  -->
+  <Target Name="RunPnpmInstall" BeforeTargets="RunNpmInstall" Condition="'$(ShouldRunNpmInstall)' == 'true'" Inputs="$(PackageJsonDirectory)package.json;$(PackageJsonDirectory)pnpm-lock.yaml" Outputs="$(NpmInstallCheck)">
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCodePnpmNode" />
+    </Exec>
+    <Error Condition="'$(ErrorCodePnpmNode)' != '0'" Text="构建 apidoc 需要 Node.js，请先安装：https://nodejs.org/" />
+    <Message Importance="high" Text="Restoring dependencies using 'pnpm'..." />
+    <Exec WorkingDirectory="$(PackageJsonDirectory)" Command="pnpm install --frozen-lockfile">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCodePnpmInstall" />
+    </Exec>
+    <Error Condition="'$(ErrorCodePnpmInstall)' != '0'" Text="pnpm install 失败（退出码 $(ErrorCodePnpmInstall)）" />
+    <Touch Files="$(NpmInstallCheck)" AlwaysCreate="true" />
+  </Target>
+</Project>
