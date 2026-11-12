@@ -22,8 +22,10 @@ public sealed class AdminAuditController(AdminQueryService adminQueryService) : 
     [HttpGet("audit-logs")]
     public async Task<IActionResult> AuditListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
-        PagedResult<AuditLogItem> result = await adminQueryService.GetAuditLogsAsync(page, pageSize).ConfigureAwait(false);
-        return Success<PagedResult<AuditLogItem>>("Audit logs acquired successfully", result, ServerKeys.ServerAdminAuditListSucceed);
+        return Success(
+            "Audit logs acquired successfully",
+            await adminQueryService.GetAuditLogsAsync(page, pageSize).ConfigureAwait(false),
+            ServerKeys.ServerAdminAuditListSucceed);
     }
 
     /// <summary>
@@ -45,11 +47,10 @@ public sealed class AdminAuditController(AdminQueryService adminQueryService) : 
         [FromQuery] long? from = null,
         [FromQuery] long? to = null)
     {
-        PagedResult<UserLoginLogItem> result = await adminQueryService
-            .GetLoginLogsAsync(page, pageSize, keyword, success, from, to)
-            .ConfigureAwait(false);
-
-        return Success<PagedResult<UserLoginLogItem>>("Login log acquired successfully", result, ServerKeys.ServerAdminLoginLogListSucceed);
+        return Success(
+            "Login log acquired successfully",
+            await adminQueryService.GetLoginLogsAsync(page, pageSize, keyword, success, from, to).ConfigureAwait(false),
+            ServerKeys.ServerAdminLoginLogListSucceed);
     }
 
     /// <summary>
@@ -67,7 +68,9 @@ public sealed class AdminAuditController(AdminQueryService adminQueryService) : 
         [FromQuery] string? jobType = null,
         [FromQuery] bool? success = null)
     {
-        PagedResult<JobLogItem> result = await adminQueryService.GetJobLogsAsync(page, pageSize, jobType, success).ConfigureAwait(false);
-        return Success<PagedResult<JobLogItem>>("Job log acquired successfully", result, ServerKeys.ServerAdminJobLogListSucceed);
+        return Success(
+            "Job log acquired successfully",
+            await adminQueryService.GetJobLogsAsync(page, pageSize, jobType, success).ConfigureAwait(false),
+            ServerKeys.ServerAdminJobLogListSucceed);
     }
 }

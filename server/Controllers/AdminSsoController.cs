@@ -28,7 +28,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     [HttpGet("status")]
     public IActionResult GetStatus()
     {
-        return Success<AdminSsoStatus>("Admin SSO status acquired successfully", new AdminSsoStatus
+        return Success("Admin SSO status acquired successfully", new AdminSsoStatus
         {
             Enabled = adminSsoService.IsEnabled,
             DisplayName = adminSsoService.DisplayName,
@@ -58,7 +58,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
             return Fail(error ?? "The identity provider is unavailable", ReturnCode.SsoUpstreamFailed, ServerKeys.ServerAdminSsoUpstreamFailed);
         }
 
-        return Success<string>("Redirect to this url to start the admin SSO login", url);
+        return Success("Redirect to this url to start the admin SSO login", url);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
             return Fail("The login ticket is invalid or has expired", ReturnCode.SsoTicketInvalid, ServerKeys.ServerAdminSsoTicketInvalid);
         }
 
-        return Success<AdminSsoTokenResponse>("Admin login succeeded", token, ServerKeys.ServerAdminSsoLoginSucceed);
+        return Success("Admin login succeeded", token, ServerKeys.ServerAdminSsoLoginSucceed);
     }
 
     /// <summary>
@@ -151,7 +151,6 @@ public sealed class AdminSsoController(AdminSsoService adminSsoService, ILogger<
     /// <returns>A 302 status result.</returns>
     private StatusCodeResult RedirectToCallback(Dictionary<string, string?> query)
     {
-        // 直接写 Location 而不是 Redirect()，避免框架对整串做二次编码后前端解析不到参数
         Response.Headers.Location = CallbackUrl(query);
         return StatusCode(StatusCodes.Status302Found);
     }

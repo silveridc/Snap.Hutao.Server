@@ -578,6 +578,7 @@ public sealed class ClientFlowTests
             {
                 ["Wallpaper.Today.Url"] = url,
                 ["Wallpaper.Today.Author"] = "Hutao",
+                ["Wallpaper.Today.Uploader"] = "HutaoUploader",
             },
             maintainer.AccessToken);
         Assert.Equal(ReturnCodes.Success, updated.Retcode);
@@ -592,7 +593,7 @@ public sealed class ClientFlowTests
             Assert.Equal(url, response!.Url);
             Assert.Equal(url, response.SourceUrl);
             Assert.Equal("Hutao", response.Author);
-            Assert.Equal("Snap Hutao", response.Uploader);
+            Assert.Equal("HutaoUploader", response.Uploader);
         }
         finally
         {
@@ -603,6 +604,7 @@ public sealed class ClientFlowTests
                 {
                     ["Wallpaper.Today.Url"] = string.Empty,
                     ["Wallpaper.Today.Author"] = string.Empty,
+                    ["Wallpaper.Today.Uploader"] = string.Empty,
                 },
                 maintainer.AccessToken);
             Assert.Equal(ReturnCodes.Success, cleared.Retcode);

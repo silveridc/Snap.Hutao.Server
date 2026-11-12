@@ -19,7 +19,7 @@ namespace server;
 
 public static class Program
 {
-    public const string applicationVersion = "server@v1.0.4";
+    public const string applicationVersion = "server@v1.0.5";
     private static ILogger? _logger;
 
     public static async Task Main(string[] args)
@@ -195,8 +195,8 @@ public static class Program
             .AddScoped<ValidateAdminWritePermission>()
             .AddScoped<GachaLogStatisticsService>()
             .AddScoped<YaeMetadataService>()
-
             .AddScoped<AfdianWebhookService>()
+
             .AddSingleton<CacheService>()
             .AddSingleton<CdnExpireService>()
             .AddSingleton<GachaLogExpireService>()
@@ -230,7 +230,12 @@ public static class Program
                     IssuerSigningKey = appOptions.GetJwtSecurityKey(),
                     ValidateIssuer = true,
                     ValidIssuer = appOptions.Jwt.Issuer,
+                    // 令牌由 PassportService / AdminSsoService 签发，两者都写入了 aud；
+                    // 校验端必须配同一个受众，并锁定 HS256，防止算法混淆
                     ValidateAudience = true,
+                    ValidAudience = appOptions.Jwt.Audience,
+                    RequireAudience = true,
+                    ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
                     RequireExpirationTime = true,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromSeconds(10),
@@ -357,7 +362,8 @@ public static class Program
             });
 
         WebApplication app = appBuilder.Build();
-        _logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Program");
+        IServiceProvider sp = app.Services;
+        _logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger("Program");
         await MigrateDatabasesAsync(app).ConfigureAwait(false);
         app.UseForwardedHeaders();
         if (!Debugger.IsAttached)
@@ -414,10 +420,10 @@ public static class Program
         app.MapFallbackToFile("admin/{*path:nonfile}", "admin/index.html");
 
         // Initialize dynamic config from DB
-        await app.Services.GetRequiredService<SystemConfigService>().InitializeAsync();
+        await sp.GetRequiredService<SystemConfigService>().InitializeAsync();
 
-        IScheduler scheduler = await app.Services.GetRequiredService<ISchedulerFactory>().GetScheduler(CancellationToken.None).ConfigureAwait(false);
-        scheduler.ListenerManager.AddJobListener(app.Services.GetRequiredService<JobLogListener>(), [GroupMatcher<JobKey>.AnyGroup()]);
+        IScheduler scheduler = await sp.GetRequiredService<ISchedulerFactory>().GetScheduler(CancellationToken.None).ConfigureAwait(false);
+        scheduler.ListenerManager.AddJobListener(sp.GetRequiredService<JobLogListener>(), [GroupMatcher<JobKey>.AnyGroup()]);
 
         _logger.LogInformation($"Api Version:{applicationVersion}");
         await app.RunAsync();

@@ -126,4 +126,18 @@ public sealed class StatisticsTests
         Assert.Contains("\"Total\":0", output);
         Assert.Contains("\"Rate\":0", output);
     }
+
+    [Fact]
+    public async Task StatisticsRun_PopulatesThePublicOverview()
+    {
+        TestUser maintainer = await factory.Users.MaintainerAsync();
+
+        TestResponse run = await client.SendEnvelopeAsync("POST", "/api/admin/statistics/refresh", null, maintainer.AccessToken);
+        Assert.Equal(ReturnCodes.Success, run.Retcode);
+
+        using HttpResponseMessage overview = await client.GetWithTokenAsync("/api/statistics/overview", token: null);
+        string body = await overview.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        TestResponse parsed = TestResponse.Parse(body);
+        Assert.True(parsed.Retcode == ReturnCodes.Success, $"/api/statistics/overview failed: {body}");
+    }
 }

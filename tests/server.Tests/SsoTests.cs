@@ -76,7 +76,14 @@ public sealed class SsoTests : IDisposable
     private AdminSsoService CreateService(string bootstrapValue, bool enabled = true, string? clientRedirectUri = null)
     {
         AppOptions host = factory.GetService<AppOptions>();
-        AppOptions options = new() { Jwt = host.Jwt };
+        AppOptions options = new()
+        {
+            Jwt = host.Jwt,
+            SentryDsn = host.SentryDsn,
+            OtlpToken = host.OtlpToken,
+            OtlpTracesEndpoint = host.OtlpTracesEndpoint,
+            OtlpLogsEndpoint = host.OtlpLogsEndpoint,
+        };
 
         // OIDC 配置现在只来自后台 system_config，用例直接把整组键写进数据库
         SystemConfigService systemConfig = factory.GetService<SystemConfigService>();

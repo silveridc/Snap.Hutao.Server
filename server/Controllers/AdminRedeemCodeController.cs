@@ -30,7 +30,7 @@ public sealed class AdminRedeemCodeController(
         req.Creator = hutaoUser.UserName;
 
         RedeemGenerateResponse response = await redeemService.GenerateRedeemCodesAsync(req).ConfigureAwait(false);
-        return Success<RedeemGenerateResponse>("Redeem codes generated successfully", response, ServerKeys.ServerAdminRedeemGenerateSucceed);
+        return Success("Redeem codes generated successfully", response, ServerKeys.ServerAdminRedeemGenerateSucceed);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public sealed class AdminRedeemCodeController(
     public async Task<IActionResult> RedeemListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? keyword = null)
     {
         PagedResult<RedeemCodeItem> result = await adminQueryService.GetRedeemCodesAsync(page, pageSize, keyword).ConfigureAwait(false);
-        return Success<PagedResult<RedeemCodeItem>>("Redeem code list acquired successfully", result, ServerKeys.ServerAdminRedeemListSucceed);
+        return Success("Redeem code list acquired successfully", result, ServerKeys.ServerAdminRedeemListSucceed);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public sealed class AdminRedeemCodeController(
     public async Task<IActionResult> RedeemUsesAsync([FromRoute] uint id)
     {
         List<RedeemCodeUsageItem> items = await adminQueryService.GetRedeemCodeUsesAsync(id).ConfigureAwait(false);
-        return Success<List<RedeemCodeUsageItem>>("Redeem code usages acquired successfully", items, ServerKeys.ServerAdminRedeemUsesSucceed);
+        return Success("Redeem code usages acquired successfully", items, ServerKeys.ServerAdminRedeemUsesSucceed);
     }
 
     /// <summary>
@@ -99,6 +99,6 @@ public sealed class AdminRedeemCodeController(
     public async Task<IActionResult> RedeemBatchDeleteAsync([FromBody] BatchIdRequest request)
     {
         long removed = await adminQueryService.BatchDeleteRedeemCodesAsync(request.Ids).ConfigureAwait(false);
-        return Success<long>($"Deleted {removed} redeem codes", removed);
+        return Success($"Deleted {removed} redeem codes", removed);
     }
 }

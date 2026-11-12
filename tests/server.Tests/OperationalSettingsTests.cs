@@ -21,7 +21,7 @@ public sealed class OperationalSettingsTests(HutaoServerFactory factory)
 {
     private const string Mask = "********";
     private const string DiagnosticSubject = "SMTP configuration test";
-    private const string DiagnosticHtml = "<p>This is a test email sent from the Snap Hutao admin panel.</p><p>No verification code or password reset link was generated.</p>";
+    private const string DiagnosticHtml = "<p>This is a test email sent from the Snap Hutao admin panel.</p>";
 
     private static readonly string[] SmtpKeys =
     [
@@ -479,7 +479,8 @@ public sealed class OperationalSettingsTests(HutaoServerFactory factory)
         {
             await DeleteSettingsAsync(TimingKeys);
             using ConnectionMultiplexer redis = await ConnectionMultiplexer.ConnectAsync($"127.0.0.1:{factory.RedisPort}");
-            IDatabase db = redis.GetDatabase(15);
+            // PassportVerificationService 固定使用 Redis DB 1
+            IDatabase db = redis.GetDatabase(1);
             List<RedisKey> created = [];
             try
             {

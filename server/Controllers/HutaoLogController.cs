@@ -31,6 +31,6 @@ public class HutaoLogController(TelemetryService telemetryService) : ControllerB
     [HttpGet("{deviceId}")]
     public async Task<IActionResult> LatestByDeviceId([FromRoute] string deviceId)
     {
-        return Success<List<HutaoLog>>("Logs acquired successfully", await telemetryService.GetLogsByDeviceId(deviceId).ConfigureAwait(false), ServerKeys.ServerHutaoLogGetRecordsSucceed);
+        return Success("Logs acquired successfully", await telemetryService.GetLogsByDeviceId(deviceId).ConfigureAwait(false), ServerKeys.ServerHutaoLogGetRecordsSucceed);
     }
 }

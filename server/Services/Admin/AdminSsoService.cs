@@ -1071,6 +1071,7 @@ public sealed class AdminSsoService(
             Subject = identity,
             Expires = timeProvider.GetUtcNow().UtcDateTime.AddMinutes(_accessTokenExpirationMinutes),
             Issuer = appOptions.Jwt.Issuer,
+            Audience = appOptions.Jwt.Audience,
             SigningCredentials = new(_jwtSigningKey, SecurityAlgorithms.HmacSha256Signature),
         };
 

@@ -27,7 +27,7 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
         Dictionary<string, string?> settings = await systemConfigService.GetAllAsync().ConfigureAwait(false);
         settings[Keys.OidcEnabled] = systemConfigService.Oidc.Enabled ? "true" : "false";
         settings[Keys.OidcRequireHttpsMetadata] = systemConfigService.Oidc.RequireHttpsMetadata ? "true" : "false";
-        return Success<Dictionary<string, string?>>("Configuration retrieved successfully", settings, ServerKeys.ServerAdminConfigGetSucceed);
+        return Success("Configuration retrieved successfully", settings, ServerKeys.ServerAdminConfigGetSucceed);
     }
 
     /// <summary>
@@ -90,7 +90,6 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            // SMTP 服务端响应可能包含用户名或凭据，日志和接口仅记录异常种类
             logger.LogWarning("SMTP diagnostic delivery failed ({ExceptionType})", ex.GetType().Name);
             return Fail("Unable to send the test email. Check the saved SMTP configuration", ReturnCode.InternalStateException, ServerKeys.ServerAdminMailTestFailed);
         }
@@ -109,8 +108,8 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
             "Mail template retrieved successfully",
             new()
             {
-                Template = customized ? custom : MailTemplates.DefaultHtml,
-                DefaultTemplate = MailTemplates.DefaultHtml,
+                Template = customized ? custom : MailContents.MailTemplateHtml,
+                DefaultTemplate = MailContents.MailTemplateHtml,
                 Customized = customized,
             },
             ServerKeys.ServerAdminMailTemplateGetSucceed);
@@ -130,7 +129,7 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
             return Fail("Mail template must not be empty", ReturnCode.InvalidUploadData, ServerKeys.ServerAdminMailTemplateEmpty);
         }
 
-        foreach (string placeholder in MailTemplates.Placeholders)
+        foreach (string placeholder in MailService.Placeholders)
         {
             if (!template.Contains(placeholder, StringComparison.Ordinal))
             {
@@ -176,7 +175,7 @@ public sealed class AdminSettingsController(SystemConfigService systemConfigServ
             Variables = kind.Variables,
             Customized = [.. MailContents.Languages.Select(language => !string.IsNullOrWhiteSpace(systemConfigService.Get(ContentKey(kind.Key, language))))],
         })];
-        return Success<List<MailContentSummary>>("Mail contents retrieved successfully", items, ServerKeys.ServerAdminMailContentListSucceed);
+        return Success("Mail contents retrieved successfully", items, ServerKeys.ServerAdminMailContentListSucceed);
     }
 
     /// <summary>

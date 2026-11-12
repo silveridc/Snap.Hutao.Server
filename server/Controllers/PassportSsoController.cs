@@ -8,6 +8,7 @@ namespace server.Controllers;
 [ApiController]
 [Route("api/passport/sso")]
 [ApiExplorerSettings(GroupName = "Passport")]
+[Obsolete("已弃用sso")]
 public sealed class PassportSsoController(
     AdminSsoService adminSsoService,
     PassportService passportService,

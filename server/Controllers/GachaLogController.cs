@@ -78,7 +78,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     public async Task<IActionResult> GetGachaEntriesAsync()
     {
         List<GachaEntry> entries = await gachaLogService.GetGachaEntriesForUserAsync(this.GetUserId()).ConfigureAwait(false);
-        return Success<List<GachaEntry>>("Entries acquired successfully", entries, ServerKeys.ServerGachaLogGetEntriesSucceed);
+        return Success("Entries acquired successfully", entries, ServerKeys.ServerGachaLogGetEntriesSucceed);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     public async Task<IActionResult> GetEndIdsAsync([FromQuery(Name = "Uid")] string uid)
     {
         EndIds endIds = await gachaLogService.GetNewestEndIdsAsync(this.GetUserId(), uid).ConfigureAwait(false);
-        return Success<EndIds>("EndIds acquired successfully", endIds, ServerKeys.ServerGachaLogGetEndIdsSucceed);
+        return Success("EndIds acquired successfully", endIds, ServerKeys.ServerGachaLogGetEndIdsSucceed);
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     {
         int userId = this.GetUserId();
         List<SimpleGachaItem> gachaItems = await gachaLogService.GetGachaItemsEarlyThanEndIdsAsync(userId, uidAndEndIds).ConfigureAwait(false);
-        return Success<List<SimpleGachaItem>>(userId.ToString(), gachaItems);
+        return Success(userId.ToString(), gachaItems);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     {
         int userId = this.GetUserId();
         List<SimpleGachaItem> gachaItems = await gachaLogService.GetLimitedGachaItemsEarlyThanEndIdsAsync(userId, uid, (GachaConfigType)configType, endId, count).ConfigureAwait(false);
-        return Success<List<SimpleGachaItem>>(userId.ToString(), gachaItems);
+        return Success(userId.ToString(), gachaItems);
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
     public async Task<IActionResult> DeleteAsync([FromRoute] string uid)
     {
         int count = await gachaLogService.DeleteGachaItemsAsync(this.GetUserId(), uid).ConfigureAwait(false);
-        return Success<int>($"Deleted {count} records", count);
+        return Success($"Deleted {count} records", count);
     }
 
     /// <summary>
@@ -181,6 +181,6 @@ public class GachaLogController(GachaLogService gachaLogService) : ControllerBas
             return Fail("Statistics are being computed or do not exist", ReturnCode.ComputingStatistics, ServerKeys.ServerGachaLogStatisticsUnavailable);
         }
 
-        return Success<T>("Gacha log statistics acquired successfully", data, ServerKeys.ServerGachaLogStatisticsSucceed);
+        return Success("Gacha log statistics acquired successfully", data, ServerKeys.ServerGachaLogStatisticsSucceed);
     }
 }

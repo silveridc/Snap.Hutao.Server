@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 
 namespace server.Tests.Infrastructure;
 
@@ -99,5 +100,29 @@ public static class TestHttpClientExtension
         }
 
         return client.SendAsync(request);
+    }
+
+    /// <summary>发送请求并解析统一外壳；500 直接判失败并附上响应体，方便定位.</summary>
+    public static async Task<TestResponse> SendEnvelopeAsync(this HttpClient client, string method, string url, string? json, string? token, string? realIp = null)
+    {
+        using HttpRequestMessage request = new(new HttpMethod(method), url);
+        request.WithToken(token);
+        request.WithDevice();
+        request.WithClientVersion();
+        if (realIp is not null)
+        {
+            request.WithRealIp(realIp);
+        }
+
+        if (json is not null)
+        {
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+        }
+
+        using HttpResponseMessage response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+        string body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.True(response.StatusCode is not HttpStatusCode.InternalServerError, $"{method} {url} returned 500: {body}");
+
+        return TestResponse.Parse(body);
     }
 }

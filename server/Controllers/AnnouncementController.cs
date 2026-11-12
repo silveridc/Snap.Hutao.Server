@@ -26,7 +26,7 @@ public sealed class AnnouncementController(AnnouncementService announcementServi
             .GetAnnouncementsAsync(currentVersion, "ALL", excludedIds)
             .ConfigureAwait(false);
 
-        return Success<List<EntityAnnouncement>>("Announcements acquired successfully", results, ServerKeys.ServerAnnouncementGetSucceed);
+        return Success("Announcements acquired successfully", results, ServerKeys.ServerAnnouncementGetSucceed);
     }
 
     /// <summary>

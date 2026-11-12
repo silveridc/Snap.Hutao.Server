@@ -267,6 +267,7 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
             Subject = claimsIdentity,
             Expires = timeProvider.GetUtcNow().UtcDateTime.AddMinutes(expirationMinutes),
             Issuer = appOptions.Jwt.Issuer,
+            Audience = appOptions.Jwt.Audience,
             SigningCredentials = new(_jwtSigningKey, SecurityAlgorithms.HmacSha256Signature),
         };
 

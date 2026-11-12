@@ -72,7 +72,7 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
             .SingleOrDefaultAsync()
             .ConfigureAwait(false);
 
-        return Success<OAuthBindStatus>("Bind status acquired successfully", bindIdentity is null ? OAuthBindStatus.NotBinded() : OAuthBindStatus.Binded(bindIdentity), ServerKeys.ServerOAuthBindStatusSucceed);
+        return Success("Bind status acquired successfully", bindIdentity is null ? OAuthBindStatus.NotBinded() : OAuthBindStatus.Binded(bindIdentity), ServerKeys.ServerOAuthBindStatusSucceed);
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
         }
 
         ArgumentNullException.ThrowIfNull(result.TokenResponse);
-        return this.Redirect($"{decryptedState.CallbackUri}?access_token={result.TokenResponse.AccessToken}&refresh_token={result.TokenResponse.RefreshToken}&expires_in={result.TokenResponse.ExpiresIn}");
+        return Redirect($"{decryptedState.CallbackUri}?access_token={result.TokenResponse.AccessToken}&refresh_token={result.TokenResponse.RefreshToken}&expires_in={result.TokenResponse.ExpiresIn}");
     }
 
     /// <summary>

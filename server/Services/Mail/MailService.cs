@@ -11,6 +11,7 @@ namespace server.Services.Mail;
 // Singleton
 public sealed partial class MailService(ILogger<MailService> logger, SystemConfigService systemConfig)
 {
+    public static readonly string[] Placeholders = ["{{options.Title}}", "{{options.RawContent}}", "{{options.Footer}}"];
     private readonly ILogger<MailService> _logger = logger;
 
     /// <summary>
@@ -164,7 +165,7 @@ public sealed partial class MailService(ILogger<MailService> logger, SystemConfi
         string template = systemConfig.MailTemplateHtml;
         if (string.IsNullOrWhiteSpace(template))
         {
-            template = MailTemplates.DefaultHtml;
+            template = MailContents.MailTemplateHtml;
         }
 
         Dictionary<string, string> values = new(variables, StringComparer.Ordinal)

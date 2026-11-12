@@ -6,8 +6,8 @@ public sealed class DistributionService(
     HttpClient httpClient,
     AppOptions appOptions)
 {
-    private readonly string _cdnEndpoint = appOptions.CdnEndpoint;
-    private readonly string _cdnToken = appOptions.CdnToken;
+    private readonly string _cdnEndpoint = appOptions.Cdn.Endpoint;
+    private readonly string _cdnToken = appOptions.Cdn.Token;
 
     public async ValueTask<string?> GetDownloadTokenAsync()
     {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using server.Models.Context;
 using server.Models.Entity.Passport;
+using server.Options;
 using server.Services.Admin;
 using server.Tests.Infrastructure;
 using System.Net;
@@ -133,7 +134,7 @@ public sealed class UserAdminTests
         (bool ok, string? error, _) = await ResetAsync(factory, victim.Id, "1qaz2ws");
         Assert.False(ok);
         Assert.False(string.IsNullOrEmpty(error), "策略失败要带回原因");
-        Assert.Contains("8", error, StringComparison.Ordinal);
+        Assert.Contains(factory.GetService<AppOptions>().Password.RequiredLength.ToString(), error, StringComparison.Ordinal);
 
         Assert.True(await PasswordWorksAsync(factory, victim.Id, TestUsers.Password), "被拒绝的重置不能误伤原密码");
         Assert.False(await PasswordWorksAsync(factory, victim.Id, "1qaz2ws"));

@@ -129,7 +129,7 @@ public sealed class AdminOperationController(
             RemovedByPattern = await cacheService.RemoveByPatternsAsync(request.Patterns).ConfigureAwait(false),
         };
 
-        return Success<CacheInvalidationResult>("Cache invalidation succeeded", result, ServerKeys.ServerAdminCacheInvalidationSucceed);
+        return Success("Cache invalidation succeeded", result, ServerKeys.ServerAdminCacheInvalidationSucceed);
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public sealed class AdminOperationController(
     public IActionResult ListCacheKeys([FromQuery] string pattern = "*", [FromQuery] int limit = 500)
     {
         List<string> keys = cacheService.ListKeys(pattern, limit);
-        return Success<List<string>>("Cache keys acquired successfully", keys, ServerKeys.ServerAdminCacheKeysSucceed);
+        return Success("Cache keys acquired successfully", keys, ServerKeys.ServerAdminCacheKeysSucceed);
     }
 
     /// <summary>
@@ -165,7 +165,7 @@ public sealed class AdminOperationController(
 
         YaeBucketDecoder.Result result = await yaeMetadataService.SyncAsync(forced, token).ConfigureAwait(false);
         return result.Succeeded
-            ? Success<YaeBucketDecoder.Result>($"Yae metadata synced for game version {result.Version}", result)
+            ? Success($"Yae metadata synced for game version {result.Version}", result)
             : Fail(result.Error!, ReturnCode.InternalStateException);
     }
 
@@ -178,7 +178,7 @@ public sealed class AdminOperationController(
     public async Task<IActionResult> YaeMetadataListAsync(CancellationToken token)
     {
         List<YaeMetadataService.Summary> items = await yaeMetadataService.ListAsync(token).ConfigureAwait(false);
-        return Success<List<YaeMetadataService.Summary>>("Yae metadata list acquired successfully", items);
+        return Success("Yae metadata list acquired successfully", items);
     }
 
     /// <summary>

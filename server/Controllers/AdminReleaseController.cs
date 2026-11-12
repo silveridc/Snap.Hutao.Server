@@ -20,7 +20,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     public async Task<IActionResult> ReleaseCurrentAsync()
     {
         HutaoReleaseItem? release = await releaseService.GetCurrentAsync().ConfigureAwait(false);
-        return Success<HutaoReleaseItem?>("Current release retrieved successfully", release, ServerKeys.ServerAdminReleaseCurrentSucceed);
+        return Success("Current release retrieved successfully", release, ServerKeys.ServerAdminReleaseCurrentSucceed);
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
     public async Task<IActionResult> ReleaseListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         PagedResult<HutaoReleaseItem> result = await releaseService.GetListAsync(page, pageSize).ConfigureAwait(false);
-        return Success<PagedResult<HutaoReleaseItem>>("Release history retrieved successfully", result, ServerKeys.ServerAdminReleaseListSucceed);
+        return Success("Release history retrieved successfully", result, ServerKeys.ServerAdminReleaseListSucceed);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
             .ConfigureAwait(false);
 
         return success
-            ? Success<HutaoReleaseItem>(message, release!, localizationKey!)
+            ? Success(message, release!, localizationKey!)
             : localizationKey is null
                 ? Fail(message, ReturnCode.InvalidUploadData)
                 : Fail(message, ReturnCode.InvalidUploadData, localizationKey);
@@ -119,7 +119,7 @@ public sealed class AdminReleaseController(ReleaseService releaseService, Releas
             .ConfigureAwait(false);
 
         return success
-            ? Success<HutaoReleaseItem>(message, release!, localizationKey!)
+            ? Success(message, release!, localizationKey!)
             : localizationKey is null
                 ? Fail(message, ReturnCode.InvalidUploadData)
                 : Fail(message, ReturnCode.InvalidUploadData, localizationKey);

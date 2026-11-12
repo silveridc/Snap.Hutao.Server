@@ -59,18 +59,16 @@ public sealed class EnkaController(IHttpClientFactory httpClientFactory, IDistri
 
         HttpClient httpClient = httpClientFactory.CreateClient(nameof(EnkaController));
         using HttpRequestMessage request = new(HttpMethod.Get, url);
-        request.Headers.TryAddWithoutValidation("User-Agent", "SnapHutaoSelfHost/1.0");
+        request.Headers.TryAddWithoutValidation("User-Agent", $"Snap.Hutao.Rev/{Program.applicationVersion}");
 
         using HttpResponseMessage response = await httpClient.SendAsync(request, token).ConfigureAwait(false);
         string body = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
 
-        // 仅缓存成功响应，避免把错误（限流、404 等）写入缓存
         if (response.IsSuccessStatusCode && !string.IsNullOrEmpty(body))
         {
             await cache.SetStringAsync(cacheKey, body, CacheOptions, token).ConfigureAwait(false);
         }
 
-        // 透传 enka 的状态码与 JSON 内容，让客户端沿用其既有错误处理
         return new ContentResult
         {
             StatusCode = (int)response.StatusCode,

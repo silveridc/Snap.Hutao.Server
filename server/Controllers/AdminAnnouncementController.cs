@@ -35,8 +35,10 @@ public sealed class AdminAnnouncementController(AnnouncementService announcement
     [HttpGet("announcements")]
     public async Task<IActionResult> AnnouncementListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
-        PagedResult<EntityAnnouncement> result = await announcementService.GetAllAsync(page, pageSize).ConfigureAwait(false);
-        return Success<PagedResult<EntityAnnouncement>>("Announcement list acquired successfully", result, ServerKeys.ServerAdminAnnouncementListSucceed);
+        return Success(
+            "Announcement list acquired successfully",
+            await announcementService.GetAllAsync(page, pageSize).ConfigureAwait(false),
+            ServerKeys.ServerAdminAnnouncementListSucceed);
     }
 
     /// <summary>

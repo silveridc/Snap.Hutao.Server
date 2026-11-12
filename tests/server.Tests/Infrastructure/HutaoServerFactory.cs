@@ -192,7 +192,9 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         string rsaKeyPath = Path.Combine(AppContext.BaseDirectory, "privkey.key");
 
         builder.UseEnvironment("Development");
-        builder.UseSetting("ConnectionStrings:PrimaryMysql8", connectionString);
+        // Program.cs 用的是 DefaultMysqlConnection；设成别的键会让测试悄悄连到开发库，
+        // ResetDatabaseAsync 清的却是 TestEnvironment 里的测试库，跨轮数据越积越多
+        builder.UseSetting("ConnectionStrings:DefaultMysqlConnection", connectionString);
         builder.UseSetting("ConnectionStrings:DefaultRedisConnection", $"127.0.0.1:{RedisPort}");
         builder.UseSetting("App:Socket:Status", "false");
 
@@ -213,8 +215,8 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
 
         // appsettings.json 里 CDN 调度服务地址为空，相对地址会让 HttpClient 直接抛异常；
         // 给一个专用域名，配合下面的桩覆盖 /Distribution/* 的成功分支
-        builder.UseSetting("App:CdnEndpoint", "https://hutao-cdn.test");
-        builder.UseSetting("App:CdnToken", "test-cdn-token");
+        builder.UseSetting("App:Cdn:Endpoint", "https://hutao-cdn.test");
+        builder.UseSetting("App:Cdn:Token", "test-cdn-token");
 
         builder.ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
 

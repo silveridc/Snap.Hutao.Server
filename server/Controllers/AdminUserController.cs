@@ -25,7 +25,7 @@ public sealed class AdminUserController(
     public async Task<IActionResult> UserStatisticsAsync()
     {
         UserStatistics statistics = await userAdminService.GetStatisticsAsync().ConfigureAwait(false);
-        return Success<UserStatistics>("User statistics acquired successfully", statistics, ServerKeys.ServerAdminUserStatisticsSucceed);
+        return Success("User statistics acquired successfully", statistics, ServerKeys.ServerAdminUserStatisticsSucceed);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public sealed class AdminUserController(
     public async Task<IActionResult> UserListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? keyword = null, [FromQuery] bool? maintainer = null, [FromQuery] bool? developer = null, [FromQuery] int? expiringInDays = null)
     {
         PagedResult<UserListItem> result = await userAdminService.GetUsersAsync(page, pageSize, keyword, maintainer, developer, expiringInDays).ConfigureAwait(false);
-        return Success<PagedResult<UserListItem>>("User list acquired successfully", result, ServerKeys.ServerAdminUserListSucceed);
+        return Success("User list acquired successfully", result, ServerKeys.ServerAdminUserListSucceed);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public sealed class AdminUserController(
         UserDetail? detail = await adminQueryService.GetUserDetailAsync(userId).ConfigureAwait(false);
         return detail is null
             ? Fail("User does not exist", ReturnCode.UserNameNotExists, ServerKeys.ServerAdminUserNotFound)
-            : Success<UserDetail>("User details retrieved successfully", detail, ServerKeys.ServerAdminUserDetailSucceed);
+            : Success("User details retrieved successfully", detail, ServerKeys.ServerAdminUserDetailSucceed);
     }
 
     /// <summary>
@@ -70,14 +70,11 @@ public sealed class AdminUserController(
     {
         request.UserId = userId;
 
-        // 防止维护者误将自己降级导致失去后台权限
         if (this.TryGetUserId(out int currentUserId) && request.UserId == currentUserId && request.IsMaintainer is false)
         {
             return Fail("You cannot revoke your own maintainer privilege", ReturnCode.ServiceKeyInvalid, ServerKeys.ServerAdminCannotRevokeOwnMaintainer);
         }
 
-        // appsettings.json 里配置的默认管理员由服务端兜底保护，任何维护者都不能降级它，
-        // 否则后台权限可能被一次性摘干净、再也无法恢复
         if (appOptions.DefaultAdminUserId > 0 && request.UserId == appOptions.DefaultAdminUserId && request.IsMaintainer is false)
         {
             return Fail("The default administrator cannot be demoted", ReturnCode.ServiceKeyInvalid, ServerKeys.ServerAdminCannotDemoteDefaultAdmin);
@@ -124,7 +121,7 @@ public sealed class AdminUserController(
     public async Task<IActionResult> BanListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? keyword = null)
     {
         PagedResult<BanItem> result = await banService.GetBannedAsync(page, pageSize, keyword).ConfigureAwait(false);
-        return Success<PagedResult<BanItem>>("Ban list acquired successfully", result, ServerKeys.ServerAdminBanListSucceed);
+        return Success("Ban list acquired successfully", result, ServerKeys.ServerAdminBanListSucceed);
     }
 
     /// <summary>
@@ -170,7 +167,7 @@ public sealed class AdminUserController(
     public async Task<IActionResult> BanBatchAddAsync([FromBody] BatchUidRequest request)
     {
         int added = await banService.BatchBanAsync(request.Uids, request.Reason).ConfigureAwait(false);
-        return Success<int>($"Banned {added} additional Uids", added);
+        return Success($"Banned {added} additional Uids", added);
     }
 
     /// <summary>
@@ -184,7 +181,7 @@ public sealed class AdminUserController(
     public async Task<IActionResult> InvalidGachaUidListAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? keyword = null)
     {
         PagedResult<string> result = await adminQueryService.GetInvalidGachaUidsAsync(page, pageSize, keyword).ConfigureAwait(false);
-        return Success<PagedResult<string>>("Invalid gacha Uid list acquired successfully", result, ServerKeys.ServerAdminInvalidGachaUidListSucceed);
+        return Success("Invalid gacha Uid list acquired successfully", result, ServerKeys.ServerAdminInvalidGachaUidListSucceed);
     }
 
     /// <summary>
