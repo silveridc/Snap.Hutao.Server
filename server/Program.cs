@@ -17,9 +17,11 @@ using StackExchange.Redis;
 
 namespace server;
 
+[SuppressMessage("", "SA1401")]
 public static class Program
 {
     public const string applicationVersion = "server@v1.0.5";
+    public static string AppResourcesPath = Path.Combine(AppContext.BaseDirectory, "Resources");
     private static ILogger? _logger;
 
     public static async Task Main(string[] args)

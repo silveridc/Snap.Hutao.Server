@@ -17,7 +17,7 @@ public sealed class AppOptions
 
     public ReCaptchaOptions ReCaptcha { get; set; } = default!;
 
-    public string RSAPrivateKey { get; set; } = default!;
+    public string RSAPrivateKey { get; set; } = Path.Combine(Program.AppResourcesPath, "privkey.key");
 
     public CdnOptions Cdn { get; set; } = new();
 
@@ -25,7 +25,7 @@ public sealed class AppOptions
 
     public int DefaultAdminUserId { get; set; } = 1!;
 
-    public SocketOptions Socket { get; set; } = default!;
+    public SocketOptions Socket { get; set; } = new();
 
     public AppPasswordOptions Password { get; set; } = new();
 

@@ -74,7 +74,7 @@
 		<Folder Include="Resources\Assets\" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="privkey.key">
+	  <None Update="Resources\privkey.key">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
