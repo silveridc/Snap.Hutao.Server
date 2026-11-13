@@ -304,10 +304,10 @@ public sealed class HutaoServerFactory : WebApplicationFactory<server.Models.Con
         {
             IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
             AppOptions options = configuration.GetSection("App").Get<AppOptions>()!;
-            options.OAuthStateEncryptKey = new byte[32];
-            for (int i = 0; i < options.OAuthStateEncryptKey.Length; i++)
+            options.Encrypt.OAuthStateEncrypt = new byte[32];
+            for (int i = 0; i < options.Encrypt.OAuthStateEncrypt.Length; i++)
             {
-                options.OAuthStateEncryptKey[i] = (byte)(i * 7 + 1);
+                options.Encrypt.OAuthStateEncrypt[i] = (byte)(i * 7 + 1);
             }
 
             return options;

@@ -14,7 +14,7 @@ public sealed class PassportService(UserManager<HutaoUser> userManager, AppDbCon
     private const int _refreshTokenExpirationDays = 30;
 
     private readonly SymmetricSecurityKey _jwtSigningKey = appOptions.GetJwtSecurityKey();
-    private readonly string _rsaPrivateKeyPath = appOptions.RSAPrivateKey;
+    private readonly string _rsaPrivateKeyPath = appOptions.Encrypt.RSAPrivateKey;
 
     public string Decrypt(string source)
     {

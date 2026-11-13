@@ -31,7 +31,7 @@
 
 	<ItemGroup>
 		<!-- 与被测项目一致：RSA 私钥用于解密客户端提交的用户名与密码 -->
-		<None Include="..\..\server\privkey.key" Link="privkey.key" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="..\..\server\Resources\privkey.key" Link="privkey.key" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 </Project>

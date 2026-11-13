@@ -18,6 +18,7 @@ using StackExchange.Redis;
 namespace server;
 
 [SuppressMessage("", "SA1401")]
+[SuppressMessage("", "CA2211")]
 public static class Program
 {
     public const string applicationVersion = "server@v1.0.5";

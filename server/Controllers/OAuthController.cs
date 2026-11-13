@@ -121,7 +121,7 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
     private string EncryptState(string state)
     {
         using Aes aes = Aes.Create();
-        aes.Key = appOptions.OAuthStateEncryptKey;
+        aes.Key = appOptions.Encrypt.OAuthStateEncrypt;
         aes.IV = new byte[16];
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.PKCS7;
@@ -152,7 +152,7 @@ public class OAuthController(IServiceProvider serviceProvider, AppDbContext appD
         try
         {
             using Aes aes = Aes.Create();
-            aes.Key = appOptions.OAuthStateEncryptKey;
+            aes.Key = appOptions.Encrypt.OAuthStateEncrypt;
             aes.IV = new byte[16];
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;

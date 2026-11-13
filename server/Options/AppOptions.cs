@@ -13,17 +13,15 @@ public sealed class AppOptions
     public required string OtlpLogsEndpoint { get; set; } = default!;
     #endregion
 
-    public JwtOptions Jwt { get; set; } = new();
+    public int DefaultAdminUserId { get; set; } = 1!;
+
+    public EncryptOptions Encrypt { get; set; } = new();
 
     public ReCaptchaOptions ReCaptcha { get; set; } = default!;
 
-    public string RSAPrivateKey { get; set; } = Path.Combine(Program.AppResourcesPath, "privkey.key");
+    public JwtOptions Jwt { get; set; } = new();
 
     public CdnOptions Cdn { get; set; } = new();
-
-    public byte[] OAuthStateEncryptKey { get; set; } = default!;
-
-    public int DefaultAdminUserId { get; set; } = 1!;
 
     public SocketOptions Socket { get; set; } = new();
 

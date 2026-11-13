@@ -294,3 +294,4 @@ appsettings.Production.json
 appsettings.Development.json
 privkey.*
 artifacts/
+appsettings.json
